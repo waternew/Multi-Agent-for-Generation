@@ -199,6 +199,7 @@ metagpt/ext/sela/results/*
 metagpt/ext/aflow/data
 metagpt/ext/aflow/scripts/optimized
 
-config/config.yaml
-config/config2.yaml
+*config.yaml
+*config2.yaml
+*config2.example.yaml
 workspace/
