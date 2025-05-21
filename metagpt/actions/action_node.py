@@ -18,7 +18,8 @@ from pydantic import BaseModel, Field, create_model, model_validator
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 from metagpt.actions.action_outcls_registry import register_action_outcls
-from metagpt.const import MARKDOWN_TITLE_PREFIX, USE_CONFIG_TIMEOUT
+from metagpt.const import MARKDOWN_TITLE_PREFIX, USE_CONFIG_TIMEOUT, METAGPT_ROOT
+print('METAGPT_ROOT', METAGPT_ROOT)
 from metagpt.exp_pool import exp_cache
 from metagpt.exp_pool.serializers import ActionNodeSerializer
 from metagpt.llm import BaseLLM

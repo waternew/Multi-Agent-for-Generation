@@ -10,6 +10,10 @@ async def main(requirement: str = ""):
 
 
 if __name__ == "__main__":
+    # print("1111111111111111")
+    # print("EXAMPLE_DATA_PATH", EXAMPLE_DATA_PATH)
+    # print("DEFAULT_WORKSPACE_ROOT", DEFAULT_WORKSPACE_ROOT)
+    # raise
     image_path = EXAMPLE_DATA_PATH / "di/dog.jpg"
     save_path = DEFAULT_WORKSPACE_ROOT / "image_rm_bg.png"
     requirement = f"This is a image, you need to use python toolkit rembg to remove the background of the image and save the result. image path:{image_path}; save path:{save_path}."

@@ -6,6 +6,7 @@ Author: garylin2099
 import asyncio
 import re
 import subprocess
+import sys
 
 import fire
 
@@ -18,6 +19,7 @@ from metagpt.schema import Message
 class SimpleWriteCode(Action):
     PROMPT_TEMPLATE: str = """
     Write a python function that can {instruction} and provide two runnable test cases.
+    The code should be executable directly, including both function definition and test cases.
     Return ```python your_code_here ``` with NO other texts,
     your code:
     """
@@ -28,9 +30,13 @@ class SimpleWriteCode(Action):
         prompt = self.PROMPT_TEMPLATE.format(instruction=instruction)
 
         rsp = await self._aask(prompt)
-
+        # print("7777777777777777")
+        # print("rsp", rsp)
+        # raise
         code_text = SimpleWriteCode.parse_code(rsp)
-
+        # print("8888888888888888")
+        # print("code_text", code_text)
+        # raise
         return code_text
 
     @staticmethod
@@ -45,8 +51,15 @@ class SimpleRunCode(Action):
     name: str = "SimpleRunCode"
 
     async def run(self, code_text: str):
-        result = subprocess.run(["python3", "-c", code_text], capture_output=True, text=True)
+        # 使用 sys.executable 来获取当前 Python 解释器的路径
+        python_cmd = sys.executable
+        # print("9999999999999999")
+        # print("python_cmd", python_cmd)
+        # raise
+        result = subprocess.run([python_cmd, "-c", code_text], capture_output=True, text=True)
         code_result = result.stdout
+        if result.stderr:
+            logger.error(f"Error: {result.stderr}")
         logger.info(f"{code_result=}")
         return code_result
 
@@ -88,7 +101,15 @@ class RunnableCoder(Role):
         msg = self.get_memories(k=1)[0]  # find the most k recent messages
         result = await todo.run(msg.content)
 
+        # print("1010101010101010")
+        # print("result", result)
+
         msg = Message(content=result, role=self.profile, cause_by=type(todo))
+
+        # print("11`11`11`11`11`11`11`11")
+        # print("msg", msg)
+        # raise
+
         self.rc.memory.add(msg)
         return msg
 

@@ -167,7 +167,9 @@ class Environment(ExtEnv):
         """
         for role in roles:
             self.roles[role.name] = role
-
+        # print("5555555555555555")
+        # print("roles", roles)
+        # raise
         for role in roles:  # setup system message with roles
             role.context = self.context
             role.set_env(self)
@@ -220,6 +222,11 @@ class Environment(ExtEnv):
         """获得环境内的指定角色
         get all the environment roles
         """
+        # print("3333333333333333")
+        # print("name", name)
+        # print("self.roles", self.roles)
+        # print("self.roles.get(name, None)", self.roles.get(name, None))
+        # raise
         return self.roles.get(name, None)
 
     def role_names(self) -> list[str]:

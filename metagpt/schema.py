@@ -50,7 +50,7 @@ from metagpt.const import (
 )
 from metagpt.logs import logger
 from metagpt.repo_parser import DotClassInfo
-from metagpt.tools.tool_registry import register_tool
+from metagpt.tools import register_tool
 from metagpt.utils.common import (
     CodeParser,
     any_to_str,

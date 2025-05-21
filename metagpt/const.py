@@ -11,9 +11,13 @@ import metagpt
 
 def get_metagpt_package_root():
     """Get the root directory of the installed package."""
-    package_root = Path(metagpt.__file__).parent.parent
-    logger.info(f"Package root set to {str(package_root)}")
-    return package_root
+    try:
+        package_root = Path(metagpt.__file__).parent.parent
+        logger.info(f"Package root set to {str(package_root)}")
+        return package_root
+    except Exception as e:
+        logger.error(f"Error getting package root: {e}")
+        return Path.cwd()
 
 
 def get_metagpt_root():
@@ -23,15 +27,17 @@ def get_metagpt_root():
     if project_root_env:
         project_root = Path(project_root_env)
         logger.info(f"PROJECT_ROOT set from environment variable to {str(project_root)}")
+        return project_root
+    
+    # Fallback to package root if no environment variable is set
+    project_root = get_metagpt_package_root()
+    for i in (".git", ".project_root", ".gitignore"):
+        if (project_root / i).exists():
+            break
     else:
-        # Fallback to package root if no environment variable is set
-        project_root = get_metagpt_package_root()
-        for i in (".git", ".project_root", ".gitignore"):
-            if (project_root / i).exists():
-                break
-        else:
-            project_root = Path.cwd()
-
+        project_root = Path.cwd()
+    
+    logger.info(f"Project root set to {str(project_root)}")
     return project_root
 
 
@@ -158,7 +164,8 @@ SWE_SETUP_PATH = get_metagpt_package_root() / "metagpt/tools/swe_agent_commands/
 EXPERIENCE_MASK = "<experience>"
 
 # TeamLeader's name
-TEAMLEADER_NAME = "Mike"
+# TEAMLEADER_NAME = "Mike"
+TEAMLEADER_NAME = "Alice"
 
 DEFAULT_MIN_TOKEN_COUNT = 10000
 DEFAULT_MAX_TOKEN_COUNT = 100000000

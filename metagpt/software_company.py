@@ -6,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from metagpt.const import CONFIG_ROOT
+from metagpt.const import CONFIG_ROOT, METAGPT_ROOT
 
 app = typer.Typer(add_completion=False, pretty_exceptions_show_locals=False)
 
@@ -154,4 +154,7 @@ def copy_config_to():
 
 
 if __name__ == "__main__":
+    # print('CONFIG_ROOT', CONFIG_ROOT)
+    # print('METAGPT_ROOT', METAGPT_ROOT)
+
     app()

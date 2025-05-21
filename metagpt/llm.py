@@ -15,6 +15,15 @@ from metagpt.provider.base_llm import BaseLLM
 def LLM(llm_config: Optional[LLMConfig] = None, context: Context = None) -> BaseLLM:
     """get the default llm provider if name is None"""
     ctx = context or Context()
+    print('context', context)
+    print('Context()', Context())
+    print('========= llm_config =========')
+    print('llm_config', llm_config)
+    print('========= llm_config =========')
+
     if llm_config is not None:
+        print('llm_config is not None')
         return ctx.llm_with_cost_manager_from_llm_config(llm_config)
+    print('llm_config is None')
+
     return ctx.llm()

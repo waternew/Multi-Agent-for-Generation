@@ -98,6 +98,10 @@ class Action(SerializationMixin, ContextMixin, BaseModel):
 
     async def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
         """Append default prefix"""
+        # print("6666666666666666")
+        # print('prompt', prompt)
+        # print('system_msgs', system_msgs)
+        # raise
         return await self.llm.aask(prompt, system_msgs)
 
     async def _run_action_node(self, *args, **kwargs):

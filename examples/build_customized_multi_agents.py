@@ -4,14 +4,17 @@ Created Date: Wednesday, November 15th 2023, 7:12:39 pm
 Author: garylin2099
 """
 import re
-
+import sys
 import fire
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from metagpt.actions import Action, UserRequirement
 from metagpt.logs import logger
 from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.team import Team
+from metagpt.const import TEAMLEADER_NAME
 
 
 def parse_code(rsp):
@@ -24,6 +27,7 @@ def parse_code(rsp):
 class SimpleWriteCode(Action):
     PROMPT_TEMPLATE: str = """
     Write a python function that can {instruction}.
+    The code should be executable directly, including both function definition and test cases.
     Return ```python your_code_here ``` with NO other texts,
     your code:
     """
@@ -76,8 +80,8 @@ class SimpleTester(Role):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.set_actions([SimpleWriteTest])
-        # self._watch([SimpleWriteCode])
-        self._watch([SimpleWriteCode, SimpleWriteReview])  # feel free to try this too
+        self._watch([SimpleWriteCode])
+        # self._watch([SimpleWriteCode, SimpleWriteReview])  # feel free to try this too
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
@@ -118,6 +122,15 @@ class SimpleReviewer(Role):
         self._watch([SimpleWriteTest])
 
 
+# class TeamLeader(Role):
+#     name: str = TEAMLEADER_NAME
+#     profile: str = "TeamLeader"
+
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self._watch([UserRequirement])
+
+
 async def main(
     idea: str = "write a function that calculates the product of a list",
     investment: float = 3.0,
@@ -129,6 +142,7 @@ async def main(
     team = Team()
     team.hire(
         [
+            # TeamLeader(),  # 添加团队领导者
             SimpleCoder(),
             SimpleTester(),
             SimpleReviewer(is_human=add_human),

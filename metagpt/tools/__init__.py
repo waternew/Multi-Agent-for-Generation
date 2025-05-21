@@ -7,7 +7,7 @@
 """
 
 from metagpt.tools import libs  # this registers all tools
-from metagpt.tools.tool_registry import TOOL_REGISTRY
+from metagpt.tools.tool_registry import TOOL_REGISTRY, register_tool
 from metagpt.configs.search_config import SearchEngineType
 from metagpt.configs.browser_config import WebBrowserEngineType
 
@@ -20,4 +20,4 @@ class SearchInterface:
         ...
 
 
-__all__ = ["SearchEngineType", "WebBrowserEngineType", "TOOL_REGISTRY"]
+__all__ = ["SearchEngineType", "WebBrowserEngineType", "TOOL_REGISTRY", "register_tool"]

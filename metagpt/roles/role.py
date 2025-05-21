@@ -513,13 +513,16 @@ class Role(BaseRole, SerializationMixin, ContextMixin, BaseModel):
         """Entry to one of three strategies by which Role reacts to the observed Message"""
         if self.rc.react_mode == RoleReactMode.REACT or self.rc.react_mode == RoleReactMode.BY_ORDER:
             rsp = await self._react()
+            # print("1111111111111111")
         elif self.rc.react_mode == RoleReactMode.PLAN_AND_ACT:
             rsp = await self._plan_and_act()
+            # print("2222222222222222")
         else:
             raise ValueError(f"Unsupported react mode: {self.rc.react_mode}")
         self._set_state(state=-1)  # current reaction is complete, reset state to -1 and todo back to None
         if isinstance(rsp, AIMessage):
             rsp.with_agent(self._setting)
+        # print("3333333333333333")
         return rsp
 
     def get_memories(self, k=0) -> list[Message]:
@@ -546,6 +549,8 @@ class Role(BaseRole, SerializationMixin, ContextMixin, BaseModel):
             return
 
         rsp = await self.react()
+        # print("5555555555555555")
+        # print('rsp', rsp)
 
         # Reset the next action to be taken.
         self.set_todo(None)

@@ -24,8 +24,13 @@ class MGXEnv(Environment, SerializationMixin):
     def publish_message(self, message: Message, user_defined_recipient: str = "", publicer: str = "") -> bool:
         """let the team leader take over message publishing"""
         message = self.attach_images(message)  # for multi-modal message
+        # print("1111111111111111")
+        # print("TEAMLEADER_NAME", TEAMLEADER_NAME)
 
         tl = self.get_role(TEAMLEADER_NAME)  # TeamLeader's name is Mike
+        # print("2222222222222222")
+        # print("tl", tl)
+        # raise
 
         if user_defined_recipient:
             # human user's direct chat message to a certain role
