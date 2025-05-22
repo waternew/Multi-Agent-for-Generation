@@ -20,6 +20,37 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.team import Team
 
+def upload_to_imgur(image_path: str) -> str:
+    """上传图片到imgur并返回URL"""
+    try:
+        # 读取图片文件
+        with open(image_path, 'rb') as image_file:
+            # 准备请求头
+            headers = {
+                'Authorization': 'Client-ID YOUR_IMGUR_CLIENT_ID'  # 需要替换为你的Imgur Client ID
+            }
+            
+            # 准备文件数据
+            files = {
+                'image': image_file
+            }
+            
+            # 发送POST请求到Imgur API
+            response = requests.post(
+                'https://api.imgur.com/3/image',
+                headers=headers,
+                files=files
+            )
+            
+            # 检查响应
+            if response.status_code == 200:
+                data = response.json()
+                return data['data']['link']
+            else:
+                raise Exception(f"Upload failed with status code: {response.status_code}")
+    except Exception as e:
+        logger.error(f"Failed to upload image: {str(e)}")
+        raise
 
 class UsabilityAction(Action):
     PROMPT_TEMPLATE: str = """
@@ -226,15 +257,22 @@ class SummaryAgent(Role):
 
 async def main(
         idea: str = "",
-        image_url: str = "",
+        image_path: str = "",
         save_path: str = "",
         investment: float = 15.0,
         n_round: int = 1,
         add_human: bool = False,
 ):
+    # 上传图片并获取URL
+    try:
+        image_url = upload_to_imgur(image_path)
+        logger.info(f"Image uploaded successfully, URL: {image_url}")
+    except Exception as e:
+        logger.error(f"Failed to upload image: {str(e)}")
+        raise
 
     logger.info(idea)
-    logger.info(f"Image loaded from: {image_url}")
+    logger.info(f"Image loaded from: {image_path}")
     logger.info(f"Results will be saved to: {save_path}")
 
     team = Team()
@@ -255,9 +293,9 @@ if __name__ == "__main__":
     save_dir = DEFAULT_WORKSPACE_ROOT / "urban_design"
     os.makedirs(save_dir, exist_ok=True)
 
-    image_url = "https://ik.imagekit.io/waternew/urban_design/1_image_compressed.jpg?updatedAt=1747918878237"
+    image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_image_compressed.jpg"
     save_path = str(save_dir / f"2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
 
     idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
-    asyncio.run(main(idea=idea, image_url=image_url, save_path=save_path))
+    asyncio.run(main(idea=idea, image_path=image_path, save_path=save_path))

@@ -1,19 +1,19 @@
-import os
 import asyncio
 import sys
 import fire
 import base64
 from io import BytesIO
+
 import datetime
+
 import cv2
 import numpy as np
 from PIL import Image
 import json
-import requests
-from pathlib import Path
 
 from metagpt.const import METAGPT_ROOT, DEFAULT_WORKSPACE_ROOT
 from metagpt.roles.di.data_interpreter import DataInterpreter
+
 from metagpt.actions import Action, UserRequirement
 from metagpt.logs import logger
 from metagpt.roles import Role
@@ -21,22 +21,30 @@ from metagpt.schema import Message
 from metagpt.team import Team
 
 
+def image_to_base64(image: Image.Image, max_size: int = 800) -> str:
+    """将PIL Image转换为base64字符串，并限制图片大小"""
+    # 调整图片大小
+    if max(image.size) > max_size:
+        ratio = max_size / max(image.size)
+        new_size = tuple(int(dim * ratio) for dim in image.size)
+        image = image.resize(new_size, Image.Resampling.LANCZOS)
+    
+    # 转换为JPEG格式并压缩
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG", quality=85)
+    return base64.b64encode(buffered.getvalue()).decode()
+
+
 class UsabilityAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are an urban design expert. Please analyze the urban design image from the following URL and evaluate it from a usability perspective (accessibility, usability, user experience).
-    
-    Image URL: {image_url}
-    
-    Please focus on:
-    1. Accessibility features (ramps, elevators, etc.)
-    2. User experience (seating, walkways, etc.)
-    3. Overall usability of the space
+    Evaluate the urban design image from usability perspective (accessibility, usability, user experience).
+    Image: {image_url}
     
     Return JSON format:
     {{
         "UsabilityAction": {{
             "rating_score": "0-10",
-            "reason": "brief explanation",
+            "reason": "brief explanation (include how many circles and how many squares, and how many other shapes)",
             "suggestion": "brief improvement suggestion"
         }}
     }}
@@ -49,6 +57,7 @@ class UsabilityAction(Action):
         prompt = self.PROMPT_TEMPLATE.format(image_url=image_url)
         rsp = await self._aask(prompt)
         return rsp
+
 
 class UsabilityAgent(Role):
     name: str = "UsabilityAgent"
@@ -65,16 +74,11 @@ class UsabilityAgent(Role):
         rsp = await todo.run(self.image_url)
         return Message(content=rsp, role=self.profile, cause_by=type(todo))
 
+
 class VitalityAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are an urban design expert. Please analyze the urban design image from the following URL and evaluate it from a vitality perspective (urban space, landscape, culture).
-    
-    Image URL: {image_url}
-    
-    Please focus on:
-    1. Urban space utilization
-    2. Landscape features
-    3. Cultural elements
+    Evaluate the urban design image from vitality perspective (urban space, landscape, culture).
+    Image: {image_url}
     
     Return JSON format:
     {{
@@ -94,6 +98,7 @@ class VitalityAction(Action):
         rsp = await self._aask(prompt)
         return rsp
 
+
 class VitalityAgent(Role):
     name: str = "VitalityAgent"
     profile: str = "VitalityAgent"
@@ -109,16 +114,11 @@ class VitalityAgent(Role):
         rsp = await todo.run(self.image_url)
         return Message(content=rsp, role=self.profile, cause_by=type(todo))
 
+
 class SafetyAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are an urban design expert. Please analyze the urban design image from the following URL and evaluate it from a safety perspective (pedestrians, cyclists, vehicles).
-    
-    Image URL: {image_url}
-    
-    Please focus on:
-    1. Pedestrian safety
-    2. Cyclist safety
-    3. Vehicle safety
+    Evaluate the urban design image from safety perspective (pedestrians, cyclists, vehicles).
+    Image: {image_url}
     
     Return JSON format:
     {{
@@ -138,6 +138,7 @@ class SafetyAction(Action):
         rsp = await self._aask(prompt)
         return rsp
 
+
 class SafetyAgent(Role):
     name: str = "SafetyAgent"
     profile: str = "SafetyAgent"
@@ -153,36 +154,28 @@ class SafetyAgent(Role):
         rsp = await todo.run(self.image_url)
         return Message(content=rsp, role=self.profile, cause_by=type(todo))
 
+
 class SummaryAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are a summary expert. You will receive evaluation results from 3 evaluation agents.
-    First, validate if all evaluation results are valid and contain actual image analysis.
-    If any evaluation result indicates that the image was not accessible or analyzable, return an error message. Please save the error message to the file: {save_path}
+    Summarize the evaluation results from 3 evaluation agents and provide final suggestions.
+    Save to: {save_path}
     
     Evaluation results:
     {evaluation_results}
     
-    If all evaluations are valid, return JSON format:
+    Return JSON format:
     {{
         "SummaryAction": {{
             "evaluation_results": {{
-                "usability": "usability feedback from UsabilityAgent",
-                "vitality": "vitality feedback from VitalityAgent",
-                "safety": "safety feedback from SafetyAgent"
+                "usability": "usability feedback",
+                "vitality": "vitality feedback",
+                "safety": "safety feedback"
             }},
             "summary_results": {{
-                "summary": "brief summary from your own analysis",
-                "conflicts": "key conflicts from your own analysis",
-                "final_suggestion": "final improvement suggestion from your own analysis"
+                "summary": "brief summary",
+                "conflicts": "key conflicts",
+                "final_suggestion": "final improvement suggestion"
             }}
-        }}
-    }}
-    
-    If any evaluation is invalid, return JSON format:
-    {{
-        "SummaryAction": {{
-            "error": "One or more evaluations failed to analyze the image properly",
-            "invalid_evaluations": ["list of failed evaluation types"]
         }}
     }}
     
@@ -197,6 +190,7 @@ class SummaryAction(Action):
         )
         rsp = await self._aask(prompt)
         return rsp
+
 
 class SummaryAgent(Role):
     name: str = "SummaryAgent"
@@ -224,40 +218,46 @@ class SummaryAgent(Role):
 
         return finally_message
 
-async def main(
-        idea: str = "",
-        image_url: str = "",
-        save_path: str = "",
-        investment: float = 15.0,
-        n_round: int = 1,
-        add_human: bool = False,
-):
 
-    logger.info(idea)
-    logger.info(f"Image loaded from: {image_url}")
-    logger.info(f"Results will be saved to: {save_path}")
+async def main(requirement: str = ""):
 
-    team = Team()
-    team.hire(
-        [
-            UsabilityAgent(image_url=image_url),
-            VitalityAgent(image_url=image_url),
-            SafetyAgent(image_url=image_url),
-            SummaryAgent(save_path=save_path),
-        ]
-    )
+    di = DataInterpreter()
+    await di.run(requirement)
 
-    team.invest(investment=investment)
-    team.run_project(idea)
-    await team.run(n_round=n_round)
 
 if __name__ == "__main__":
-    save_dir = DEFAULT_WORKSPACE_ROOT / "urban_design"
-    os.makedirs(save_dir, exist_ok=True)
-
+    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image.png"
+    # save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_image_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
     image_url = "https://ik.imagekit.io/waternew/urban_design/1_image_compressed.jpg?updatedAt=1747918878237"
-    save_path = str(save_dir / f"2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_image_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
 
-    idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
+    requirement = f"This is an urban design image, image path:{image_url}. Fisrt, you need to evaluate it from 3 perspectives (Usability, Vitality, Safety) to give specific evaluation of the image. Second, you need to give a suggestion for improvement, and save the suggestion to the path:{save_path}."
 
-    asyncio.run(main(idea=idea, image_url=image_url, save_path=save_path))
+    asyncio.run(main(requirement=requirement))
+
+
+
+
+
+
+
+
+
+
+# # without team
+# async def main(image_path: str, requirement: str):
+#     print("image_path", image_path)
+#     print("requirement", requirement)
+#     # raise
+#     di = DataInterpreter()
+#     await di.run(requirement)
+
+
+
+# # without team
+# if __name__ == "__main__":
+#     # image_path = METAGPT_ROOT / "data" / "1_image.png"
+#     image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image.png"
+#     save_path = DEFAULT_WORKSPACE_ROOT / "urban_design" / "1_image_improved.png"
+#     # requirement = f"This is the path of an urban design image:{image_path}. You need to hire 3 evaluation agents to give specific evaluation of the image, and 1 summary agent to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement. Specifically, first, you need to hire 1 agent to evaluate the image from the usability of urban design, 1 agent to evaluate the image from the vitality of urban design, and 1 agent to evaluate the image from the safety of urban design. Second, every agent should give a rating score between 0 and 10, and give a detailed explanation of the rating score, then give a suggestion for improvement. Third, you need to hire 1 agent to give a summary of the evaluation results, find the conflicts and unify their suggestions and give a final suggestion for improvement, and generate a new urban design image based on the final suggestion for improvement and save the image to the path:{save_path}."
+#     # asyncio.run(main(image_path, requirement))
