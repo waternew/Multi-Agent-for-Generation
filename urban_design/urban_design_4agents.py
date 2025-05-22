@@ -1,3 +1,4 @@
+import os
 import asyncio
 import sys
 import fire
@@ -29,22 +30,36 @@ def image_to_base64(image: Image.Image, max_size: int = 800) -> str:
         new_size = tuple(int(dim * ratio) for dim in image.size)
         image = image.resize(new_size, Image.Resampling.LANCZOS)
     
+    # print("image.size", image.size)
+
     # 转换为JPEG格式并压缩
     buffered = BytesIO()
     image.save(buffered, format="JPEG", quality=85)
-    return base64.b64encode(buffered.getvalue()).decode()
+    # print("buffered.getvalue()", buffered.getvalue())
+    # print("type(buffered.getvalue())", type(buffered.getvalue())) # <class 'bytes'>
+
+    # 将图片转换为base64格式
+    base64_str = base64.b64encode(buffered.getvalue()).decode()
+
+    # print("base64_str", base64_str)
+    # print("type(base64_str)", type(base64_str)) # <class 'str'>
+    # raise
+
+    return f"data:image/jpeg;base64,{base64_str}"
 
 
 class UsabilityAction(Action):
     PROMPT_TEMPLATE: str = """
-    Evaluate the urban design image from usability perspective (accessibility, usability, user experience).
-    Image: {image_base64}
+    You are an urban design expert. You will receive an image in base64 format. Please analyze the image and evaluate it from a usability perspective (accessibility, usability, user experience).
+    
+    The image is provided in base64 format. You should be able to see and analyze it.
+    The image is provided in the following format: data:image/jpeg;base64,{image_base64}
     
     Return JSON format:
     {{
         "UsabilityAction": {{
             "rating_score": "0-10",
-            "reason": "brief explanation (include how many circles and how many squares, and how many other shapes)",
+            "reason": "brief explanation",
             "suggestion": "brief improvement suggestion"
         }}
     }}
@@ -77,8 +92,10 @@ class UsabilityAgent(Role):
 
 class VitalityAction(Action):
     PROMPT_TEMPLATE: str = """
-    Evaluate the urban design image from vitality perspective (urban space, landscape, culture).
-    Image: {image_base64}
+    You are an urban design expert. You will receive an image in base64 format. Please analyze the image and evaluate it from a vitality perspective (urban space, landscape, culture).
+    
+    The image is provided in base64 format. You should be able to see and analyze it.
+    The image is provided in the following format: data:image/jpeg;base64,{image_base64}
     
     Return JSON format:
     {{
@@ -117,8 +134,10 @@ class VitalityAgent(Role):
 
 class SafetyAction(Action):
     PROMPT_TEMPLATE: str = """
-    Evaluate the urban design image from safety perspective (pedestrians, cyclists, vehicles).
-    Image: {image_base64}
+    You are an urban design expert. You will receive an image in base64 format. Please analyze the image and evaluate it from a safety perspective (pedestrians, cyclists, vehicles).
+    
+    The image is provided in base64 format. You should be able to see and analyze it.
+    The image is provided in the following format: data:image/jpeg;base64,{image_base64}
     
     Return JSON format:
     {{
@@ -157,25 +176,34 @@ class SafetyAgent(Role):
 
 class SummaryAction(Action):
     PROMPT_TEMPLATE: str = """
-    Summarize the evaluation results from 3 evaluation agents and provide final suggestions.
-    Save to: {save_path}
+    You are a summary expert. You will receive evaluation results from 3 evaluation agents.
+    First, validate if all evaluation results are valid and contain actual image analysis.
+    If any evaluation result indicates that the image was not accessible or analyzable, return an error message. Please save the error message to the file: {save_path}
     
     Evaluation results:
     {evaluation_results}
     
-    Return JSON format:
+    If all evaluations are valid, return JSON format:
     {{
         "SummaryAction": {{
             "evaluation_results": {{
-                "usability": "usability feedback",
-                "vitality": "vitality feedback",
-                "safety": "safety feedback"
+                "usability": "usability feedback from UsabilityAgent",
+                "vitality": "vitality feedback from VitalityAgent",
+                "safety": "safety feedback from SafetyAgent"
             }},
             "summary_results": {{
-                "summary": "brief summary",
-                "conflicts": "key conflicts",
-                "final_suggestion": "final improvement suggestion"
+                "summary": "brief summary from your own analysis",
+                "conflicts": "key conflicts from your own analysis",
+                "final_suggestion": "final improvement suggestion from your own analysis"
             }}
+        }}
+    }}
+    
+    If any evaluation is invalid, return JSON format:
+    {{
+        "SummaryAction": {{
+            "error": "One or more evaluations failed to analyze the image properly",
+            "invalid_evaluations": ["list of failed evaluation types"]
         }}
     }}
     
@@ -219,21 +247,31 @@ class SummaryAgent(Role):
         return finally_message
 
 
+
+def encode_image(image_path: str):
+    with open(image_path, "rb") as image_file:
+        # print("type(image_file.read())", type(image_file.read()))
+        # raise
+        image_base64 = base64.b64encode(image_file.read()).decode('utf-8')  # 使用优化后的图片转换函数
+    return image_base64
+
+
+
 async def main(
         idea: str = "",
         image_path: str = "",
         save_path: str = "",
-        investment: float = 5.0,
+        investment: float = 15.0,
         n_round: int = 1,
         add_human: bool = False,
 ):
     # 读取并转换图片
-    image = cv2.imread(image_path)
-    image = Image.fromarray(image)
-    image_base64 = image_to_base64(image)  # 使用优化后的图片转换函数
+    # image = cv2.imread(image_path)
+    # image = Image.fromarray(image)
+    
+    image_base64 = encode_image(image_path) # <class 'str'>
 
-    print("type(image)", type(image))
-    print("type(image_base64)", type(image_base64))
+    # print("type(image_base64)", type(image_base64))
     # raise
 
     logger.info(idea)
@@ -256,10 +294,13 @@ async def main(
 
 
 if __name__ == "__main__":
-    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image.png"
-    # save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_image_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-    image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout.png"
-    save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_layout_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    save_dir = DEFAULT_WORKSPACE_ROOT / "urban_design"
+    os.makedirs(save_dir, exist_ok=True)
+
+    image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_image_compressed.jpg"
+    save_path = str(save_dir / f"2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout.png"
+    # save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_layout_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
 
     idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
