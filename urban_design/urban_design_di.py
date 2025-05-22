@@ -219,51 +219,21 @@ class SummaryAgent(Role):
         return finally_message
 
 
-async def main(
-        idea: str = "",
-        image_path: str = "",
-        save_path: str = "",
-        investment: float = 5.0,
-        n_round: int = 1,
-        add_human: bool = False,
-):
-    # 读取并转换图片
-    image = cv2.imread(image_path)
-    image = Image.fromarray(image)
-    image_base64 = image_to_base64(image)  # 使用优化后的图片转换函数
+async def main(requirement: str = ""):
 
-    print("type(image)", type(image))
-    print("type(image_base64)", type(image_base64))
-    # raise
-
-    logger.info(idea)
-    logger.info(f"Image loaded from: {image_path}")
-    logger.info(f"Results will be saved to: {save_path}")
-
-    team = Team()
-    team.hire(
-        [
-            UsabilityAgent(image_base64=image_base64),
-            VitalityAgent(image_base64=image_base64),
-            SafetyAgent(image_base64=image_base64),
-            SummaryAgent(save_path=save_path),
-        ]
-    )
-
-    team.invest(investment=investment)
-    team.run_project(idea)
-    await team.run(n_round=n_round)
+    di = DataInterpreter()
+    await di.run(requirement)
 
 
 if __name__ == "__main__":
     # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image.png"
     # save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_image_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-    image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout.png"
-    save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_layout_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image.png"
+    save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_image_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
 
-    idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
+    requirement = f"This is an urban design image, image path:{image_path}. Fisrt, you need to evaluate it from 3 perspectives (Usability, Vitality, Safety) to give specific evaluation of the image. Second, you need to give a suggestion for improvement. Third, you need to use stable diffusion model to generate a new urban design image based on the suggestion for improvement and save the image to the path:{save_path}."
 
-    asyncio.run(main(idea=idea, image_path=image_path, save_path=save_path))
+    asyncio.run(main(requirement=requirement))
 
 
 
