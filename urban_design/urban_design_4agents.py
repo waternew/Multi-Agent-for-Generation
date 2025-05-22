@@ -199,7 +199,12 @@ class SummaryAgent(Role):
         evaluation_results = "\n".join([msg.content for msg in memories])
         
         rsp = await todo.run(self.save_path, evaluation_results)
-        return Message(content=rsp, role=self.profile, cause_by=type(todo))
+
+        finally_message = Message(content=rsp, role=self.profile, cause_by=type(todo))
+        with open(self.save_path, "w") as f:
+            json.dump(finally_message.content, f)
+
+        return finally_message
 
 
 async def main(
@@ -214,6 +219,10 @@ async def main(
     image = cv2.imread(image_path)
     image = Image.fromarray(image)
     image_base64 = image_to_base64(image)  # 使用优化后的图片转换函数
+
+    print("type(image)", type(image))
+    print("type(image_base64)", type(image_base64))
+    # raise
 
     logger.info(idea)
     logger.info(f"Image loaded from: {image_path}")
