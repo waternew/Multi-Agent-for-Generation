@@ -193,6 +193,10 @@ class SummaryAction(Action):
         
     If all evaluations are valid, print your feedback and save the following format:
     [SummaryAgent]
+    [evaluation_results]:
+    "UsabilityAgent evaluation results": summary the usability feedback from UsabilityAgent using a sentence, including the rating score, the reason, and the suggestion for improvement,
+    "VitalityAgent evaluation results": summary the vitality feedback from VitalityAgent using a sentence, including the rating score, the reason, and the suggestion for improvement,
+    "SafetyAgent evaluation results": summary the safety feedback from SafetyAgent using a sentence, including the rating score, the reason, and the suggestion for improvement
     [summary_results]:
     "summary": "brief summary from your own analysis
     "conflicts": "key conflicts from your own analysis
@@ -206,11 +210,16 @@ class SummaryAction(Action):
     """
     name: str = "SummaryAction"
 
-    async def run(self, save_path: str, content: str = ""):
+    async def run(self, save_path: str, evaluation_results: str = "", content: str = ""):
         print("\n\n=============== SummaryAction save_path ===============\n\n", save_path)
+        print("\n\n=============== SummaryAction evaluation_results ===============\n\n", evaluation_results)
         print("\n\n=============== SummaryAction content ===============\n\n", content)
         # raise
-        prompt = self.PROMPT_TEMPLATE.format(save_path=save_path, content=content)
+        prompt = self.PROMPT_TEMPLATE.format(
+            save_path=save_path,
+            evaluation_results=evaluation_results,
+            content=content
+        )
         rsp = await self._aask(prompt)
         print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
         return rsp
@@ -223,8 +232,7 @@ class SummaryAgent(Role):
     def __init__(self, save_path: str = "", **kwargs):
         super().__init__(**kwargs)
         self.save_path = save_path
-        # 监听所有评估代理的动作
-        self._watch([UserRequirement, UsabilityAction, VitalityAction, SafetyAction])
+        self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
 
     async def _act(self) -> Message:
@@ -238,11 +246,17 @@ class SummaryAgent(Role):
         # 将所有评估结果组合成一个字符串
         evaluation_results = "\n".join([msg.content for msg in msgs])
         print("\n\n=============== SummaryAgent evaluation_results ===============\n\n", evaluation_results)
-                
+        
+        # 获取原始的用户需求
+        user_msg = self.get_memories(k=1)[0]  # 获取第一条消息（用户需求）
+        print("\n\n=============== SummaryAgent user_msg ===============\n\n", user_msg)
+        # raise
+        
         # 调用SummaryAction的run方法
         code_text = await todo.run(
             save_path=self.save_path,
-            content=evaluation_results
+            evaluation_results=evaluation_results,
+            content=user_msg.content
         )
 
         finally_message = Message(content=code_text, role=self.profile, cause_by=type(todo))
@@ -270,12 +284,13 @@ async def main(
 ):
     # 读取并转换图片
     image_base64 = encode_image(image_path)
+    # print("\n\n=============== image_base64 ===============\n\n", image_base64)
+    # raise   
 
     logger.info(idea)
     logger.info(f"Image loaded from: {image_path}")
     logger.info(f"Results will be saved to: {save_path}")
 
-    # 创建团队    
     team = Team()
     team.hire(
         [
@@ -286,7 +301,6 @@ async def main(
         ]
     )
 
-    # 设置投资和运行项目
     team.invest(investment=investment)
     team.run_project(idea)
     await team.run(n_round=n_round)
@@ -298,8 +312,6 @@ if __name__ == "__main__":
 
     image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_image_compressed.jpg"
     save_path = f"{save_dir}/2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_layout_compressed.jpg"
-    # save_path = f"{save_dir}/2_layout_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
     idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 

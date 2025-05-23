@@ -1,6 +1,8 @@
 # Full Example: https://github.com/geekan/MetaGPT/blob/main/config/config2.example.yaml
 # Reflected Code: https://github.com/geekan/MetaGPT/blob/main/metagpt/config2.py
 # Config Docs: https://docs.deepwisdom.ai/main/en/guide/get_started/configuration.html
+
+# openai 
 llm:
   api_type: "openai"  # or azure / ollama / groq etc.
   model: "gpt-4o"  # or gpt-4-turbo
@@ -9,4 +11,11 @@ llm:
   # base_url: "https://chatapi.littlewheat.com/v1/chat/completions"  # or forward url / other llm url
   # api_key: "sk-5rDGIzSL8UFIinrxFp60MPFq3JsqdLVLKHOWJK2GGOFIgLoR" # 3.5
   api_key: "sk-1v3Xw2NPZkz2hzuhlkPXC7vuzCyK3tQvwGOk9anAxYdLQqQD" # 4
-  calc_usage: false
+  # calc_usage: false
+
+
+# # gemini
+# llm:
+#   api_type: "gemini" 
+#   model: "gemini-2.0-flash" 
+#   api_key: "AIzaSyBY6fgb6uL8AG8q8xemJX3p1bm36s1_YOA" 

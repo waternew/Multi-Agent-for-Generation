@@ -60,8 +60,16 @@ class BaseLLM(ABC):
         pass
 
     def _user_msg(self, msg: str, images: Optional[Union[str, list[str]]] = None) -> dict[str, Union[str, dict]]:
+        # print("\n\n=============== _user_msg type(msg) ===============\n\n", type(msg))
+        # print("\n\n=============== _user_msg msg ===============\n\n", msg)
+        # print("\n\n=============== _user_msg type(images) ===============\n\n", type(images))
+        # print("\n\n=============== _user_msg images ===============\n\n", images)
+        # print("\n\n=============== _user_msg ===============\n\n", self.support_image_input())
+        # raise
         if images and self.support_image_input():
             # as gpt-4v, chat with image
+            # print("\n\n=============== _user_msg if images and self.support_image_input() ===============\n\n", type(images))
+            # raise
             return self._user_msg_with_imgs(msg, images)
         else:
             return {"role": "user", "content": msg}
@@ -70,12 +78,26 @@ class BaseLLM(ABC):
         """
         images: can be list of http(s) url or base64
         """
+        # print("\n\n=============== _user_msg_with_imgs type(msg) ===============\n\n", type(msg))
+        # print("\n\n=============== _user_msg_with_imgs msg ===============\n\n", msg)
+        # print("\n\n=============== _user_msg_with_imgs type(images) ===============\n\n", type(images))
+        # print("\n\n=============== _user_msg_with_imgs images1 ===============\n\n", images)
+        # raise
         if isinstance(images, str):
             images = [images]
         content = [{"type": "text", "text": msg}]
         for image in images:
+            # print("\n\n=============== _user_msg_with_imgs image2 ===============\n\n", type(image))
+            # raise
             # image url or image base64
-            url = image if image.startswith("http") else f"data:image/jpeg;base64,{image}"
+            if image.startswith("http"):
+                # print("\n\n=============== _user_msg_with_imgs image.startswith(http) ===============\n\n", type(image))
+                url = image
+            else:
+                # print("\n\n=============== _user_msg_with_imgs image not startswith(http) ===============\n\n", type(image))
+                url = f"data:image/jpeg;base64,{image}"
+            # print("\n\n=============== _user_msg_with_imgs url ===============\n\n", url)
+            # raise
             # it can with multiple-image inputs
             content.append({"type": "image_url", "image_url": {"url": url}})
         return {"role": "user", "content": content}
@@ -105,6 +127,11 @@ class BaseLLM(ABC):
                 processed_messages.append(msg)
             elif isinstance(msg, Message):
                 images = msg.metadata.get(IMAGES)
+                # print("\n\n=============== format_msg type(msg.content) ===============\n\n", type(msg.content))
+                # print("\n\n=============== format_msg msg.content ===============\n\n", msg.content)
+                # print("\n\n=============== format_msg type(images) ===============\n\n", type(images))
+                # print("\n\n=============== format_msg images ===============\n\n", images)
+                # raise
                 processed_msg = self._user_msg(msg=msg.content, images=images) if images else msg.to_dict()
                 processed_messages.append(processed_msg)
             else:
@@ -192,6 +219,14 @@ class BaseLLM(ABC):
         if format_msgs:
             message.extend(format_msgs)
         if isinstance(msg, str):
+            # print("\n\n=============== aask if isinstance(msg, str) msg ===============\n\n", msg)
+            # print("\n\n=============== aask if isinstance(msg, str) type(msg) ===============\n\n", type(msg))
+            # print("\n\n=============== aask if isinstance(msg, str) msg ===============\n\n", msg)
+            # print("\n\n=============== aask if isinstance(msg, str) type(system_msgs) ===============\n\n", type(system_msgs))
+            # print("\n\n=============== aask if isinstance(msg, str) type(format_msgs) ===============\n\n", type(format_msgs))
+            # print("\n\n=============== aask if isinstance(msg, str) type(images) ===============\n\n", type(images))
+            # print("\n\n=============== aask if isinstance(msg, str) images ===============\n\n", images)
+            # raise
             message.append(self._user_msg(msg, images=images))
         else:
             message.extend(msg)

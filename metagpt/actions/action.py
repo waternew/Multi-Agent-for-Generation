@@ -96,13 +96,20 @@ class Action(SerializationMixin, ContextMixin, BaseModel):
     def __repr__(self):
         return self.__str__()
 
-    async def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
+    async def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None, images: Optional[list[str]] = None) -> str:
         """Append default prefix"""
         # print("6666666666666666")
         # print('prompt', prompt)
         # print('system_msgs', system_msgs)
+        # print("\n\n=============== _aask type(prompt) ===============\n\n", type(prompt))
+        # print("\n\n=============== _aask prompt ===============\n\n", prompt)
+        # print("\n\n=============== _aask type(system_msgs) ===============\n\n", type(system_msgs))
+        # print("\n\n=============== _aask system_msgs ===============\n\n", system_msgs)
+        # print("\n\n=============== _aask type(images) ===============\n\n", type(images))
+        # print("\n\n=============== _aask images ===============\n\n", images)
         # raise
-        return await self.llm.aask(prompt, system_msgs)
+        # return await self.llm.aask(prompt, system_msgs)
+        return await self.llm.aask(prompt, system_msgs=system_msgs, format_msgs=None, images=images)
 
     async def _run_action_node(self, *args, **kwargs):
         """Run action node"""
