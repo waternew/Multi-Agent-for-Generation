@@ -2,7 +2,8 @@ import os
 import asyncio
 import sys
 import fire
-import base64
+from base64 import b64encode
+from pathlib import Path
 from io import BytesIO
 
 import datetime
@@ -21,31 +22,6 @@ from metagpt.roles import Role
 from metagpt.schema import Message
 from metagpt.team import Team
 
-
-def image_to_base64(image: Image.Image, max_size: int = 800) -> str:
-    """将PIL Image转换为base64字符串，并限制图片大小"""
-    # 调整图片大小
-    if max(image.size) > max_size:
-        ratio = max_size / max(image.size)
-        new_size = tuple(int(dim * ratio) for dim in image.size)
-        image = image.resize(new_size, Image.Resampling.LANCZOS)
-    
-    # print("image.size", image.size)
-
-    # 转换为JPEG格式并压缩
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG", quality=85)
-    # print("buffered.getvalue()", buffered.getvalue())
-    # print("type(buffered.getvalue())", type(buffered.getvalue())) # <class 'bytes'>
-
-    # 将图片转换为base64格式
-    base64_str = base64.b64encode(buffered.getvalue()).decode()
-
-    # print("base64_str", base64_str)
-    # print("type(base64_str)", type(base64_str)) # <class 'str'>
-    # raise
-
-    return f"data:image/jpeg;base64,{base64_str}"
 
 
 class UsabilityAction(Action):
@@ -248,13 +224,11 @@ class SummaryAgent(Role):
 
 
 
-def encode_image(image_path: str):
-    with open(image_path, "rb") as image_file:
-        # print("type(image_file.read())", type(image_file.read()))
-        # raise
-        image_base64 = base64.b64encode(image_file.read()).decode('utf-8')  # 使用优化后的图片转换函数
-    return image_base64
-
+def encode_image(image_path: Path | str) -> str:
+    """Encodes image to base64."""    
+    with open(image_path, "rb") as img_file:
+        b64code = b64encode(img_file.read()).decode('utf-8')
+        return f"data:image/jpeg;base64,{b64code}"
 
 
 async def main(
@@ -294,11 +268,11 @@ async def main(
 
 
 if __name__ == "__main__":
-    save_dir = DEFAULT_WORKSPACE_ROOT / "urban_design"
+    save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
     os.makedirs(save_dir, exist_ok=True)
 
     image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_image_compressed.jpg"
-    save_path = str(save_dir / f"2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    save_path = f"{save_dir}/2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout.png"
     # save_path = str(DEFAULT_WORKSPACE_ROOT / "urban_design" / f"1_layout_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
 
