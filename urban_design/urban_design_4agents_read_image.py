@@ -35,30 +35,23 @@ class UsabilityAction(Action):
     2. User experience (seating, walkways, etc.)
     3. Overall usability of the space
     
-    Return feedback format:
-    [UsabilityAgent]
-    [description]: what you see in the image,
-    [rating_score]: 0-10,
-    [reason]: brief explanation,
-    [suggestion]: brief improvement suggestion
+    Return feedback in JSON format:
+    {{
+        "agent": "UsabilityAgent",
+        "description": "what you see in the image",
+        "rating_score": 0-10,
+        "reason": "brief explanation",
+        "suggestion": "brief improvement suggestion"
+    }}
     
-    Return ``` your feedback here ``` with NO other texts.
+    Please return your feedback in valid JSON format without any markdown formatting or additional text.
     """
     name: str = "UsabilityAction"
 
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
-        # print("\n\n=============== UsabilityAction type(prompt) ===============\n\n", type(prompt))
-        # print("\n\n=============== UsabilityAction prompt ===============\n\n", prompt)
-        # print("\n\n=============== UsabilityAction type(content) ===============\n\n", type(content))
-        # print("\n\n=============== UsabilityAction content ===============\n\n", content)
-        # print("\n\n=============== UsabilityAction type(image_base64) ===============\n\n", type(image_base64))
-        # print("\n\n=============== UsabilityAction image_base64 ===============\n\n", image_base64)
-        # raise
-
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
         print("\n\n=============== UsabilityAction rsp ===============\n\n", rsp)
-        # print("\n\n=============== UsabilityAction type(image_base64) ===============\n\n", type(image_base64))
         return rsp
 
 
@@ -78,7 +71,11 @@ class UsabilityAgent(Role):
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
         code_text = await todo.run(msg.content, self.image_base64)
-        msg = Message(content=code_text, role=self.profile, cause_by=type(todo))
+        print("\n\n=============== UsabilityAgent code_text ===============\n\n", code_text)
+        # raise
+        msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
+        # 确保消息被发送到SummaryAgent
+        self.publish_message(msg)
         print("\n\n=============== UsabilityAgent msg ===============\n\n", msg)
         return msg
 
@@ -94,14 +91,16 @@ class VitalityAction(Action):
     2. Landscape features
     3. Cultural elements
     
-    Return feedback format:
-    [VitalityAgent]
-    [description]: what you see in the image,
-    [rating_score]: 0-10,
-    [reason]: brief explanation,
-    [suggestion]: brief improvement suggestion
+    Return feedback in JSON format:
+    {{
+        "agent": "VitalityAgent",
+        "description": "what you see in the image",
+        "rating_score": 0-10,
+        "reason": "brief explanation",
+        "suggestion": "brief improvement suggestion"
+    }}
     
-    Return ``` your feedback here ``` with NO other texts.
+    Please return your feedback in valid JSON format without any markdown formatting or additional text.
     """
     name: str = "VitalityAction"
 
@@ -109,7 +108,6 @@ class VitalityAction(Action):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
         print("\n\n=============== VitalityAction rsp ===============\n\n", rsp)
-        # print("\n\n=============== VitalityAction type(image_base64) ===============\n\n", type(image_base64))
         return rsp
 
 
@@ -129,7 +127,9 @@ class VitalityAgent(Role):
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
         code_text = await todo.run(msg.content, self.image_base64)
-        msg = Message(content=code_text, role=self.profile, cause_by=type(todo))
+        msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
+        # 确保消息被发送到SummaryAgent
+        self.publish_message(msg)
         print("\n\n=============== VitalityAction msg ===============\n\n", msg)
         return msg
 
@@ -145,22 +145,28 @@ class SafetyAction(Action):
     2. Cyclist safety
     3. Vehicle safety
     
-    Return feedback format:
-    [SafetyAgent]
-    [description]: what you see in the image,
-    [rating_score]: 0-10,
-    [reason]: brief explanation,
-    [suggestion]: brief improvement suggestion
+    Return feedback in JSON format:
+    {{
+        "agent": "SafetyAgent",
+        "description": "what you see in the image",
+        "rating_score": 0-10,
+        "reason": "brief explanation",
+        "suggestion": "brief improvement suggestion"
+    }}
     
-    Return ``` your feedback here ``` with NO other texts.
+    Please return your feedback in valid JSON format without any markdown formatting or additional text.
     """
     name: str = "SafetyAction"
 
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+        print("\n\n=============== SafetyAction prompt ===============\n\n", prompt)
+        print("\n\n=============== SafetyAction content ===============\n\n", content)
+        #  [Message] from User to SummaryAgent: This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement.
         print("\n\n=============== SafetyAction rsp ===============\n\n", rsp)
-        # print("\n\n=============== SafetyAction type(image_base64) ===============\n\n", type(image_base64))
+        #  {"agent": "SafetyAgent", "description": "The image shows an urban area plan with several large buildings, green spaces, pathways, and roads.", "rating_score": 7, "reason": "The design includes green spaces and pathways that may accommodate pedestrians and cyclists safely. There seems to be adequate separation between vehicular roads and pedestrian pathways. However, the exact markings and signage are not visible, which are crucial for safety enforcement.", "suggestion": "Include clear demarcations and traffic calming measures for pedestrian crossings and cyclist paths. Add signage and lighting to improve visibility and safety for all users."}
+        # raise
         return rsp
 
 
@@ -180,37 +186,40 @@ class SafetyAgent(Role):
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
         code_text = await todo.run(msg.content, self.image_base64)
-        msg = Message(content=code_text, role=self.profile, cause_by=type(todo))
+        msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
+        # 确保消息被发送到SummaryAgent
+        self.publish_message(msg)
         print("\n\n=============== SafetyAgent msg ===============\n\n", msg)
         return msg
 
 
 class SummaryAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are a summary expert. You will receive evaluation results from 3 evaluation agents.
-    First, validate and contain actual image analysis.
-    If any evaluation result indicates that the image was not accessible or analyzable, return an error message. Please save the error message to the file: {save_path}
-        
-    If all evaluations are valid, print your feedback and save the following format:
-    [SummaryAgent]
-    [summary_results]:
-    "summary": "brief summary from your own analysis
-    "conflicts": "key conflicts from your own analysis
-    "final_suggestion": "final improvement suggestion from your own analysis
+    You are a summary expert. You will receive evaluation results from 3 evaluation agents in JSON format.
+    The input will be a JSON array containing the evaluations from UsabilityAgent, VitalityAgent, and SafetyAgent.
+
+    If any evaluation result indicates that the image was not accessible or analyzable, you should save the error message to the file: {save_path}. And if all evaluations are valid, you should give a comprehensive summary in the JSON format below, and save the summary to the file: {save_path}.
     
-    If any evaluation is invalid, print your feedback and save the following format:
-    [SummaryAgent]
-    "summary_error": One or more evaluations failed to analyze the image properly
+    Please analyze the evaluations and provide a comprehensive summary in the following JSON format:
+    {{
+        "agent": "SummaryAgent",
+        "summary": "A brief summary of the key points from all three evaluations",
+        "conflicts": "Any conflicts or contradictions found between the evaluations",
+        "final_suggestion": "A unified improvement suggestion that addresses all concerns"
+    }}
     
-    Return ``` your_feedback here ``` with NO other texts.
+    If any evaluation result indicates that the image was not accessible or analyzable, return:
+    {{
+        "agent": "SummaryAgent",
+        "summary_error": "One or more evaluations failed to analyze the image properly"
+    }}
+    
+    Please ensure your response is valid JSON and follows the exact format specified above.
     """
     name: str = "SummaryAction"
 
-    async def run(self, save_path: str, content: str = ""):
-        print("\n\n=============== SummaryAction save_path ===============\n\n", save_path)
-        print("\n\n=============== SummaryAction content ===============\n\n", content)
-        # raise
-        prompt = self.PROMPT_TEMPLATE.format(save_path=save_path, content=content)
+    async def run(self, content: str = "", evaluation_str: str = "", save_path: str = ""):
+        prompt = self.PROMPT_TEMPLATE.format(content=content, evaluation_str=evaluation_str, save_path=save_path)
         rsp = await self._aask(prompt)
         print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
         return rsp
@@ -223,33 +232,67 @@ class SummaryAgent(Role):
     def __init__(self, save_path: str = "", **kwargs):
         super().__init__(**kwargs)
         self.save_path = save_path
-        # 监听所有评估代理的动作
-        self._watch([UserRequirement, UsabilityAction, VitalityAction, SafetyAction])
+        # 修改监听设置
+        self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
         
-        # 获取所有评估结果
-        msgs = self.get_memories()
-        print("\n\n=============== SummaryAgent msgs ===============\n\n", msgs)
+        # 获取所有评估Agent的消息
+        memories = self.get_memories(k=0)
+        print("\n\n=============== SummaryAgent memories ===============\n\n", memories)
+        print("\n\n=============== SummaryAgent self.get_memories ===============\n\n", self.get_memories)
+        # raise
         
-        # 将所有评估结果组合成一个字符串
-        evaluation_results = "\n".join([msg.content for msg in msgs])
-        print("\n\n=============== SummaryAgent evaluation_results ===============\n\n", evaluation_results)
+        if len(memories) < 3:
+            print("\n\n=============== SummaryAgent Not enough memories ===============\n\n")
+            return Message(content="Error: Not enough evaluation results received", role=self.profile)
+            
+        # 提取每个Agent的JSON内容
+        evaluation_results = []
+        for i, msg in enumerate(memories):
+            print(f"\n\n=============== SummaryAgent Processing memory {i} ===============\n\n")
+            print(f"Message content: {msg.content}")
+            try:
+                # 提取JSON部分
+                content = msg.content
+                if "```json" in content:
+                    json_str = content.split("```json")[1].split("```")[0].strip()
+                elif "```" in content:
+                    json_str = content.split("```")[1].split("```")[0].strip()
+                else:
+                    json_str = content.strip()
                 
-        # 调用SummaryAction的run方法
-        code_text = await todo.run(
-            save_path=self.save_path,
-            content=evaluation_results
-        )
-
-        finally_message = Message(content=code_text, role=self.profile, cause_by=type(todo))
-        with open(self.save_path, "w") as f:
-            f.write(finally_message.content)
-
-        return finally_message
+                print(f"\n\n=============== SummaryAgent Extracted JSON {i} ===============\n\n")
+                print(f"JSON string: {json_str}")
+                    
+                # 解析JSON
+                result = json.loads(json_str)
+                evaluation_results.append(result)
+                print(f"\n\n=============== SummaryAgent Successfully parsed JSON {i} ===============\n\n")
+            except Exception as e:
+                print(f"\n\n=============== SummaryAgent Error parsing JSON {i} ===============\n\n")
+                print(f"Error: {str(e)}")
+                logger.error(f"Error parsing JSON from {msg.role}: {str(e)}")
+                return Message(content=f"Error parsing evaluation results: {str(e)}", role=self.profile)
+        
+        # 将评估结果转换为字符串
+        evaluation_str = json.dumps(evaluation_results, ensure_ascii=False, indent=2)
+        print("\n\n=============== SummaryAgent evaluation_str ===============\n\n", evaluation_str)
+        
+        # 运行总结Action
+        code_text = await todo.run(evaluation_str=evaluation_str, save_path=self.save_path)
+        
+        finally_msg = Message(content=code_text, role=self.profile, cause_by=type(todo))
+        print("\n\n=============== SummaryAgent finally_msg ===============\n\n", finally_msg)
+        print("\n\n=============== SummaryAgent finally_msg.content ===============\n\n", finally_msg.content)
+        
+        # 保存结果
+        with open(self.save_path, "w", encoding='utf-8') as f:
+            f.write(finally_msg.content)
+        return finally_msg
 
 
 
@@ -289,6 +332,7 @@ async def main(
     # 设置投资和运行项目
     team.invest(investment=investment)
     team.run_project(idea)
+    # 运行方式1：直接运行
     await team.run(n_round=n_round)
 
 
