@@ -185,8 +185,11 @@ class Environment(ExtEnv):
         """
         logger.debug(f"publish_message: {message.dump()}")
         found = False
+        # print("self.member_addrs.items()", self.member_addrs.items())
         # According to the routing feature plan in Chapter 2.2.3.2 of RFC 113
         for role, addrs in self.member_addrs.items():
+            # print("is_send_to(message, addrs)", is_send_to(message, addrs))
+            # raise
             if is_send_to(message, addrs):
                 role.put_message(message)
                 found = True

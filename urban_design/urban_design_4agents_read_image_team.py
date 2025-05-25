@@ -88,10 +88,6 @@ class UsabilityAgent(Role):
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
         print("\n\n=============== UsabilityAgent msg ===============\n\n", msg)
-
-        logger.info("UsabilityAgent msg", msg)
-
-        logger.info("UsabilityAgent msg", msg)
         return msg
 
 
@@ -205,8 +201,6 @@ class SafetyAgent(Role):
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
         print("\n\n=============== SafetyAgent msg ===============\n\n", msg)
-
-        logger.info("SafetyAgent msg", msg)
         return msg
 
 
@@ -320,8 +314,6 @@ class SummaryAgent(Role):
         # 保存结果
         with open(self.save_path, "w", encoding='utf-8') as f:
             f.write(finally_msg.content)
-
-        logger.info("SummaryAgent finally_msg", finally_msg)
         return finally_msg
 
 
@@ -334,64 +326,48 @@ def encode_image(image_path: Path | str) -> str:
 
 
 async def main(
-        description: str = "",
+        idea: str = "",
         image_path: str = "",
         save_path: str = "",
+        investment: float = 15.0,
+        n_round: int = 1,
+        add_human: bool = False,
 ):
     # 读取并转换图片
     image_base64 = encode_image(image_path)
 
-    logger.info(description)
+    logger.info(idea)
     logger.info(f"Image loaded from: {image_path}")
     logger.info(f"Results will be saved to: {save_path}")
 
-    context = Context(config_file="config/config2.yaml")
-    env = Environment(context=context)
-
-    usability_agent = UsabilityAgent(image_base64=image_base64)
-    vitality_agent = VitalityAgent(image_base64=image_base64)
-    safety_agent = SafetyAgent(image_base64=image_base64)
-    summary_agent = SummaryAgent(save_path=save_path)
-
-    env.add_roles([usability_agent, vitality_agent, safety_agent, summary_agent])
-    logger.info("agents added to environment")
-
-    # content = {"description": description, "image_base64": image_base64}
-    content = {"description": description}
-    content_json = json.dumps(content)
-
-    env.publish_message(
-        Message(
-            # content=content_json, send_to=(usability_agent, vitality_agent, safety_agent, summary_agent), sent_from=UserRequirement
-            content=content_json, send_to=(usability_agent, vitality_agent, safety_agent), sent_from=UserRequirement
-        )
+    # 创建团队    
+    team = Team()
+    team.hire(
+        [
+            UsabilityAgent(image_base64=image_base64),
+            VitalityAgent(image_base64=image_base64),
+            SafetyAgent(image_base64=image_base64),
+            SummaryAgent(save_path=save_path),
+        ]
     )
 
-    logger.info("environment start running...")
-    run_count = 0
-    while not env.is_idle:
-        run_count += 1
-        logger.info(f"environment running #{run_count}")
-        await env.run()
+    # 设置投资和运行项目
+    team.invest(investment=investment)
+    # team.run_project(idea, send_to=(UsabilityAgent, VitalityAgent, SafetyAgent))
+    team.run_project(idea)
+    # 运行方式1：直接运行
+    await team.run(n_round=n_round)
 
-    logger.info(f"environment finished, run_count: {run_count}")
-    
-    logger.info("getting env")
-    logger.info("getting env")
-    print("================= main env =================", env)
-    
-    # return final_result
 
 if __name__ == "__main__":
     save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
     os.makedirs(save_dir, exist_ok=True)
-
-    description = "This is an urban design image. Hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
     image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_image_compressed.jpg"
     save_path = f"{save_dir}/2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_l_compressed.jpg"
     # save_path = f"{save_dir}/2_l_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
-    result = asyncio.run(main(description=description, image_path=image_path, save_path=save_path))
-    print("\n\n=============== Result ===============\n\n", json.dumps(result, ensure_ascii=False))
+    idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
+
+    asyncio.run(main(idea=idea, image_path=image_path, save_path=save_path))

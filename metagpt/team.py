@@ -105,6 +105,7 @@ class Team(BaseModel):
 
         # Human requirement.
         self.env.publish_message(Message(content=idea))
+        # self.env.publish_message(Message(content=idea, send_to=send_to))
 
     def start_project(self, idea, send_to: str = ""):
         """

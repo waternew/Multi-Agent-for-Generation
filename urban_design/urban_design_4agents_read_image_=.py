@@ -16,8 +16,6 @@ import json
 from metagpt.const import METAGPT_ROOT, DEFAULT_WORKSPACE_ROOT
 from metagpt.roles.di.data_interpreter import DataInterpreter
 
-from metagpt.context import Context
-from metagpt.environment import Environment
 from metagpt.actions import Action, UserRequirement
 from metagpt.logs import logger
 from metagpt.roles import Role
@@ -37,14 +35,14 @@ class UsabilityAction(Action):
     2. User experience (seating, walkways, etc.)
     3. Overall usability of the space
     
-    Return feedback in JSON format:
-    {{
-        "agent": "UsabilityAgent",
-        "description": "what you see in the image",
-        "rating_score": 0-10,
-        "reason": "brief explanation",
-        "suggestion": "brief improvement suggestion"
-    }}
+    Return feedback in the following format:
+    ================================================
+    agent: UsabilityAgent
+    description: what you see in the image
+    rating_score: 0-10
+    reason: brief explanation
+    suggestion: brief improvement suggestion
+    ================================================
     
     Please return your feedback in valid JSON format without any markdown formatting or additional text.
     """
@@ -67,31 +65,18 @@ class UsabilityAgent(Role):
         self._watch([UserRequirement])
         self.set_actions([UsabilityAction])
 
-        logger.info(f"UsabilityAgent UserRequirement): {UserRequirement}")
-
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
-        # debug
-        # print("\n\n=============== UsabilityAgent msg.content ===============\n\n", msg.content)
-        # print("\n\n=============== UsabilityAgent self.rc.history ===============\n\n", self.rc.history)
-        # print("\n\n=============== UsabilityAgent self.rc.news ===============\n\n", self.rc.news)
-        # raise
         code_text = await todo.run(msg.content, self.image_base64)
         print("\n\n=============== UsabilityAgent code_text ===============\n\n", code_text)
-        logger.info(f"UsabilityAgent cause_by: {type(todo)}")
         # raise
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
-        print()
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
         print("\n\n=============== UsabilityAgent msg ===============\n\n", msg)
-
-        logger.info("UsabilityAgent msg", msg)
-
-        logger.info("UsabilityAgent msg", msg)
         return msg
 
 
@@ -106,14 +91,14 @@ class VitalityAction(Action):
     2. Landscape features
     3. Cultural elements
     
-    Return feedback in JSON format:
-    {{
-        "agent": "VitalityAgent",
-        "description": "what you see in the image",
-        "rating_score": 0-10,
-        "reason": "brief explanation",
-        "suggestion": "brief improvement suggestion"
-    }}
+    Return feedback in the following format:
+    ================================================
+    agent: VitalityAgent
+    description: what you see in the image
+    rating_score: 0-10
+    reason: brief explanation
+    suggestion: brief improvement suggestion
+    ================================================
     
     Please return your feedback in valid JSON format without any markdown formatting or additional text.
     """
@@ -160,14 +145,14 @@ class SafetyAction(Action):
     2. Cyclist safety
     3. Vehicle safety
     
-    Return feedback in JSON format:
-    {{
-        "agent": "SafetyAgent",
-        "description": "what you see in the image",
-        "rating_score": 0-10,
-        "reason": "brief explanation",
-        "suggestion": "brief improvement suggestion"
-    }}
+    Return feedback in the following format:
+    ================================================
+    agent: SafetyAgent
+    description: what you see in the image
+    rating_score: 0-10
+    reason: brief explanation
+    suggestion: brief improvement suggestion
+    ================================================
     
     Please return your feedback in valid JSON format without any markdown formatting or additional text.
     """
@@ -205,26 +190,23 @@ class SafetyAgent(Role):
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
         print("\n\n=============== SafetyAgent msg ===============\n\n", msg)
-
-        logger.info("SafetyAgent msg", msg)
         return msg
 
 
 class SummaryAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are a summary expert. You will receive evaluation results from 3 evaluation agents in JSON format.
-    The input will be a JSON array containing the evaluations from UsabilityAgent, VitalityAgent, and SafetyAgent.
+    You are a summary expert. You will receive evaluation results from 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent).
 
     If any evaluation result indicates that the image was not accessible or analyzable, you should save the error message to the file: {save_path}. And if all evaluations are valid, you should give a comprehensive summary in the JSON format below, and save the summary to the file: {save_path}.
 
     What evaluations you receive from UsabilityAgent, VitalityAgent, and SafetyAgent will be like this:
-    {{
-        "agent": "UsabilityAgent",
-        "description": "what you see in the image",
-        "rating_score": 0-10,
-        "reason": "brief explanation",
-        "suggestion": "brief improvement suggestion"
-    }}
+    ================================================
+    agent: UsabilityAgent
+    description: what you see in the image
+    rating_score: 0-10
+    reason: brief explanation
+    suggestion: brief improvement suggestion
+    ================================================
     
     Please analyze the evaluations and provide a comprehensive summary in the following JSON format:
     {{
@@ -261,8 +243,6 @@ class SummaryAgent(Role):
         # 修改监听设置
         self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
-
-        logger.info(f"SummaryAgent UsabilityAction, VitalityAction, SafetyAction): {UsabilityAction, VitalityAction, SafetyAction}")
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
@@ -320,8 +300,6 @@ class SummaryAgent(Role):
         # 保存结果
         with open(self.save_path, "w", encoding='utf-8') as f:
             f.write(finally_msg.content)
-
-        logger.info("SummaryAgent finally_msg", finally_msg)
         return finally_msg
 
 
@@ -334,64 +312,47 @@ def encode_image(image_path: Path | str) -> str:
 
 
 async def main(
-        description: str = "",
+        idea: str = "",
         image_path: str = "",
         save_path: str = "",
+        investment: float = 15.0,
+        n_round: int = 1,
+        add_human: bool = False,
 ):
     # 读取并转换图片
     image_base64 = encode_image(image_path)
 
-    logger.info(description)
+    logger.info(idea)
     logger.info(f"Image loaded from: {image_path}")
     logger.info(f"Results will be saved to: {save_path}")
 
-    context = Context(config_file="config/config2.yaml")
-    env = Environment(context=context)
-
-    usability_agent = UsabilityAgent(image_base64=image_base64)
-    vitality_agent = VitalityAgent(image_base64=image_base64)
-    safety_agent = SafetyAgent(image_base64=image_base64)
-    summary_agent = SummaryAgent(save_path=save_path)
-
-    env.add_roles([usability_agent, vitality_agent, safety_agent, summary_agent])
-    logger.info("agents added to environment")
-
-    # content = {"description": description, "image_base64": image_base64}
-    content = {"description": description}
-    content_json = json.dumps(content)
-
-    env.publish_message(
-        Message(
-            # content=content_json, send_to=(usability_agent, vitality_agent, safety_agent, summary_agent), sent_from=UserRequirement
-            content=content_json, send_to=(usability_agent, vitality_agent, safety_agent), sent_from=UserRequirement
-        )
+    # 创建团队    
+    team = Team()
+    team.hire(
+        [
+            UsabilityAgent(image_base64=image_base64),
+            VitalityAgent(image_base64=image_base64),
+            SafetyAgent(image_base64=image_base64),
+            SummaryAgent(save_path=save_path),
+        ]
     )
 
-    logger.info("environment start running...")
-    run_count = 0
-    while not env.is_idle:
-        run_count += 1
-        logger.info(f"environment running #{run_count}")
-        await env.run()
+    # 设置投资和运行项目
+    team.invest(investment=investment)
+    team.run_project(idea)
+    # 运行方式1：直接运行
+    await team.run(n_round=n_round)
 
-    logger.info(f"environment finished, run_count: {run_count}")
-    
-    logger.info("getting env")
-    logger.info("getting env")
-    print("================= main env =================", env)
-    
-    # return final_result
 
 if __name__ == "__main__":
     save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
     os.makedirs(save_dir, exist_ok=True)
 
-    description = "This is an urban design image. Hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
-
     image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_image_compressed.jpg"
     save_path = f"{save_dir}/2_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_l_compressed.jpg"
-    # save_path = f"{save_dir}/2_l_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_layout_compressed.jpg"
+    # save_path = f"{save_dir}/2_layout_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
-    result = asyncio.run(main(description=description, image_path=image_path, save_path=save_path))
-    print("\n\n=============== Result ===============\n\n", json.dumps(result, ensure_ascii=False))
+    idea = f"This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
+
+    asyncio.run(main(idea=idea, image_path=image_path, save_path=save_path))

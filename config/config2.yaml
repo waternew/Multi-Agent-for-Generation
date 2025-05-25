@@ -12,6 +12,9 @@ llm:
   # api_key: "sk-5rDGIzSL8UFIinrxFp60MPFq3JsqdLVLKHOWJK2GGOFIgLoR" # 3.5
   api_key: "sk-1v3Xw2NPZkz2hzuhlkPXC7vuzCyK3tQvwGOk9anAxYdLQqQD" # 4
   # calc_usage: false
+  temperature: 0
+  max_token: 8000
+  stream: false
 
 
 # # gemini
