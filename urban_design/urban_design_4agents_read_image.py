@@ -13,6 +13,11 @@ import numpy as np
 from PIL import Image
 import json
 
+import urllib.request
+import time
+import requests
+import random
+
 from metagpt.const import METAGPT_ROOT, DEFAULT_WORKSPACE_ROOT
 from metagpt.roles.di.data_interpreter import DataInterpreter
 
@@ -25,6 +30,8 @@ from metagpt.schema import Message
 from metagpt.team import Team
 from metagpt.tools.tool_recommend import BM25ToolRecommender
 
+from api_payload import i2i_controlnet_payload
+from sd_webapi import timestamp, encode_file_to_base64, decode_and_save_base64, call_api, call_img2img_api
 
 
 class UsabilityAction(Action):
@@ -65,7 +72,8 @@ class UsabilityAgent(Role):
     def __init__(self, image_base64: str = "", **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
-        self._watch([UserRequirement])
+        # self._watch([UserRequirement])
+        self._watch([UserRequirement, GenImageAction])
         self.set_actions([UsabilityAction])
 
         logger.info(f"UsabilityAgent UserRequirement): {UserRequirement}")
@@ -134,7 +142,8 @@ class VitalityAgent(Role):
     def __init__(self, image_base64: str = "", **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
-        self._watch([UserRequirement])
+        # self._watch([UserRequirement])
+        self._watch([UserRequirement, GenImageAction])
         self.set_actions([VitalityAction])
 
     async def _act(self) -> Message:
@@ -193,7 +202,8 @@ class SafetyAgent(Role):
     def __init__(self, image_base64: str = "", **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
-        self._watch([UserRequirement])
+        # self._watch([UserRequirement])
+        self._watch([UserRequirement, GenImageAction])
         self.set_actions([SafetyAction])
 
     async def _act(self) -> Message:
@@ -274,10 +284,7 @@ class SummaryAgent(Role):
         print("\n\n=============== SummaryAgent memories ===============\n\n", memories)
         print("\n\n=============== SummaryAgent self.get_memories ===============\n\n", self.get_memories)
         # raise
-        
-        # if len(memories) < 3:
-        #     print("\n\n=============== SummaryAgent Not enough memories ===============\n\n")
-            
+                    
         # # 提取每个Agent的JSON内容
         # evaluation_results = []
         # for i, msg in enumerate(memories):
@@ -312,18 +319,86 @@ class SummaryAgent(Role):
         # 运行总结Action
         code_text = await todo.run(content=memories, save_path=self.save_path)
         
-        finally_msg = Message(content=code_text, role=self.profile, cause_by=type(todo))
-        print("\n\n=============== SummaryAgent finally_msg ===============\n\n", finally_msg)
-        print("\n\n=============== SummaryAgent finally_msg.content ===============\n\n", finally_msg.content)
+        summary_msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="GenImageAgent")
+        self.publish_message(summary_msg)
+        print("\n\n=============== SummaryAgent summary_msg ===============\n\n", summary_msg)
+        print("\n\n=============== SummaryAgent summary_msg.content ===============\n\n", summary_msg.content)
 
         # raise
         
         # 保存结果
         with open(self.save_path, "w", encoding='utf-8') as f:
-            f.write(finally_msg.content)
+            f.write(summary_msg.content)
 
-        logger.info("SummaryAgent finally_msg", finally_msg)
-        return finally_msg
+        logger.info("SummaryAgent summary_msg", summary_msg)
+        return summary_msg
+
+
+class GenImageAction(Action):
+    PROMPT_TEMPLATE: str = """
+    You are an urban design expert. You will receive a image in base64 format, a suggestion from SummaryAgent, and a layout image in base64 format.
+    Please use call_img2img_api function to generate a new image based on them.
+    """
+    name: str = "GenImageAction"
+
+    async def run(self, content: str, image_base64: str, layout_base64: str, gen_image_path: str):
+        
+        webui_server_url = 'http://127.0.0.1:7860'
+        out_i2i_dir = r"E:\\HKUST\\202505_Agent_Urban_Design\\MetaGPT\\workspace\\urban_design\\sd_api_out"
+        os.makedirs(out_i2i_dir, exist_ok=True)
+
+        random_seed = random.randint(1,1000000)
+
+        prompt_i2i = content
+        negative_prompt_i2i = ""
+        print("\n\n=============== GenImageAction prompt_i2i ===============\n\n", prompt_i2i)
+        # raise
+
+        # 第一次的图片、后面的图片？
+
+        payload_i2i = i2i_controlnet_payload(prompt_i2i, negative_prompt_i2i, image_base64, layout_base64, random_seed)    
+        print("\n\n=============== GenImageAction payload_i2i ===============\n\n", payload_i2i)
+
+        response = call_img2img_api(webui_server_url, **payload_i2i)
+
+        for index, image in enumerate(response.get('images')):
+            save_path = os.path.join(out_i2i_dir, f'img2img-{timestamp()}-{index}.png')
+            decode_and_save_base64(image, save_path)
+
+        print("\n\n=============== GenImageAction response ===============\n\n", response)
+        return response
+    
+    
+class GenImageAgent(Role):
+    name: str = "GenImageAgent"
+    profile: str = "GenImageAgent"
+
+    def __init__(self, image_base64: str = "", layout_base64: str = "", gen_image_path: str = "", **kwargs):
+        super().__init__(**kwargs)
+        self.image_base64 = image_base64
+        self.layout_base64 = layout_base64
+        self.gen_image_path = gen_image_path
+        self._watch([SummaryAction])
+        self.set_actions([GenImageAction])
+
+    async def _act(self) -> Message:
+        logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
+        todo = self.rc.todo
+
+        msg = self.get_memories(k=1)[0]  # find the most recent messages
+        print("\n\n=============== GenImageAgent self.get_memories ===============\n\n", msg)
+        # raise
+        gen_image = await todo.run(content=msg.content, image_base64=self.image_base64, layout_base64=self.layout_base64, gen_image_path=self.gen_image_path)
+
+        gen_msg = Message(content=gen_image, role=self.profile, cause_by=type(todo), send_to=(UsabilityAgent, VitalityAgent, SafetyAgent))
+        self.publish_message(gen_msg)
+
+        print("\n\n=============== GenImageAgent type(gen_image) ===============\n\n", type(gen_image))
+        print("\n\n=============== GenImageAgent gen_msg ===============\n\n", gen_msg)
+
+        logger.info("GenImageAgent gen_msg", type(gen_msg))
+        return gen_msg
+
 
 
 
@@ -336,25 +411,31 @@ def encode_image(image_path: Path | str) -> str:
 
 async def main(
         description: str = "",
-        image_path: str = "",
-        save_path: str = "",
+        init_image_path: str = "",
+        layout_path: str = "",
+        suggestion_path: str = "",
+        gen_image_path: str = "",
 ):
     # 读取并转换图片
-    image_base64 = encode_image(image_path)
+    init_image_base64 = encode_image(init_image_path)
+    layout_base64 = encode_image(layout_path)
 
     logger.info(description)
-    logger.info(f"Image loaded from: {image_path}")
-    logger.info(f"Results will be saved to: {save_path}")
+    logger.info(f"Image loaded from: {init_image_path}")
+    logger.info(f"Layout loaded from: {layout_path}")
+    logger.info(f"Results will be saved to: {suggestion_path}")
+    logger.info(f"Gen image will be saved to: {gen_image_path}")
 
     context = Context(config_file="config/config2.yaml")
     env = Environment(context=context)
 
-    usability_agent = UsabilityAgent(image_base64=image_base64)
-    vitality_agent = VitalityAgent(image_base64=image_base64)
-    safety_agent = SafetyAgent(image_base64=image_base64)
-    summary_agent = SummaryAgent(save_path=save_path)
+    usability_agent = UsabilityAgent(image_base64=init_image_base64)
+    vitality_agent = VitalityAgent(image_base64=init_image_base64)
+    safety_agent = SafetyAgent(image_base64=init_image_base64)
+    summary_agent = SummaryAgent(save_path=suggestion_path)
+    gen_image_agent = GenImageAgent(image_base64=init_image_base64, layout_base64=layout_base64, gen_image_path=gen_image_path)
 
-    env.add_roles([usability_agent, vitality_agent, safety_agent, summary_agent])
+    env.add_roles([usability_agent, vitality_agent, safety_agent, summary_agent, gen_image_agent])
     logger.info("agents added to environment")
 
     # content = {"description": description, "image_base64": image_base64}
@@ -363,7 +444,6 @@ async def main(
 
     env.publish_message(
         Message(
-            # content=content_json, send_to=(usability_agent, vitality_agent, safety_agent, summary_agent), sent_from=UserRequirement
             content=content_json, send_to=(usability_agent, vitality_agent, safety_agent), sent_from=UserRequirement
         )
     )
@@ -378,7 +458,6 @@ async def main(
     logger.info(f"environment finished, run_count: {run_count}")
     
     logger.info("getting env")
-    logger.info("getting env")
     print("================= main env =================", env)
     
     # return final_result
@@ -389,10 +468,12 @@ if __name__ == "__main__":
 
     description = "This is an urban design image. Hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
-    image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image_compressed.jpg"
-    save_path = f"{save_dir}/1_image_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    init_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image_comp.jpg"
+    layout_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout_comp.jpg"
+    suggestion_path = f"{save_dir}/1_image_comp-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    gen_image_path = f"{save_dir}/1_image_comp_gen_image-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
     # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_l_compressed.jpg"
     # save_path = f"{save_dir}/2_l_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
-    result = asyncio.run(main(description=description, image_path=image_path, save_path=save_path))
+    result = asyncio.run(main(description=description, init_image_path=init_image_path, layout_path=layout_path, suggestion_path=suggestion_path, gen_image_path=gen_image_path))
     print("\n\n=============== Result ===============\n\n", json.dumps(result, ensure_ascii=False))

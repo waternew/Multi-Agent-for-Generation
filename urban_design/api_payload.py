@@ -1,12 +1,3 @@
-# prompt = "Realistic style,outdoor,sunshine,green and inviting atmosphere,well-maintained greenery,trees,stunning sunny lighting,\na modern multi-story office building,red brick building with large windows:2,The ground floor includes a cafe with outdoor seating,where people are enjoying coffee and conversations," # 直接固定风格
-
-# 红砖立面
-# prompt_01 = "Realistic style,outdoor,sunshine,green and inviting atmosphere,well-maintained greenery,trees,stunning sunny lighting,a modern multi-story office building,red brick building with large windows:2, The ground floor includes a cafe with outdoor seating,where people are enjoying coffee and conversations" 
-    
-# 木制立面
-# prompt_02 = "Realistic photography, outdoor,sunny day, sunshine, a modern multi-story office building with a contemporary design,featuring horizontal slatted wood elements and extensive glass windows. The building has several staggered layers with lush greenery on each level. The facade includes wooden slats that provide a sleek and sophisticated look. The structure is surrounded by well-maintained greenery,including hedges and trees. The setting appears to be in the evening with soft,warm lighting illuminating the building. The sky is clear,providing a serene and peaceful atmosphere,gravel road"
-
-
 def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, random_seed):
     payload = {
         "alwayson_scripts": {
@@ -127,11 +118,11 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
         "tiling": False,
 
 
-        # # 换模型
-        # "override_settings": {
-        #     'sd_model_checkpoint': "LandscapeBING_v1.0.safetensors [0bbe3f1aa3]"
-        # },            
-        # "override_settings_restore_afterwards": False,
+        # 换模型
+        "override_settings": {
+            'sd_model_checkpoint': "LandscapeBING_v1.0.safetensors [0bbe3f1aa3]"
+        },            
+        "override_settings_restore_afterwards": False,
 
         "width": width,                     # 生成图像宽度
         "height": height,                   # 生成图像高度
@@ -147,6 +138,7 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
         "hr_scale": 1.5,                    # 高清级别
     }
     return payload
+
 
 def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_seed):
     payload = {
@@ -212,9 +204,8 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
         "save_images": False,
 
     }
-    print('\n================= prompt =================\n', prompt)
+    # print('\n================= prompt =================\n', prompt)
     return payload
-
 
 
 def inpainting_payload(height, width, prompt, negative_prompt, init_img, mask_img, random_seed):
