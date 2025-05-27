@@ -33,6 +33,8 @@ from metagpt.tools.tool_recommend import BM25ToolRecommender
 from api_payload import i2i_controlnet_payload
 from sd_webapi import timestamp, encode_file_to_base64, decode_and_save_base64, call_api, call_img2img_api
 
+import re
+
 
 class UsabilityAction(Action):
     PROMPT_TEMPLATE: str = """
@@ -61,7 +63,7 @@ class UsabilityAction(Action):
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
-        print("\n\n=============== UsabilityAction rsp ===============\n\n", rsp)
+        # print("\n\n=============== UsabilityAction rsp ===============\n\n", rsp)
         return rsp
 
 
@@ -75,6 +77,7 @@ class UsabilityAgent(Role):
         # self._watch([UserRequirement])
         self._watch([UserRequirement, GenImageAction])
         self.set_actions([UsabilityAction])
+        self.last_msg = None
 
         logger.info(f"UsabilityAgent UserRequirement): {UserRequirement}")
 
@@ -83,24 +86,37 @@ class UsabilityAgent(Role):
         todo = self.rc.todo
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
+        # 如果是GenImageAgent发来的，更新image_base64
+        if msg.role == "GenImageAgent":
+            self.image_base64 = msg.content
+
+        # print(f"\n\n=============== UsabilityAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
+
+        print("\n\n=============== UsabilityAgent self.get_memories ===============\n\n", msg)
+        print("\n\n=============== UsabilityAgent msg.role ===============\n\n", msg.role)
+        print("\n\n=============== UsabilityAgent self.image_base64 ===============\n\n", self.image_base64)
+        # raise
+
+
         # debug
         # print("\n\n=============== UsabilityAgent msg.content ===============\n\n", msg.content)
         # print("\n\n=============== UsabilityAgent self.rc.history ===============\n\n", self.rc.history)
         # print("\n\n=============== UsabilityAgent self.rc.news ===============\n\n", self.rc.news)
         # raise
         code_text = await todo.run(msg.content, self.image_base64)
-        print("\n\n=============== UsabilityAgent code_text ===============\n\n", code_text)
+        # print("\n\n=============== UsabilityAgent code_text ===============\n\n", code_text)
         logger.info(f"UsabilityAgent cause_by: {type(todo)}")
         # raise
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
         print()
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
-        print("\n\n=============== UsabilityAgent msg ===============\n\n", msg)
+        # print("\n\n=============== UsabilityAgent msg ===============\n\n", msg)
 
         logger.info("UsabilityAgent msg", msg)
 
         logger.info("UsabilityAgent msg", msg)
+        self.last_msg = msg
         return msg
 
 
@@ -131,7 +147,7 @@ class VitalityAction(Action):
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
-        print("\n\n=============== VitalityAction rsp ===============\n\n", rsp)
+        # print("\n\n=============== VitalityAction rsp ===============\n\n", rsp)
         return rsp
 
 
@@ -145,17 +161,24 @@ class VitalityAgent(Role):
         # self._watch([UserRequirement])
         self._watch([UserRequirement, GenImageAction])
         self.set_actions([VitalityAction])
+        self.last_msg = None
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
+
+        # print(f"\n\n=============== VitalityAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
+
+        print("\n\n=============== VitalityAgent self.get_memories ===============\n\n", self.get_memories)
+
         code_text = await todo.run(msg.content, self.image_base64)
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
-        print("\n\n=============== VitalityAction msg ===============\n\n", msg)
+        # print("\n\n=============== VitalityAction msg ===============\n\n", msg)
+        self.last_msg = msg
         return msg
 
 
@@ -186,10 +209,10 @@ class SafetyAction(Action):
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
-        print("\n\n=============== SafetyAction prompt ===============\n\n", prompt)
-        print("\n\n=============== SafetyAction content ===============\n\n", content)
+        # print("\n\n=============== SafetyAction prompt ===============\n\n", prompt)
+        # print("\n\n=============== SafetyAction content ===============\n\n", content)
         #  [Message] from User to SummaryAgent: This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement.
-        print("\n\n=============== SafetyAction rsp ===============\n\n", rsp)
+        # print("\n\n=============== SafetyAction rsp ===============\n\n", rsp)
         #  {"agent": "SafetyAgent", "description": "The image shows an urban area plan with several large buildings, green spaces, pathways, and roads.", "rating_score": 7, "reason": "The design includes green spaces and pathways that may accommodate pedestrians and cyclists safely. There seems to be adequate separation between vehicular roads and pedestrian pathways. However, the exact markings and signage are not visible, which are crucial for safety enforcement.", "suggestion": "Include clear demarcations and traffic calming measures for pedestrian crossings and cyclist paths. Add signage and lighting to improve visibility and safety for all users."}
         # raise
         return rsp
@@ -205,19 +228,26 @@ class SafetyAgent(Role):
         # self._watch([UserRequirement])
         self._watch([UserRequirement, GenImageAction])
         self.set_actions([SafetyAction])
+        self.last_msg = None
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
 
         msg = self.get_memories(k=1)[0]  # find the most recent messages
+
+        # print(f"\n\n=============== SafetyAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
+
+        print("\n\n=============== SafetyAgent self.get_memories ===============\n\n", self.get_memories)
+
         code_text = await todo.run(msg.content, self.image_base64)
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
         # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
-        print("\n\n=============== SafetyAgent msg ===============\n\n", msg)
+        # print("\n\n=============== SafetyAgent msg ===============\n\n", msg)
 
         logger.info("SafetyAgent msg", msg)
+        self.last_msg = msg
         return msg
 
 
@@ -258,7 +288,7 @@ class SummaryAction(Action):
     async def run(self, content: str = "", evaluation_str: str = "", save_path: str = ""):
         prompt = self.PROMPT_TEMPLATE.format(content=content, evaluation_str=evaluation_str, save_path=save_path)
         rsp = await self._aask(prompt)
-        print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
+        # print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
         return rsp
 
 
@@ -272,6 +302,7 @@ class SummaryAgent(Role):
         # 修改监听设置
         self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
+        self.last_msg = None
 
         logger.info(f"SummaryAgent UsabilityAction, VitalityAction, SafetyAction): {UsabilityAction, VitalityAction, SafetyAction}")
 
@@ -280,50 +311,21 @@ class SummaryAgent(Role):
         todo = self.rc.todo
         
         # 获取所有评估Agent的消息
-        memories = self.get_memories(k=0)
+        memories = self.get_memories(k=1)[0]
+
+        # print(f"\n\n=============== SummaryAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
+
         print("\n\n=============== SummaryAgent memories ===============\n\n", memories)
         print("\n\n=============== SummaryAgent self.get_memories ===============\n\n", self.get_memories)
         # raise
-                    
-        # # 提取每个Agent的JSON内容
-        # evaluation_results = []
-        # for i, msg in enumerate(memories):
-        #     print(f"\n\n=============== SummaryAgent Processing memory {i} ===============\n\n")
-        #     print(f"Message content: {msg.content}")
-        #     try:
-        #         # 提取JSON部分
-        #         content = msg.content
-        #         if "```json" in content:
-        #             json_str = content.split("```json")[1].split("```")[0].strip()
-        #         elif "```" in content:
-        #             json_str = content.split("```")[1].split("```")[0].strip()
-        #         else:
-        #             json_str = content.strip()
-                
-        #         print(f"\n\n=============== SummaryAgent Extracted JSON {i} ===============\n\n")
-        #         print(f"JSON string: {json_str}")
-                    
-        #         # 解析JSON
-        #         result = json.loads(json_str)
-        #         evaluation_results.append(result)
-        #         print(f"\n\n=============== SummaryAgent Successfully parsed JSON {i} ===============\n\n")
-        #     except Exception as e:
-        #         print(f"\n\n=============== SummaryAgent Error parsing JSON {i} ===============\n\n")
-        #         print(f"Error: {str(e)}")
-        #         logger.error(f"Error parsing JSON from {msg.role}: {str(e)}")
-        
-        # # 将评估结果转换为字符串
-        # evaluation_str = json.dumps(evaluation_results, ensure_ascii=False, indent=2)
-        # print("\n\n=============== SummaryAgent evaluation_str ===============\n\n", evaluation_str)
-        
+                            
         # 运行总结Action
         code_text = await todo.run(content=memories, save_path=self.save_path)
         
         summary_msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="GenImageAgent")
         self.publish_message(summary_msg)
-        print("\n\n=============== SummaryAgent summary_msg ===============\n\n", summary_msg)
-        print("\n\n=============== SummaryAgent summary_msg.content ===============\n\n", summary_msg.content)
-
+        # print("\n\n=============== SummaryAgent summary_msg ===============\n\n", summary_msg)
+        # print("\n\n=============== SummaryAgent summary_msg.content ===============\n\n", summary_msg.content)
         # raise
         
         # 保存结果
@@ -331,6 +333,9 @@ class SummaryAgent(Role):
             f.write(summary_msg.content)
 
         logger.info("SummaryAgent summary_msg", summary_msg)
+        self.last_msg = summary_msg
+        print("\n\n=============== SummaryAgent summary_msg in _act ===============\n\n", summary_msg)
+
         return summary_msg
 
 
@@ -351,13 +356,13 @@ class GenImageAction(Action):
 
         prompt_i2i = content
         negative_prompt_i2i = ""
-        print("\n\n=============== GenImageAction prompt_i2i ===============\n\n", prompt_i2i)
+        # print("\n\n=============== GenImageAction prompt_i2i ===============\n\n", prompt_i2i)
         # raise
 
         # 第一次的图片、后面的图片？
 
         payload_i2i = i2i_controlnet_payload(prompt_i2i, negative_prompt_i2i, image_base64, layout_base64, random_seed)    
-        print("\n\n=============== GenImageAction payload_i2i ===============\n\n", payload_i2i)
+        # print("\n\n=============== GenImageAction payload_i2i ===============\n\n", payload_i2i)
 
         response = call_img2img_api(webui_server_url, **payload_i2i)
 
@@ -365,7 +370,7 @@ class GenImageAction(Action):
             save_path = os.path.join(out_i2i_dir, f'img2img-{timestamp()}-{index}.png')
             decode_and_save_base64(image, save_path)
 
-        print("\n\n=============== GenImageAction response ===============\n\n", response)
+        # print("\n\n=============== GenImageAction response ===============\n\n", response)
         return response
     
     
@@ -373,30 +378,57 @@ class GenImageAgent(Role):
     name: str = "GenImageAgent"
     profile: str = "GenImageAgent"
 
-    def __init__(self, image_base64: str = "", layout_base64: str = "", gen_image_path: str = "", **kwargs):
+    def __init__(self, image_base64: str = "", layout_base64: str = "", gen_image_path: str = "", max_rounds: int = 3, **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
         self.layout_base64 = layout_base64
         self.gen_image_path = gen_image_path
+        self.max_rounds = max_rounds
+        self.current_round = 1  
         self._watch([SummaryAction])
         self.set_actions([GenImageAction])
+        self.last_msg = None
+        self.last_image_base64 = ""  
+        self.last_image_path = ""    
 
     async def _act(self) -> Message:
         logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
 
+        print(f"\n\n=============== GenImageAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
+
         msg = self.get_memories(k=1)[0]  # find the most recent messages
         print("\n\n=============== GenImageAgent self.get_memories ===============\n\n", msg)
         # raise
-        gen_image = await todo.run(content=msg.content, image_base64=self.image_base64, layout_base64=self.layout_base64, gen_image_path=self.gen_image_path)
 
-        gen_msg = Message(content=gen_image, role=self.profile, cause_by=type(todo), send_to=(UsabilityAgent, VitalityAgent, SafetyAgent))
+        # 提取final_suggestion
+        final_suggestion = extract_final_suggestion(msg.content)
+        print("\n\n=============== GenImageAgent final_suggestion ===============\n\n", final_suggestion)
+
+        gen_image = await todo.run(content=final_suggestion, image_base64=self.image_base64, layout_base64=self.layout_base64, gen_image_path=self.gen_image_path)
+
+        print("\n\n=============== GenImageAgent len(gen_image) ===============\n\n", len(gen_image))
+
+        if isinstance(gen_image, dict) and 'images' in gen_image:
+            new_image_base64 = gen_image['images'][0]
+        else:
+            new_image_base64 = gen_image  # 已经是字符串
+        # print("\n\n=============== GenImageAgent new_image_base64 ===============\n\n", new_image_base64)
+
+        gen_msg = Message(content=new_image_base64, role=self.profile, cause_by=type(todo), send_to=(UsabilityAgent, VitalityAgent, SafetyAgent))
         self.publish_message(gen_msg)
 
-        print("\n\n=============== GenImageAgent type(gen_image) ===============\n\n", type(gen_image))
-        print("\n\n=============== GenImageAgent gen_msg ===============\n\n", gen_msg)
-
-        logger.info("GenImageAgent gen_msg", type(gen_msg))
+        # 轮数+1
+        self.current_round += 1
+        if self.current_round > self.max_rounds:
+            # 发一个特殊消息
+            gen_msg = Message(content="TERMINATE", role=self.profile, cause_by=type(todo), send_to=())
+            self.publish_message(gen_msg)
+            return gen_msg
+        
+        self.last_msg = gen_msg
+        self.last_image_base64 = new_image_base64
+        self.last_image_path = self.gen_image_path  # 如果有
         return gen_msg
 
 
@@ -415,6 +447,7 @@ async def main(
         layout_path: str = "",
         suggestion_path: str = "",
         gen_image_path: str = "",
+        max_rounds: int = 3,
 ):
     # 读取并转换图片
     init_image_base64 = encode_image(init_image_path)
@@ -433,7 +466,12 @@ async def main(
     vitality_agent = VitalityAgent(image_base64=init_image_base64)
     safety_agent = SafetyAgent(image_base64=init_image_base64)
     summary_agent = SummaryAgent(save_path=suggestion_path)
-    gen_image_agent = GenImageAgent(image_base64=init_image_base64, layout_base64=layout_base64, gen_image_path=gen_image_path)
+    gen_image_agent = GenImageAgent(
+        image_base64=init_image_base64,
+        layout_base64=layout_base64,
+        gen_image_path=gen_image_path,
+        max_rounds=max_rounds,  
+    )
 
     env.add_roles([usability_agent, vitality_agent, safety_agent, summary_agent, gen_image_agent])
     logger.info("agents added to environment")
@@ -450,17 +488,81 @@ async def main(
 
     logger.info("environment start running...")
     run_count = 0
+    history = []
     while not env.is_idle:
         run_count += 1
-        logger.info(f"environment running #{run_count}")
+        logger.info(f"now environment running #{run_count}")
         await env.run()
+
+        # # 记录每一轮
+        # usability_msg = usability_agent.last_msg
+        # vitality_msg = vitality_agent.last_msg
+        # safety_msg = safety_agent.last_msg
+        # summary_msg = getattr(summary_agent, "last_msg", None)
+        # print("\n\n=============== GenImageAgent summary_msg in main ===============\n\n", summary_msg)
+        # final_suggestion = extract_final_suggestion(summary_msg.content) if summary_msg else ""
+        # gen_image_base64 = gen_image_agent.last_image_base64
+        # gen_image_path = gen_image_agent.last_image_path
+
+        # history.append({
+        #     "round": run_count,
+        #     "evaluations": [usability_msg.content, vitality_msg.content, safety_msg.content],
+        #     "summary": summary_msg.content,
+        #     "final_suggestion": final_suggestion,
+        #     "gen_image_base64": gen_image_base64,
+        #     "gen_image_path": gen_image_path,
+        # })
+
+        # 检查终止信号
+        if gen_image_agent.current_round > max_rounds:
+            break
 
     logger.info(f"environment finished, run_count: {run_count}")
     
     logger.info("getting env")
     print("================= main env =================", env)
     
-    # return final_result
+    # 循环外保存
+    with open("..\\workspace\\urban_design\\process_history.json", "w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
+
+    return history
+
+def extract_final_suggestion(summary_json_str):
+    """
+    从包含多个markdown代码块的字符串中，提取SummaryAgent的final_suggestion字段
+    """
+    # 匹配所有```json ... ```代码块
+    code_blocks = re.findall(r"```json\s*([\s\S]*?)```", summary_json_str)
+    if not code_blocks:
+        print("未找到json代码块")
+        return ""
+    # 通常第二个代码块才是SummaryAgent的json
+    if len(code_blocks) >= 2:
+        summary_json = code_blocks[1]
+    else:
+        summary_json = code_blocks[0]
+    try:
+        data = json.loads(summary_json)
+        return data.get("final_suggestion", "")
+    except Exception as e:
+        print(f"解析summary json失败: {e}")
+        return ""
+
+
+def extract_final_suggestion_method2(summary_json_str):
+    code_blocks = re.findall(r"```json\s*([\s\S]*?)```", summary_json_str)
+    for block in code_blocks:
+        try:
+            data = json.loads(block)
+            if "final_suggestion" in data:
+                return data["final_suggestion"]
+        except Exception:
+            continue
+    print("未找到final_suggestion字段")
+    return ""
+
+
 
 if __name__ == "__main__":
     save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
