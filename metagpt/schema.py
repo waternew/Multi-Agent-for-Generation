@@ -51,6 +51,8 @@ from metagpt.const import (
 from metagpt.logs import logger
 from metagpt.repo_parser import DotClassInfo
 from metagpt.tools import register_tool
+# from metagpt.tools.tool_registry import register_tool
+# from .tools.tool_registry import register_tool
 from metagpt.utils.common import (
     CodeParser,
     any_to_str,
@@ -495,12 +497,25 @@ class TaskResult(BaseModel):
 )
 class Plan(BaseModel):
     """Plan is a sequence of tasks towards a goal."""
+    # from metagpt.tools import register_tool
 
     goal: str
     context: str = ""
     tasks: list[Task] = []
     task_map: dict[str, Task] = {}
     current_task_id: str = ""
+
+    # def __init__(self, **data):
+    #     super().__init__(**data)
+    #     from metagpt.tools import register_tool
+    #     register_tool(
+    #         include_functions=[
+    #             "append_task",
+    #             "reset_task",
+    #             "replace_task",
+    #             "finish_current_task",
+    #         ]
+    #     )(self.__class__)
 
     def _topological_sort(self, tasks: list[Task]):
         task_map = {task.task_id: task for task in tasks}
