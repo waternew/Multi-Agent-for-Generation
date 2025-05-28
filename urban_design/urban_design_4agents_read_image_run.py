@@ -34,7 +34,6 @@ from api_payload import i2i_controlnet_payload
 from sd_webapi import timestamp, encode_file_to_base64, decode_and_save_base64, call_api, call_img2img_api
 
 import re
-from utils.execution_logger import ExecutionLogger
 
 
 class UsabilityAction(Action):
@@ -75,97 +74,48 @@ class UsabilityAgent(Role):
     def __init__(self, image_base64: str = "", **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
+        # self._watch([UserRequirement])
         self._watch([UserRequirement, GenImageAction])
         self.set_actions([UsabilityAction])
         self.last_msg = None
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="Initialize",
-            description="UsabilityAgent initialized with UserRequirement and GenImageAction",
-            status="success"
-        )
+        logger.info(f"UsabilityAgent UserRequirement): {UserRequirement}")
 
     async def _act(self) -> Message:
-        execution_logger.log_action(
-            agent=self.name,
-            action="StartAction",
-            description=f"Starting {self.rc.todo.name}",
-            status="in_progress"
-        )
-
+        logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
+
         msg = self.get_memories(k=1)[0]  # find the most recent messages
-        
+        # 如果是GenImageAgent发来的，更新image_base64
         if msg.role == "GenImageAgent":
             self.image_base64 = msg.content
-            execution_logger.log_action(
-                agent=self.name,
-                action="UpdateImage",
-                description="Updated image_base64 from GenImageAgent message",
-                received_message={
-                    "role": msg.role,
-                    "content_length": len(msg.content),
-                    "image_info": "New image received from GenImageAgent"
-                },
-                status="success"
-            )
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="ProcessMessage",
-            description="Processing current message",
-            received_message={
-                "role": msg.role,
-                "content": msg.content[:100] + "...",
-                "message_type": "Initial request" if msg.role == "UserRequirement" else "Generated image"
-            },
-            status="in_progress"
-        )
+        # print(f"\n\n=============== UsabilityAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
 
+        print("\n\n=============== UsabilityAgent self.get_memories ===============\n\n", msg)
+        print("\n\n=============== UsabilityAgent msg.role ===============\n\n", msg.role)
+        print("\n\n=============== UsabilityAgent self.image_base64 ===============\n\n", self.image_base64)
+        # raise
+
+
+        # debug
+        # print("\n\n=============== UsabilityAgent msg.content ===============\n\n", msg.content)
+        # print("\n\n=============== UsabilityAgent self.rc.history ===============\n\n", self.rc.history)
+        # print("\n\n=============== UsabilityAgent self.rc.news ===============\n\n", self.rc.news)
+        # raise
         code_text = await todo.run(msg.content, self.image_base64)
-        
-        # 解析评估结果
-        try:
-            evaluation_result = json.loads(code_text)
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateResponse",
-                description=f"Generated evaluation response",
-                additional_data={
-                    "evaluation": {
-                        "agent": evaluation_result.get("agent"),
-                        "rating_score": evaluation_result.get("rating_score"),
-                        "reason": evaluation_result.get("reason"),
-                        "suggestion": evaluation_result.get("suggestion")
-                    }
-                },
-                status="success"
-            )
-        except json.JSONDecodeError:
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateResponse",
-                description=f"Generated response for {type(todo)}",
-                status="success"
-            )
-
+        # print("\n\n=============== UsabilityAgent code_text ===============\n\n", code_text)
+        logger.info(f"UsabilityAgent cause_by: {type(todo)}")
+        # raise
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
+        print()
+        # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
-        
-        execution_logger.log_action(
-            agent=self.name,
-            action="SendMessage",
-            description="Sending evaluation to SummaryAgent",
-            sent_message={
-                "role": self.profile,
-                "content": code_text,
-                "send_to": "SummaryAgent",
-                "message_type": "Evaluation result"
-            },
-            status="success"
-        )
+        # print("\n\n=============== UsabilityAgent msg ===============\n\n", msg)
 
+        logger.info("UsabilityAgent msg", msg)
+
+        logger.info("UsabilityAgent msg", msg)
         self.last_msg = msg
         return msg
 
@@ -208,97 +158,26 @@ class VitalityAgent(Role):
     def __init__(self, image_base64: str = "", **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
+        # self._watch([UserRequirement])
         self._watch([UserRequirement, GenImageAction])
         self.set_actions([VitalityAction])
         self.last_msg = None
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="Initialize",
-            description="VitalityAgent initialized with UserRequirement and GenImageAction",
-            status="success"
-        )
-
     async def _act(self) -> Message:
-        execution_logger.log_action(
-            agent=self.name,
-            action="StartAction",
-            description=f"Starting {self.rc.todo.name}",
-            status="in_progress"
-        )
-
+        logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
+
         msg = self.get_memories(k=1)[0]  # find the most recent messages
 
-        if msg.role == "GenImageAgent":
-            self.image_base64 = msg.content
-            execution_logger.log_action(
-                agent=self.name,
-                action="UpdateImage",
-                description="Updated image_base64 from GenImageAgent message",
-                received_message={
-                    "role": msg.role,
-                    "content_length": len(msg.content),
-                    "image_info": "New image received from GenImageAgent"
-                },
-                status="success"
-            )
+        # print(f"\n\n=============== VitalityAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="ProcessMessage",
-            description="Processing current message",
-            received_message={
-                "role": msg.role,
-                "content": msg.content[:100] + "...",
-                "message_type": "Initial request" if msg.role == "UserRequirement" else "Generated image"
-            },
-            status="in_progress"
-        )
+        print("\n\n=============== VitalityAgent self.get_memories ===============\n\n", self.get_memories)
 
         code_text = await todo.run(msg.content, self.image_base64)
-        
-        # 解析评估结果
-        try:
-            evaluation_result = json.loads(code_text)
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateResponse",
-                description=f"Generated evaluation response",
-                additional_data={
-                    "evaluation": {
-                        "agent": evaluation_result.get("agent"),
-                        "rating_score": evaluation_result.get("rating_score"),
-                        "reason": evaluation_result.get("reason"),
-                        "suggestion": evaluation_result.get("suggestion")
-                    }
-                },
-                status="success"
-            )
-        except json.JSONDecodeError:
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateResponse",
-                description=f"Generated response for {type(todo)}",
-                status="success"
-            )
-
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
+        # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
-        
-        execution_logger.log_action(
-            agent=self.name,
-            action="SendMessage",
-            description="Sending evaluation to SummaryAgent",
-            sent_message={
-                "role": self.profile,
-                "content": code_text,
-                "send_to": "SummaryAgent",
-                "message_type": "Evaluation result"
-            },
-            status="success"
-        )
-
+        # print("\n\n=============== VitalityAction msg ===============\n\n", msg)
         self.last_msg = msg
         return msg
 
@@ -346,97 +225,28 @@ class SafetyAgent(Role):
     def __init__(self, image_base64: str = "", **kwargs):
         super().__init__(**kwargs)
         self.image_base64 = image_base64
+        # self._watch([UserRequirement])
         self._watch([UserRequirement, GenImageAction])
         self.set_actions([SafetyAction])
         self.last_msg = None
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="Initialize",
-            description="SafetyAgent initialized with UserRequirement and GenImageAction",
-            status="success"
-        )
-
     async def _act(self) -> Message:
-        execution_logger.log_action(
-            agent=self.name,
-            action="StartAction",
-            description=f"Starting {self.rc.todo.name}",
-            status="in_progress"
-        )
-
+        logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
+
         msg = self.get_memories(k=1)[0]  # find the most recent messages
 
-        if msg.role == "GenImageAgent":
-            self.image_base64 = msg.content
-            execution_logger.log_action(
-                agent=self.name,
-                action="UpdateImage",
-                description="Updated image_base64 from GenImageAgent message",
-                received_message={
-                    "role": msg.role,
-                    "content_length": len(msg.content),
-                    "image_info": "New image received from GenImageAgent"
-                },
-                status="success"
-            )
+        # print(f"\n\n=============== SafetyAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="ProcessMessage",
-            description="Processing current message",
-            received_message={
-                "role": msg.role,
-                "content": msg.content[:100] + "...",
-                "message_type": "Initial request" if msg.role == "UserRequirement" else "Generated image"
-            },
-            status="in_progress"
-        )
+        print("\n\n=============== SafetyAgent self.get_memories ===============\n\n", self.get_memories)
 
         code_text = await todo.run(msg.content, self.image_base64)
-        
-        # 解析评估结果
-        try:
-            evaluation_result = json.loads(code_text)
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateResponse",
-                description=f"Generated evaluation response",
-                additional_data={
-                    "evaluation": {
-                        "agent": evaluation_result.get("agent"),
-                        "rating_score": evaluation_result.get("rating_score"),
-                        "reason": evaluation_result.get("reason"),
-                        "suggestion": evaluation_result.get("suggestion")
-                    }
-                },
-                status="success"
-            )
-        except json.JSONDecodeError:
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateResponse",
-                description=f"Generated response for {type(todo)}",
-                status="success"
-            )
-
         msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="SummaryAgent")
+        # 确保消息被发送到SummaryAgent
         self.publish_message(msg)
-        
-        execution_logger.log_action(
-            agent=self.name,
-            action="SendMessage",
-            description="Sending evaluation to SummaryAgent",
-            sent_message={
-                "role": self.profile,
-                "content": code_text,
-                "send_to": "SummaryAgent",
-                "message_type": "Evaluation result"
-            },
-            status="success"
-        )
+        # print("\n\n=============== SafetyAgent msg ===============\n\n", msg)
 
+        logger.info("SafetyAgent msg", msg)
         self.last_msg = msg
         return msg
 
@@ -486,118 +296,46 @@ class SummaryAgent(Role):
     name: str = "SummaryAgent"
     profile: str = "SummaryAgent"
 
-    def __init__(self, suggestions_dir: str = "", **kwargs):
+    def __init__(self, save_path: str = "", **kwargs):
         super().__init__(**kwargs)
-        self.suggestions_dir = suggestions_dir
-        self.current_round = 1
+        self.save_path = save_path
+        # 修改监听设置
         self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
         self.last_msg = None
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="Initialize",
-            description="SummaryAgent initialized with UsabilityAction, VitalityAction, and SafetyAction",
-            status="success"
-        )
+        logger.info(f"SummaryAgent UsabilityAction, VitalityAction, SafetyAction): {UsabilityAction, VitalityAction, SafetyAction}")
 
     async def _act(self) -> Message:
-        execution_logger.log_action(
-            agent=self.name,
-            action="StartAction",
-            description=f"Starting {self.rc.todo.name} for round {self.current_round}",
-            status="in_progress"
-        )
-
+        logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
+        
+        # 获取所有评估Agent的消息
         memories = self.get_memories(k=1)[0]
 
-        # 解析接收到的评估结果
-        try:
-            evaluations = json.loads(memories.content)
-            execution_logger.log_action(
-                agent=self.name,
-                action="ProcessMessage",
-                description="Processing evaluation results from all agents",
-                received_message={
-                    "content": memories.content,
-                    "evaluations": evaluations,
-                    "message_type": "Evaluation results from all agents"
-                },
-                status="in_progress"
-            )
-        except json.JSONDecodeError:
-            execution_logger.log_action(
-                agent=self.name,
-                action="ProcessMessage",
-                description="Processing evaluation results from all agents",
-                received_message={
-                    "content": memories.content[:100] + "...",
-                    "message_type": "Evaluation results from all agents"
-                },
-                status="in_progress"
-            )
+        # print(f"\n\n=============== SummaryAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
 
-        # 为当前轮次创建建议文件路径
-        current_suggestion_path = os.path.join(self.suggestions_dir, f"round_{self.current_round}.txt")
-        code_text = await todo.run(content=memories, save_path=current_suggestion_path)
+        print("\n\n=============== SummaryAgent memories ===============\n\n", memories)
+        print("\n\n=============== SummaryAgent self.get_memories ===============\n\n", self.get_memories)
+        # raise
+                            
+        # 运行总结Action
+        code_text = await todo.run(content=memories, save_path=self.save_path)
         
-        # 解析生成的总结
-        try:
-            summary_result = json.loads(code_text)
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateSummary",
-                description="Generated summary of all evaluations",
-                additional_data={
-                    "summary": {
-                        "agent": summary_result.get("agent"),
-                        "summary": summary_result.get("summary"),
-                        "conflicts": summary_result.get("conflicts"),
-                        "final_suggestion": summary_result.get("final_suggestion")
-                    }
-                },
-                status="success"
-            )
-        except json.JSONDecodeError:
-            execution_logger.log_action(
-                agent=self.name,
-                action="GenerateSummary",
-                description="Generated summary of all evaluations",
-                additional_data={"summary_length": len(code_text)},
-                status="success"
-            )
-
         summary_msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="GenImageAgent")
         self.publish_message(summary_msg)
+        # print("\n\n=============== SummaryAgent summary_msg ===============\n\n", summary_msg)
+        # print("\n\n=============== SummaryAgent summary_msg.content ===============\n\n", summary_msg.content)
+        # raise
         
-        execution_logger.log_action(
-            agent=self.name,
-            action="SendMessage",
-            description="Sending summary to GenImageAgent",
-            sent_message={
-                "role": self.profile,
-                "content": code_text,
-                "send_to": "GenImageAgent",
-                "message_type": "Summary with final suggestion"
-            },
-            status="success"
-        )
-
         # 保存结果
-        with open(current_suggestion_path, "w", encoding='utf-8') as f:
+        with open(self.save_path, "w", encoding='utf-8') as f:
             f.write(summary_msg.content)
-            
-        execution_logger.log_action(
-            agent=self.name,
-            action="SaveResult",
-            description="Saved summary result to file",
-            additional_data={"save_path": current_suggestion_path},
-            status="success"
-        )
 
-        self.current_round += 1
+        logger.info("SummaryAgent summary_msg", summary_msg)
         self.last_msg = summary_msg
+        print("\n\n=============== SummaryAgent summary_msg in _act ===============\n\n", summary_msg)
+
         return summary_msg
 
 
@@ -611,7 +349,8 @@ class GenImageAction(Action):
     async def run(self, content: str, image_base64: str, layout_base64: str, gen_image_path: str):
         
         webui_server_url = 'http://127.0.0.1:7860'
-        os.makedirs(gen_image_path, exist_ok=True)
+        out_i2i_dir = r"E:\\HKUST\\202505_Agent_Urban_Design\\MetaGPT\\workspace\\urban_design\\sd_api_out"
+        os.makedirs(out_i2i_dir, exist_ok=True)
 
         random_seed = random.randint(1,1000000)
 
@@ -628,7 +367,7 @@ class GenImageAction(Action):
         response = call_img2img_api(webui_server_url, **payload_i2i)
 
         for index, image in enumerate(response.get('images')):
-            save_path = os.path.join(gen_image_path, f'img2img-{timestamp()}-{index}.png')
+            save_path = os.path.join(out_i2i_dir, f'img2img-{timestamp()}-{index}.png')
             decode_and_save_base64(image, save_path)
 
         # print("\n\n=============== GenImageAction response ===============\n\n", response)
@@ -652,102 +391,44 @@ class GenImageAgent(Role):
         self.last_image_base64 = ""  
         self.last_image_path = ""    
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="Initialize",
-            description=f"GenImageAgent initialized with max_rounds={max_rounds}",
-            status="success"
-        )
-
     async def _act(self) -> Message:
-        execution_logger.log_action(
-            agent=self.name,
-            action="StartAction",
-            description=f"Starting round {self.current_round}/{self.max_rounds}",
-            status="in_progress"
-        )
-
+        logger.info(f"{self._setting}: to do {self.rc.todo}({self.rc.todo.name})")
         todo = self.rc.todo
-        msg = self.get_memories(k=1)[0]
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="ProcessMessage",
-            description="Processing message from SummaryAgent",
-            received_message={
-                "role": msg.role,
-                "content": msg.content,
-                "message_type": "Summary with final suggestion"
-            },
-            status="in_progress"
-        )
+        print(f"\n\n=============== GenImageAgent 当前轮数: {self.current_round}/{self.max_rounds} ===============\n\n")
 
+        msg = self.get_memories(k=1)[0]  # find the most recent messages
+        print("\n\n=============== GenImageAgent self.get_memories ===============\n\n", msg)
+        # raise
+
+        # 提取final_suggestion
         final_suggestion = extract_final_suggestion(msg.content)
-        execution_logger.log_action(
-            agent=self.name,
-            action="ExtractSuggestion",
-            description="Extracted final suggestion",
-            additional_data={"final_suggestion": final_suggestion},
-            status="success"
-        )
+        print("\n\n=============== GenImageAgent final_suggestion ===============\n\n", final_suggestion)
 
         gen_image = await todo.run(content=final_suggestion, image_base64=self.image_base64, layout_base64=self.layout_base64, gen_image_path=self.gen_image_path)
 
-        # 记录生成的图片信息
+        print("\n\n=============== GenImageAgent len(gen_image) ===============\n\n", len(gen_image))
+
         if isinstance(gen_image, dict) and 'images' in gen_image:
             new_image_base64 = gen_image['images'][0]
-            image_info = {
-                "image_count": len(gen_image['images']),
-                "image_length": len(new_image_base64),
-                "save_path": self.gen_image_path
-            }
         else:
-            new_image_base64 = gen_image
-            image_info = {
-                "image_length": len(new_image_base64),
-                "save_path": self.gen_image_path
-            }
-
-        execution_logger.log_action(
-            agent=self.name,
-            action="GenerateImage",
-            description="Generated new image",
-            additional_data={"image_info": image_info},
-            status="success"
-        )
+            new_image_base64 = gen_image  # 已经是字符串
+        # print("\n\n=============== GenImageAgent new_image_base64 ===============\n\n", new_image_base64)
 
         gen_msg = Message(content=new_image_base64, role=self.profile, cause_by=type(todo), send_to=(UsabilityAgent, VitalityAgent, SafetyAgent))
         self.publish_message(gen_msg)
 
-        execution_logger.log_action(
-            agent=self.name,
-            action="SendMessage",
-            description="Sending generated image to evaluation agents",
-            sent_message={
-                "role": self.profile,
-                "content_length": len(new_image_base64),
-                "send_to": ["UsabilityAgent", "VitalityAgent", "SafetyAgent"],
-                "message_type": "Generated image",
-                "image_info": image_info
-            },
-            status="success"
-        )
-
+        # 轮数+1
         self.current_round += 1
         if self.current_round > self.max_rounds:
-            execution_logger.log_action(
-                agent=self.name,
-                action="Terminate",
-                description="Maximum rounds reached, sending termination message",
-                status="success"
-            )
+            # 发一个特殊消息
             gen_msg = Message(content="TERMINATE", role=self.profile, cause_by=type(todo), send_to=())
             self.publish_message(gen_msg)
             return gen_msg
         
         self.last_msg = gen_msg
         self.last_image_base64 = new_image_base64
-        self.last_image_path = self.gen_image_path
+        self.last_image_path = self.gen_image_path  # 如果有
         return gen_msg
 
 
@@ -764,20 +445,19 @@ async def main(
         description: str = "",
         init_image_path: str = "",
         layout_path: str = "",
-        suggestions_dir: str = "",
+        suggestion_path: str = "",
         gen_image_path: str = "",
-        max_rounds: int = 2,
+        max_rounds: int = 3,
 ):
     # 读取并转换图片
     init_image_base64 = encode_image(init_image_path)
     layout_base64 = encode_image(layout_path)
 
-    logger.info(f"Description: {description}")
+    logger.info(description)
     logger.info(f"Image loaded from: {init_image_path}")
     logger.info(f"Layout loaded from: {layout_path}")
-    logger.info(f"Results will be saved to: {suggestions_dir}")
+    logger.info(f"Results will be saved to: {suggestion_path}")
     logger.info(f"Gen image will be saved to: {gen_image_path}")
-    logger.info(f"Maximum rounds: {max_rounds}")
 
     context = Context(config_file="config/config2.yaml")
     env = Environment(context=context)
@@ -785,17 +465,18 @@ async def main(
     usability_agent = UsabilityAgent(image_base64=init_image_base64)
     vitality_agent = VitalityAgent(image_base64=init_image_base64)
     safety_agent = SafetyAgent(image_base64=init_image_base64)
-    summary_agent = SummaryAgent(suggestions_dir=suggestions_dir)
+    summary_agent = SummaryAgent(save_path=suggestion_path)
     gen_image_agent = GenImageAgent(
         image_base64=init_image_base64,
         layout_base64=layout_base64,
         gen_image_path=gen_image_path,
-        max_rounds=max_rounds,
+        max_rounds=max_rounds,  
     )
 
     env.add_roles([usability_agent, vitality_agent, safety_agent, summary_agent, gen_image_agent])
-    logger.info("All agents added to environment")
+    logger.info("agents added to environment")
 
+    # content = {"description": description, "image_base64": image_base64}
     content = {"description": description}
     content_json = json.dumps(content)
 
@@ -805,27 +486,45 @@ async def main(
         )
     )
 
-    logger.info("Environment starting to run...")
+    logger.info("environment start running...")
     run_count = 0
     history = []
     while not env.is_idle:
         run_count += 1
-        logger.info(f"Environment running iteration #{run_count}")
+        logger.info(f"now environment running #{run_count}")
         await env.run()
 
+        # # 记录每一轮
+        # usability_msg = usability_agent.last_msg
+        # vitality_msg = vitality_agent.last_msg
+        # safety_msg = safety_agent.last_msg
+        # summary_msg = getattr(summary_agent, "last_msg", None)
+        # print("\n\n=============== GenImageAgent summary_msg in main ===============\n\n", summary_msg)
+        # final_suggestion = extract_final_suggestion(summary_msg.content) if summary_msg else ""
+        # gen_image_base64 = gen_image_agent.last_image_base64
+        # gen_image_path = gen_image_agent.last_image_path
+
+        # history.append({
+        #     "round": run_count,
+        #     "evaluations": [usability_msg.content, vitality_msg.content, safety_msg.content],
+        #     "summary": summary_msg.content,
+        #     "final_suggestion": final_suggestion,
+        #     "gen_image_base64": gen_image_base64,
+        #     "gen_image_path": gen_image_path,
+        # })
+
+        # 检查终止信号
         if gen_image_agent.current_round > max_rounds:
-            logger.info("Maximum rounds reached, stopping environment")
             break
 
-    logger.info(f"Environment finished, total iterations: {run_count}")
+    logger.info(f"environment finished, run_count: {run_count}")
     
-    logger.info("Getting environment state")
-    logger.debug(f"Environment state: {env}")
+    logger.info("getting env")
+    print("================= main env =================", env)
     
     # 循环外保存
     with open("..\\workspace\\urban_design\\process_history.json", "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
-        logger.info("Process history saved to file")
 
     return history
 
@@ -869,34 +568,14 @@ if __name__ == "__main__":
     save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
     os.makedirs(save_dir, exist_ok=True)
 
-    # 使用同一个时间戳创建结果目录
-    timestamp_str = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    result_dir = os.path.join(save_dir, timestamp_str)
-    os.makedirs(result_dir, exist_ok=True)
-
-    # 创建子目录
-    logs_dir = os.path.join(result_dir, "logs")
-    suggestions_dir = os.path.join(result_dir, "suggestions")
-    gen_image_path = os.path.join(result_dir, "sd_api_out")
-    
-    os.makedirs(logs_dir, exist_ok=True)
-    os.makedirs(suggestions_dir, exist_ok=True)
-    os.makedirs(gen_image_path, exist_ok=True)
-
-    # 初始化日志记录器
-    execution_logger = ExecutionLogger(result_dir=result_dir)
-
     description = "This is an urban design image. Hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
     init_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image_comp.jpg"
     layout_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout_comp.jpg"
+    suggestion_path = f"{save_dir}/1_image_comp-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    gen_image_path = f"{save_dir}/1_image_comp_gen_image-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    # image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/2_l_compressed.jpg"
+    # save_path = f"{save_dir}/2_l_compressed_4o_suggestion-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
-    result = asyncio.run(main(
-        description=description, 
-        init_image_path=init_image_path, 
-        layout_path=layout_path, 
-        suggestions_dir=suggestions_dir, 
-        gen_image_path=gen_image_path,
-        max_rounds=2  # 设置最大轮次
-    ))
+    result = asyncio.run(main(description=description, init_image_path=init_image_path, layout_path=layout_path, suggestion_path=suggestion_path, gen_image_path=gen_image_path))
     print("\n\n=============== Result ===============\n\n", json.dumps(result, ensure_ascii=False))
