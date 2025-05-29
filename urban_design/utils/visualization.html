@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Design Agent Log Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 95vw;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .log-table th,
+        .log-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+            vertical-align: top;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-width: 200px;
+        }
+
+        .log-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .log-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* 设置各列宽度 */
+        .log-table th:nth-child(1),
+        .log-table td:nth-child(1) {
+            width: 10%;
+        } /* Agent */
+        .log-table th:nth-child(2),
+        .log-table td:nth-child(2) {
+            width: 10%;
+        } /* Action */
+        .log-table th:nth-child(3),
+        .log-table td:nth-child(3) {
+            width: 15%;
+        } /* Description */
+        .log-table th:nth-child(4),
+        .log-table td:nth-child(4) {
+            width: 8%;
+        } /* Status */
+        .log-table th:nth-child(5),
+        .log-table td:nth-child(5) {
+            width: 15%;
+        } /* Received Message */
+        .log-table th:nth-child(6),
+        .log-table td:nth-child(6) {
+            width: 15%;
+        } /* Sent Message */
+        .log-table th:nth-child(7),
+        .log-table td:nth-child(7) {
+            width: 15%;
+        } /* Additional Data */
+
+        /* 可折叠内容样式 */
+        .collapsible {
+            background-color: #f1f1f1;
+            color: #444;
+            cursor: pointer;
+            padding: 6px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 12px;
+            border-radius: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: #ccc;
+        }
+
+        .content {
+            padding: 0 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            transition: max-height 0.2s ease-out;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        /* 添加滚动条样式 */
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* 状态样式 */
+        .status-success {
+            color: #28a745;
+        }
+
+        .status-error {
+            color: #dc3545;
+        }
+
+        .status-in-progress {
+            color: #ffc107;
+        }
+
+        /* 图片预览样式 */
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* 评估结果样式 */
+        .evaluation-result {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .evaluation-score {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .evaluation-suggestion {
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Urban Design Agent Log Visualization</h1>
+        <div id="log-container">
+            <table id="log-table" class="log-table">
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Received Message</th>
+                        <th>Sent Message</th>
+                        <th>Additional Data</th>
+                    </tr>
+                </thead>
+                <tbody id="log-entries">
+                    <!-- 日志条目将动态添加到这里 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket连接
+        const ws = new WebSocket("ws://localhost:8081");
+        const logEntriesContainer = document.getElementById("log-entries");
+
+        // 处理接收到的消息
+        ws.onmessage = (event) => {
+            const data = event.data;
+            try {
+                const message = JSON.parse(data);
+                
+                // 处理不同类型的消息
+                if (message.type === "log_entry") {
+                    addLogEntry(message.data);
+                } else if (message.type === "error") {
+                    console.error("Server error:", message.message);
+                    addErrorEntry(message.message);
+                }
+            } catch (e) {
+                console.error("Error parsing message:", e);
+            }
+        };
+
+        ws.onopen = () => {
+            console.log("Connected to server");
+            addSystemEntry("Connected to visualization server");
+        };
+
+        ws.onclose = () => {
+            console.log("Disconnected from server");
+            addSystemEntry("Disconnected from visualization server");
+        };
+
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+            addSystemEntry("Error connecting to server");
+        };
+
+        // 添加日志条目
+        function addLogEntry(logEntry) {
+            const row = document.createElement("tr");
+            
+            // 设置状态样式
+            const statusClass = `status-${logEntry.status.toLowerCase()}`;
+            
+            row.innerHTML = `
+                <td>${logEntry.agent}</td>
+                <td>${logEntry.action}</td>
+                <td>${logEntry.description}</td>
+                <td class="${statusClass}">${logEntry.status}</td>
+                <td>${formatMessage(logEntry.received_message)}</td>
+                <td>${formatMessage(logEntry.sent_message)}</td>
+                <td>${formatAdditionalData(logEntry.additional_data)}</td>
+            `;
+            
+            logEntriesContainer.appendChild(row);
+        }
+
+        // 添加错误条目
+        function addErrorEntry(message) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td colspan="7" class="status-error">
+                    Error: ${message}
+                </td>
+            `;
+            logEntriesContainer.appendChild(row);
+        }
+
+        // 添加系统消息
+        function addSystemEntry(message) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td colspan="7" class="status-in-progress">
+                    System: ${message}
+                </td>
+            `;
+            logEntriesContainer.appendChild(row);
+        }
+
+        // 格式化消息内容
+        function formatMessage(message) {
+            if (!message) return "";
+            
+            if (typeof message === "string") {
+                return `<button class="collapsible">${message.substring(0, 50)}...</button>
+                        <div class="content">${message}</div>`;
+            }
+            
+            return `<button class="collapsible">${JSON.stringify(message).substring(0, 50)}...</button>
+                    <div class="content">${JSON.stringify(message, null, 2)}</div>`;
+        }
+
+        // 格式化额外数据
+        function formatAdditionalData(data) {
+            if (!data) return "";
+            
+            if (data.evaluation) {
+                return `
+                    <div class="evaluation-result">
+                        <div>Agent: ${data.evaluation.agent}</div>
+                        <div>Score: <span class="evaluation-score">${data.evaluation.rating_score}</span></div>
+                        <div>Reason: ${data.evaluation.reason}</div>
+                        <div class="evaluation-suggestion">Suggestion: ${data.evaluation.suggestion}</div>
+                    </div>
+                `;
+            }
+            
+            return `<button class="collapsible">${JSON.stringify(data).substring(0, 50)}...</button>
+                    <div class="content">${JSON.stringify(data, null, 2)}</div>`;
+        }
+
+        // 添加折叠功能
+        document.addEventListener("click", function(e) {
+            if (e.target.classList.contains("collapsible")) {
+                e.target.classList.toggle("active");
+                const content = e.target.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

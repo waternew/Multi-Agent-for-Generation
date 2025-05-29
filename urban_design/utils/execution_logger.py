@@ -5,122 +5,116 @@ from loguru import logger
 import sys
 import logging
 from typing import Dict, Any, Optional
+from logging.handlers import RotatingFileHandler
 
 class ExecutionLogger:
     """执行日志记录器，用于记录agent的执行过程"""
     
-    def __init__(self, result_dir: str = None, max_description_length: int = 200):
+    def __init__(self, result_dir: str, max_log_size: int = 10 * 1024 * 1024, backup_count: int = 5):
         self.result_dir = result_dir
-        self.log_dir = os.path.join(result_dir, "logs") if result_dir else "../../workspace/logs/execution"
-        self.current_log_file = None
-        self.max_description_length = max_description_length
-        self._setup_logger()
+        self.logs_dir = os.path.join(result_dir, "logs")
+        os.makedirs(self.logs_dir, exist_ok=True)
+        
+        # 创建带时间戳的日志文件
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.log_file = os.path.join(self.logs_dir, f"execution_{timestamp}.jsonl")
+        
+        # 设置日志记录器
+        self.logger = self._setup_logger()
+        
+        # 记录初始化信息
+        self.log_action(
+            agent="System",
+            action="Initialize",
+            description="ExecutionLogger initialized",
+            status="success"
+        )
         
     def _setup_logger(self):
         """设置日志记录器"""
-        # 确保日志目录存在
-        os.makedirs(self.log_dir, exist_ok=True)
-        
-        # 创建当前日志文件
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.current_log_file = os.path.join(self.log_dir, f"execution_{timestamp}.jsonl")
-        
-        # 配置loguru
-        logger.remove()  # 移除默认处理器
-        
-        # 添加控制台输出
-        logger.add(sys.stdout, 
-                  format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
-                  level="INFO")
-        
-        # 添加文件输出
-        logger.add(self.current_log_file,
-                  format="{message}",
-                  level="INFO",
-                  mode="a")
-        
-        # 设置agent日志记录器
-        self.agent_logger = logging.getLogger("agent")
-        self.agent_logger.setLevel(logging.INFO)
-        
-        # 为agent日志添加文件处理器
-        agent_log_file = os.path.join(self.log_dir, f"agent_{timestamp}.log")
-        agent_file_handler = logging.FileHandler(agent_log_file, encoding='utf-8')
-        agent_file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s'
-        ))
-        self.agent_logger.addHandler(agent_file_handler)
-        
-        # 为agent日志添加控制台处理器
-        agent_console_handler = logging.StreamHandler()
-        agent_console_handler.setFormatter(logging.Formatter(
-            '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s'
-        ))
-        self.agent_logger.addHandler(agent_console_handler)
-    
-    def _truncate_description(self, description: str) -> str:
-        """截断描述文本，保留完整句子"""
-        if len(description) <= self.max_description_length:
-            return description
+        try:
+            logger = logging.getLogger("ExecutionLogger")
+            logger.setLevel(logging.INFO)
             
-        # 找到最后一个完整句子的位置
-        last_period = description[:self.max_description_length].rfind('.')
-        if last_period == -1:
-            last_period = self.max_description_length
+            # 创建文件处理器
+            file_handler = RotatingFileHandler(
+                self.log_file,
+                maxBytes=self.max_log_size,
+                backupCount=self.backup_count,
+                encoding='utf-8'
+            )
             
-        return description[:last_period + 1] + "..."
-    
+            # 设置JSON格式
+            class JsonFormatter(logging.Formatter):
+                def format(self, record):
+                    if isinstance(record.msg, dict):
+                        return json.dumps(record.msg, ensure_ascii=False)
+                    return json.dumps({"message": str(record.msg)}, ensure_ascii=False)
+            
+            file_handler.setFormatter(JsonFormatter())
+            logger.addHandler(file_handler)
+            
+            return logger
+        except Exception as e:
+            print(f"Error setting up logger: {str(e)}")
+            return None
+            
+    def _truncate_description(self, description: str, max_length: int = 1000) -> str:
+        """截断过长的描述"""
+        if len(description) > max_length:
+            return description[:max_length] + "..."
+        return description
+        
     def log_action(
-        self, 
-        agent: str, 
-        action: str, 
-        description: str, 
+        self,
+        agent: str,
+        action: str,
+        description: str,
         status: str = "success",
-        received_message: Optional[Dict[str, Any]] = None,
-        sent_message: Optional[Dict[str, Any]] = None,
-        additional_data: Optional[Dict[str, Any]] = None
+        received_message: dict = None,
+        sent_message: dict = None,
+        additional_data: dict = None
     ):
-        """记录agent的动作
-        
-        Args:
-            agent: agent名称
-            action: 动作名称
-            description: 动作描述
-            status: 执行状态（success/failed等）
-            received_message: 接收到的消息详情
-            sent_message: 发送的消息详情
-            additional_data: 额外的数据
-        """
-        # 截断描述文本
-        truncated_description = self._truncate_description(description)
-        
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "agent": agent,
-            "action": action,
-            "description": truncated_description,
-            "status": status,
-            "received_message": received_message,
-            "sent_message": sent_message,
-            "additional_data": additional_data
-        }
-        
-        # 将日志条目写入文件
-        with open(self.current_log_file, "a", encoding="utf-8") as f:
-            f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
-        
-        # 使用agent_logger记录
-        self.agent_logger.info(
-            f"Agent: {agent} | Action: {action} | Status: {status} | Description: {truncated_description}"
-        )
-        
-        # 记录详细信息
-        if received_message:
-            self.agent_logger.debug(f"Received message: {json.dumps(received_message, ensure_ascii=False)}")
-        if sent_message:
-            self.agent_logger.debug(f"Sent message: {json.dumps(sent_message, ensure_ascii=False)}")
-        if additional_data:
-            self.agent_logger.debug(f"Additional data: {json.dumps(additional_data, ensure_ascii=False)}")
+        """记录动作"""
+        try:
+            # 构建日志条目
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "agent": agent,
+                "action": action,
+                "description": self._truncate_description(description),
+                "status": status
+            }
+            
+            if received_message:
+                log_entry["received_message"] = received_message
+            if sent_message:
+                log_entry["sent_message"] = sent_message
+            if additional_data:
+                log_entry["additional_data"] = additional_data
+                
+            # 记录日志
+            if self.logger:
+                self.logger.info(log_entry)
+            else:
+                # 如果logger未初始化，直接写入文件
+                with open(self.log_file, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
+                    
+        except Exception as e:
+            print(f"Error logging action: {str(e)}")
+            # 尝试直接写入文件
+            try:
+                with open(self.log_file, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps({
+                        "timestamp": datetime.now().isoformat(),
+                        "agent": "System",
+                        "action": "Error",
+                        "description": f"Failed to log action: {str(e)}",
+                        "status": "error"
+                    }, ensure_ascii=False) + '\n')
+            except:
+                pass
 
 # 创建全局日志记录器实例
 # execution_logger = ExecutionLogger() 

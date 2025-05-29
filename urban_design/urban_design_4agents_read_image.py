@@ -36,6 +36,26 @@ from sd_webapi import timestamp, encode_file_to_base64, decode_and_save_base64, 
 import re
 from utils.execution_logger import ExecutionLogger
 
+# 创建基础目录结构
+save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
+os.makedirs(save_dir, exist_ok=True)
+
+# 使用同一个时间戳创建结果目录
+timestamp_str = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+result_dir = os.path.join(save_dir, timestamp_str)
+os.makedirs(result_dir, exist_ok=True)
+
+# 创建子目录
+logs_dir = os.path.join(result_dir, "logs")
+suggestions_dir = os.path.join(result_dir, "suggestions")
+gen_image_path = os.path.join(result_dir, "sd_api_out")
+
+os.makedirs(logs_dir, exist_ok=True)
+os.makedirs(suggestions_dir, exist_ok=True)
+os.makedirs(gen_image_path, exist_ok=True)
+
+# 初始化日志记录器
+execution_logger = ExecutionLogger(result_dir=result_dir)
 
 class UsabilityAction(Action):
     PROMPT_TEMPLATE: str = """
@@ -64,7 +84,6 @@ class UsabilityAction(Action):
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
-        # print("\n\n=============== UsabilityAction rsp ===============\n\n", rsp)
         return rsp
 
 
@@ -118,7 +137,7 @@ class UsabilityAgent(Role):
             received_message={
                 "role": msg.role,
                 "content": msg.content[:100] + "...",
-                "message_type": "Initial request" if msg.role == "UserRequirement" else "Generated image"
+                "message_type": "Initial request" if msg.role == "user" else "Generated image"
             },
             status="in_progress"
         )
@@ -251,7 +270,7 @@ class VitalityAgent(Role):
             received_message={
                 "role": msg.role,
                 "content": msg.content[:100] + "...",
-                "message_type": "Initial request" if msg.role == "UserRequirement" else "Generated image"
+                "message_type": "Initial request" if msg.role == "user" else "Generated image"
             },
             status="in_progress"
         )
@@ -330,12 +349,6 @@ class SafetyAction(Action):
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
         rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
-        # print("\n\n=============== SafetyAction prompt ===============\n\n", prompt)
-        # print("\n\n=============== SafetyAction content ===============\n\n", content)
-        #  [Message] from User to SummaryAgent: This is an urban design image. You need to hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement.
-        # print("\n\n=============== SafetyAction rsp ===============\n\n", rsp)
-        #  {"agent": "SafetyAgent", "description": "The image shows an urban area plan with several large buildings, green spaces, pathways, and roads.", "rating_score": 7, "reason": "The design includes green spaces and pathways that may accommodate pedestrians and cyclists safely. There seems to be adequate separation between vehicular roads and pedestrian pathways. However, the exact markings and signage are not visible, which are crucial for safety enforcement.", "suggestion": "Include clear demarcations and traffic calming measures for pedestrian crossings and cyclist paths. Add signage and lighting to improve visibility and safety for all users."}
-        # raise
         return rsp
 
 
@@ -368,6 +381,7 @@ class SafetyAgent(Role):
         todo = self.rc.todo
         msg = self.get_memories(k=1)[0]  # find the most recent messages
 
+        # 检查消息来源和内容
         if msg.role == "GenImageAgent":
             self.image_base64 = msg.content
             execution_logger.log_action(
@@ -389,7 +403,8 @@ class SafetyAgent(Role):
             received_message={
                 "role": msg.role,
                 "content": msg.content[:100] + "...",
-                "message_type": "Initial request" if msg.role == "UserRequirement" else "Generated image"
+                "message_type": "Initial request" if msg.role == "user" else "Generated image",
+                "image_available": bool(self.image_base64) # check
             },
             status="in_progress"
         )
@@ -446,40 +461,64 @@ class SummaryAction(Action):
     You are a summary expert. You will receive evaluation results from 3 evaluation agents in JSON format.
     The input will be a JSON array containing the evaluations from UsabilityAgent, VitalityAgent, and SafetyAgent.
 
-    If any evaluation result indicates that the image was not accessible or analyzable, you should save the error message to the file: {save_path}. And if all evaluations are valid, you should give a comprehensive summary in the JSON format below, and save the summary to the file: {save_path}.
-
-    What evaluations you receive from UsabilityAgent, VitalityAgent, and SafetyAgent will be like this:
-    {{
-        "agent": "UsabilityAgent",
-        "description": "what you see in the image",
-        "rating_score": 0-10,
-        "reason": "brief explanation",
-        "suggestion": "brief improvement suggestion"
-    }}
-    
-    Please analyze the evaluations and provide a comprehensive summary in the following JSON format:
+    Your task is to analyze these evaluations and provide a comprehensive summary in the following JSON format:
     {{
         "agent": "SummaryAgent",
         "summary": "A brief summary of the key points from all three evaluations",
-        "conflicts": "Any conflicts or contradictions found between the evaluations",
+        "conflicts": [
+            {{
+                "issue": "Description of the conflict",
+                "agents": ["Agent names involved"],
+                "suggestion": "How to resolve this conflict"
+            }}
+        ],
         "final_suggestion": "A unified improvement suggestion that addresses all concerns"
     }}
-    
+
     If any evaluation result indicates that the image was not accessible or analyzable, return:
     {{
         "agent": "SummaryAgent",
         "summary_error": "One or more evaluations failed to analyze the image properly"
     }}
-    
+
     Please ensure your response is valid JSON and follows the exact format specified above.
+    Do not include any additional text or markdown formatting.
     """
     name: str = "SummaryAction"
 
     async def run(self, content: str = "", evaluation_str: str = "", save_path: str = ""):
+        # 确保输入是有效的JSON
+        try:
+            evaluations = json.loads(evaluation_str) if evaluation_str else json.loads(content)
+            # 验证评估结果
+            if not isinstance(evaluations, list) or len(evaluations) < 3:
+                return json.dumps({
+                    "agent": "SummaryAgent",
+                    "summary_error": f"Invalid evaluations format. Expected list of 3 evaluations, got {type(evaluations)}"
+                })
+        except json.JSONDecodeError as e:
+            return json.dumps({
+                "agent": "SummaryAgent",
+                "summary_error": f"Failed to parse evaluations: {str(e)}"
+            })
+
         prompt = self.PROMPT_TEMPLATE.format(content=content, evaluation_str=evaluation_str, save_path=save_path)
         rsp = await self._aask(prompt)
-        # print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
-        return rsp
+        
+        # 验证响应格式
+        try:
+            summary = json.loads(rsp)
+            if not isinstance(summary, dict):
+                return json.dumps({
+                    "agent": "SummaryAgent",
+                    "summary_error": "Invalid summary format"
+                })
+            return rsp
+        except json.JSONDecodeError:
+            return json.dumps({
+                "agent": "SummaryAgent",
+                "summary_error": "Failed to generate valid JSON summary"
+            })
 
 
 class SummaryAgent(Role):
@@ -493,6 +532,7 @@ class SummaryAgent(Role):
         self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
         self.last_msg = None
+        self.evaluations = []  # 存储所有评估结果
 
         execution_logger.log_action(
             agent=self.name,
@@ -510,63 +550,106 @@ class SummaryAgent(Role):
         )
 
         todo = self.rc.todo
-        memories = self.get_memories(k=1)[0]
+        memories = self.get_memories(k=3)  # 获取最近3条消息，确保获取所有评估结果
 
-        # 解析接收到的评估结果
-        try:
-            evaluations = json.loads(memories.content)
+        # 收集所有评估结果
+        for msg in memories:
+            if msg.role in ["UsabilityAgent", "VitalityAgent", "SafetyAgent"]:
+                try:
+                    evaluation = json.loads(msg.content)
+                    self.evaluations.append(evaluation)
+                    execution_logger.log_action(
+                        agent=self.name,
+                        action="CollectEvaluation",
+                        description=f"Collected evaluation from {msg.role}",
+                        received_message={
+                            "role": msg.role,
+                            "content": evaluation,
+                            "message_type": "Evaluation result"
+                        },
+                        status="success"
+                    )
+                except json.JSONDecodeError as e:
+                    execution_logger.log_action(
+                        agent=self.name,
+                        action="CollectEvaluation",
+                        description=f"Failed to parse evaluation from {msg.role}",
+                        received_message={
+                            "role": msg.role,
+                            "content": msg.content[:100] + "...",
+                            "error": str(e)
+                        },
+                        status="error"
+                    )
+
+        # 检查是否收集到所有评估结果
+        if len(self.evaluations) < 3:
+            error_msg = f"Missing evaluations. Expected 3, got {len(self.evaluations)}"
             execution_logger.log_action(
                 agent=self.name,
-                action="ProcessMessage",
-                description="Processing evaluation results from all agents",
-                received_message={
-                    "content": memories.content,
-                    "evaluations": evaluations,
-                    "message_type": "Evaluation results from all agents"
-                },
-                status="in_progress"
+                action="CheckEvaluations",
+                description=error_msg,
+                status="error"
             )
-        except json.JSONDecodeError:
-            execution_logger.log_action(
-                agent=self.name,
-                action="ProcessMessage",
-                description="Processing evaluation results from all agents",
-                received_message={
-                    "content": memories.content[:100] + "...",
-                    "message_type": "Evaluation results from all agents"
-                },
-                status="in_progress"
+            return Message(
+                content=json.dumps({
+                    "agent": "SummaryAgent",
+                    "summary_error": error_msg
+                }),
+                role=self.profile,
+                cause_by=type(todo)
             )
 
         # 为当前轮次创建建议文件路径
         current_suggestion_path = os.path.join(self.suggestions_dir, f"round_{self.current_round}.txt")
-        code_text = await todo.run(content=memories, save_path=current_suggestion_path)
+        
+        # 生成总结
+        code_text = await todo.run(
+            content=json.dumps(self.evaluations, ensure_ascii=False),
+            evaluation_str=json.dumps(self.evaluations, ensure_ascii=False),
+            save_path=current_suggestion_path
+        )
         
         # 解析生成的总结
         try:
             summary_result = json.loads(code_text)
+            # 检查 summary_result 的类型
+            if isinstance(summary_result, list):
+                # 如果是列表，取第一个元素
+                summary_result = summary_result[0] if summary_result else {}
+            
+            # 确保 summary_result 是字典类型
+            if not isinstance(summary_result, dict):
+                raise ValueError(f"Unexpected summary result type: {type(summary_result)}")
+                
             execution_logger.log_action(
                 agent=self.name,
                 action="GenerateSummary",
                 description="Generated summary of all evaluations",
                 additional_data={
                     "summary": {
-                        "agent": summary_result.get("agent"),
-                        "summary": summary_result.get("summary"),
-                        "conflicts": summary_result.get("conflicts"),
-                        "final_suggestion": summary_result.get("final_suggestion")
+                        "agent": summary_result.get("agent", "SummaryAgent"),
+                        "summary": summary_result.get("summary", ""),
+                        "conflicts": summary_result.get("conflicts", ""),
+                        "final_suggestion": summary_result.get("final_suggestion", "")
                     }
                 },
                 status="success"
             )
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, ValueError, IndexError) as e:
+            error_msg = f"Failed to process summary result: {str(e)}"
             execution_logger.log_action(
                 agent=self.name,
                 action="GenerateSummary",
-                description="Generated summary of all evaluations",
-                additional_data={"summary_length": len(code_text)},
-                status="success"
+                description=error_msg,
+                additional_data={"raw_response": code_text},
+                status="error"
             )
+            summary_result = {
+                "agent": "SummaryAgent",
+                "summary_error": error_msg
+            }
+            code_text = json.dumps(summary_result)
 
         summary_msg = Message(content=code_text, role=self.profile, cause_by=type(todo), send_to="GenImageAgent")
         self.publish_message(summary_msg)
@@ -779,6 +862,20 @@ async def main(
     logger.info(f"Gen image will be saved to: {gen_image_path}")
     logger.info(f"Maximum rounds: {max_rounds}")
 
+    # 记录初始状态
+    execution_logger.log_action(
+        agent="System",
+        action="Initialize",
+        description="Starting urban design evaluation process",
+        additional_data={
+            "description": description,
+            "init_image_path": init_image_path,
+            "layout_path": layout_path,
+            "max_rounds": max_rounds
+        },
+        status="success"
+    )
+
     context = Context(config_file="config/config2.yaml")
     env = Environment(context=context)
 
@@ -823,7 +920,7 @@ async def main(
     logger.debug(f"Environment state: {env}")
     
     # 循环外保存
-    with open("..\\workspace\\urban_design\\process_history.json", "w", encoding="utf-8") as f:
+    with open("E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace/urban_design/process_history.json", "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
         logger.info("Process history saved to file")
 
@@ -886,17 +983,49 @@ if __name__ == "__main__":
     # 初始化日志记录器
     execution_logger = ExecutionLogger(result_dir=result_dir)
 
+    # 启动可视化服务器
+    import subprocess
+    import sys
+    import time
+    
+    # 启动可视化服务器
+    server_process = subprocess.Popen(
+        [sys.executable, os.path.join(os.path.dirname(__file__), "utils/visualization_server.py")],
+        env={**os.environ, "LOG_DIR": logs_dir}
+    )
+    
+    # 等待服务器启动
+    time.sleep(2)
+
     description = "This is an urban design image. Hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
     init_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_image_comp.jpg"
     layout_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data/1_layout_comp.jpg"
 
-    result = asyncio.run(main(
-        description=description, 
-        init_image_path=init_image_path, 
-        layout_path=layout_path, 
-        suggestions_dir=suggestions_dir, 
-        gen_image_path=gen_image_path,
-        max_rounds=2  # 设置最大轮次
-    ))
-    print("\n\n=============== Result ===============\n\n", json.dumps(result, ensure_ascii=False))
+    try:
+        result = asyncio.run(main(
+            description=description, 
+            init_image_path=init_image_path, 
+            layout_path=layout_path, 
+            suggestions_dir=suggestions_dir, 
+            gen_image_path=gen_image_path,
+            max_rounds=2  # 设置最大轮次
+        ))
+        print("\n\n=============== Result ===============\n\n", json.dumps(result, ensure_ascii=False))
+        
+        # 程序运行完成后，等待用户输入
+        print("\n程序运行完成！可视化服务器仍在运行。")
+        print("您可以在浏览器中查看日志：http://localhost:8002/urban_design/utils/visualization.html")
+        print("按 Ctrl+C 可以关闭服务器和程序。")
+        
+        # 保持服务器运行，直到用户按 Ctrl+C
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print("\n正在关闭服务器...")
+    finally:
+        # 关闭可视化服务器
+        server_process.terminate()
+        server_process.wait()
+        print("服务器已关闭。")
