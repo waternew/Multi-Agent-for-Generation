@@ -7,6 +7,10 @@ from datetime import datetime
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import yaml
+import base64
+from PIL import Image
+from io import BytesIO
 
 class LogFileHandler(FileSystemEventHandler):
     def __init__(self, server):
@@ -20,8 +24,27 @@ class LogFileHandler(FileSystemEventHandler):
                 self.server.loop
             )
 
+def get_image_size(base64_str):
+    """获取 base64 图片的尺寸"""
+    try:
+        image_data = base64.b64decode(base64_str)
+        image = Image.open(BytesIO(image_data))
+        return image.size
+    except Exception as e:
+        print(f"Error getting image size: {e}")
+        return None
+
 class VisualizationServer:
     def __init__(self, log_dir: str = None, port: int = 8081):
+        # 读取配置文件
+        config_path = os.path.join(os.path.dirname(__file__), "../../config/config2.yaml")
+        print(f"\n[Server] Loading config from: {config_path}")
+        # raise
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+            self.max_token = config.get('llm', {}).get('max_token', 100000)
+            print(f"\n[Server] Loaded max_token from config: {self.max_token}")
+        
         # 如果没有指定日志目录，则使用默认目录
         if log_dir is None:
             # 获取当前时间戳
@@ -48,6 +71,15 @@ class VisualizationServer:
     async def register(self, websocket):
         self.clients.add(websocket)
         try:
+            # 发送配置信息
+            await websocket.send(json.dumps({
+                "type": "config",
+                "data": {
+                    "max_token": self.max_token
+                },
+                "timestamp": datetime.now().isoformat()
+            }))
+            
             # 发送初始数据
             await self.send_initial_data(websocket)
             # 保持连接
@@ -94,6 +126,47 @@ class VisualizationServer:
                     if line.strip():
                         try:
                             log_entry = json.loads(line.strip())
+                            
+                            # 处理 token 统计信息
+                            if "additional_data" in log_entry:
+                                additional_data = log_entry["additional_data"]
+                                
+                                # 处理 token 使用信息
+                                if "token_usage" in additional_data:
+                                    token_usage = additional_data["token_usage"]
+                                    # 计算使用百分比
+                                    total_tokens = token_usage.get("total_tokens", 0)
+                                    max_token = token_usage.get("max_token", self.max_token)
+                                    usage_percentage = (total_tokens / max_token * 100) if max_token > 0 else 0
+                                    
+                                    # 添加警告标记
+                                    if usage_percentage > 80:
+                                        token_usage["warning"] = True
+                                    if usage_percentage > 95:
+                                        token_usage["danger"] = True
+                                    
+                                    token_usage["usage_percentage"] = round(usage_percentage, 1)
+                                    token_usage["max_token"] = max_token
+                                    
+                                    print(f"[Server] Token usage for {log_entry['agent']}: {total_tokens}/{max_token} ({usage_percentage:.1f}%)")
+                                
+                                # 处理图片信息
+                                if "image_available" in additional_data:
+                                    image_info = additional_data.get("image_info", {})
+                                    if "image_length" in image_info:
+                                        # 估算 token 使用量（base64 编码的图片每 4 个字符约使用 3 个 token）
+                                        image_tokens = int(image_info["image_length"] * 0.75)
+                                        additional_data["image_tokens"] = image_tokens
+                                        
+                                        # 获取图片尺寸
+                                        if "image_base64" in image_info:
+                                            image_size = get_image_size(image_info["image_base64"])
+                                            if image_size:
+                                                additional_data["image_size"] = image_size
+                                                print(f"[Server] Image size for {log_entry['agent']}: {image_size[0]}x{image_size[1]}")
+                                    
+                                    print(f"[Server] Image info for {log_entry['agent']}: available={additional_data['image_available']}, length={additional_data.get('image_length', 0)}")
+                            
                             await websocket.send(json.dumps({
                                 "type": "log_entry",
                                 "data": log_entry,

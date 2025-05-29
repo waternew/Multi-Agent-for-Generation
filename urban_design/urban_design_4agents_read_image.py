@@ -71,7 +71,6 @@ class UsabilityAction(Action):
     Return feedback in JSON format:
     {{
         "agent": "UsabilityAgent",
-        "description": "what you see in the image",
         "rating_score": 0-10,
         "reason": "brief explanation",
         "suggestion": "brief improvement suggestion"
@@ -203,7 +202,6 @@ class VitalityAction(Action):
     Return feedback in JSON format:
     {{
         "agent": "VitalityAgent",
-        "description": "what you see in the image",
         "rating_score": 0-10,
         "reason": "brief explanation",
         "suggestion": "brief improvement suggestion"
@@ -336,7 +334,6 @@ class SafetyAction(Action):
     Return feedback in JSON format:
     {{
         "agent": "SafetyAgent",
-        "description": "what you see in the image",
         "rating_score": 0-10,
         "reason": "brief explanation",
         "suggestion": "brief improvement suggestion"
@@ -458,43 +455,48 @@ class SafetyAgent(Role):
 
 class SummaryAction(Action):
     PROMPT_TEMPLATE: str = """
-    You are a summary expert. You will receive evaluation results from 3 evaluation agents in JSON format.
-    The input will be a JSON array containing the evaluations from UsabilityAgent, VitalityAgent, and SafetyAgent.
+    You are a summary expert. You will receive evaluation results, which will be a JSON array containing the evaluations from UsabilityAgent, VitalityAgent, and SafetyAgent.
 
-    Your task is to analyze these evaluations and provide a comprehensive summary in the following JSON format:
+    Your task is to:
+    1. Extract the 'suggestion' field from each agent's evaluation
+    2. Analyze these suggestions to identify any conflicts or contradictions between them
+    3. Provide a unified final suggestion that addresses all concerns
+
+    IMPORTANT: You must return ONLY ONE JSON object in the following format:
     {{
         "agent": "SummaryAgent",
-        "summary": "A brief summary of the key points from all three evaluations",
-        "conflicts": [
-            {{
-                "issue": "Description of the conflict",
-                "agents": ["Agent names involved"],
-                "suggestion": "How to resolve this conflict"
-            }}
-        ],
-        "final_suggestion": "A unified improvement suggestion that addresses all concerns"
+        "conflicts": "Describe any conflicts or contradictions between the three agents' suggestions. If there are no conflicts, state that the suggestions are complementary.",
+        "final_suggestion": "A unified final improvement suggestion that addresses all concerns from the three agents"
     }}
 
-    If any evaluation result indicates that the image was not accessible or analyzable, return:
-    {{
-        "agent": "SummaryAgent",
-        "summary_error": "One or more evaluations failed to analyze the image properly"
-    }}
-
-    Please ensure your response is valid JSON and follows the exact format specified above.
-    Do not include any additional text or markdown formatting.
+    DO NOT return an array of evaluations. DO NOT include any other text or markdown formatting.
+    Your response must be a single JSON object that follows the exact format above.
     """
     name: str = "SummaryAction"
 
-    async def run(self, content: str = "", evaluation_str: str = "", save_path: str = ""):
+    async def run(self, content: str = "", save_path: str = ""):
         # 确保输入是有效的JSON
         try:
-            evaluations = json.loads(evaluation_str) if evaluation_str else json.loads(content)
+            evaluations = json.loads(content)
+
+            print("\n\n=============== SummaryAction evaluations ===============\n\n", evaluations)
+
+            # 提取每个 agent 的 suggestion
+            simplified_evaluations = []
+            for eval in evaluations:
+                if isinstance(eval, dict) and "suggestion" in eval:
+                    simplified_evaluations.append({
+                        "agent": eval.get("agent", "Unknown"),
+                        "suggestion": eval.get("suggestion", "")
+                    })
+
+            print("\n\n=============== SummaryAction simplified_evaluations ===============\n\n", simplified_evaluations)
+
             # 验证评估结果
-            if not isinstance(evaluations, list) or len(evaluations) < 3:
+            if not isinstance(simplified_evaluations, list) or len(simplified_evaluations) < 3:
                 return json.dumps({
                     "agent": "SummaryAgent",
-                    "summary_error": f"Invalid evaluations format. Expected list of 3 evaluations, got {type(evaluations)}"
+                    "summary_error": f"Invalid evaluations format. Expected list of 3 evaluations, got {type(simplified_evaluations)}"
                 })
         except json.JSONDecodeError as e:
             return json.dumps({
@@ -502,18 +504,38 @@ class SummaryAction(Action):
                 "summary_error": f"Failed to parse evaluations: {str(e)}"
             })
 
-        prompt = self.PROMPT_TEMPLATE.format(content=content, evaluation_str=evaluation_str, save_path=save_path)
+        prompt = self.PROMPT_TEMPLATE.format(content=simplified_evaluations)
+
+        print("\n\n=============== SummaryAction prompt ===============\n\n", prompt)
+
         rsp = await self._aask(prompt)
+
+        print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
         
         # 验证响应格式
         try:
             summary = json.loads(rsp)
-            if not isinstance(summary, dict):
+            
+            # 确保返回的是单个对象而不是数组
+            if isinstance(summary, list):
+                if len(summary) > 0 and isinstance(summary[0], dict):
+                    summary = summary[0]
+                else:
+                    return json.dumps({
+                        "agent": "SummaryAgent",
+                        "summary_error": "Invalid response format: received array instead of object"
+                    })
+
+            print("\n\n=============== SummaryAction summary ===============\n\n", summary)
+
+            # 验证返回的对象格式是否正确
+            if not isinstance(summary, dict) or "agent" not in summary or "conflicts" not in summary or "final_suggestion" not in summary:
                 return json.dumps({
                     "agent": "SummaryAgent",
-                    "summary_error": "Invalid summary format"
+                    "summary_error": "Invalid summary format: missing required fields"
                 })
-            return rsp
+
+            return json.dumps(summary)
         except json.JSONDecodeError:
             return json.dumps({
                 "agent": "SummaryAgent",
@@ -603,16 +625,29 @@ class SummaryAgent(Role):
         # 为当前轮次创建建议文件路径
         current_suggestion_path = os.path.join(self.suggestions_dir, f"round_{self.current_round}.txt")
         
+
+        # print("\n\n=============== SummaryAction self.evaluations ===============\n\n", self.evaluations)
+
+        # print("\n\n=============== SummaryAction json.dumps(self.evaluations, ensure_ascii=False) ===============\n\n", json.dumps(self.evaluations, ensure_ascii=False))
+        # raise
+
         # 生成总结
         code_text = await todo.run(
             content=json.dumps(self.evaluations, ensure_ascii=False),
-            evaluation_str=json.dumps(self.evaluations, ensure_ascii=False),
+            # evaluation_str=json.dumps(self.evaluations, ensure_ascii=False),
             save_path=current_suggestion_path
         )
-        
+
+        # raise
+
+        print("\n\n=============== SummaryAction code_text ===============\n\n", code_text)
+
+
         # 解析生成的总结
         try:
             summary_result = json.loads(code_text)
+            print("\n\n=============== SummaryAction summary_result ===============\n\n", summary_result)
+            # raise
             # 检查 summary_result 的类型
             if isinstance(summary_result, list):
                 # 如果是列表，取第一个元素
@@ -629,7 +664,6 @@ class SummaryAgent(Role):
                 additional_data={
                     "summary": {
                         "agent": summary_result.get("agent", "SummaryAgent"),
-                        "summary": summary_result.get("summary", ""),
                         "conflicts": summary_result.get("conflicts", ""),
                         "final_suggestion": summary_result.get("final_suggestion", "")
                     }
@@ -705,7 +739,7 @@ class GenImageAction(Action):
 
         # 第一次的图片、后面的图片？
 
-        payload_i2i = i2i_controlnet_payload(prompt_i2i, negative_prompt_i2i, image_base64, layout_base64, random_seed)    
+        payload_i2i = i2i_controlnet_payload(prompt_i2i, negative_prompt_i2i, image_base64, layout_base64, random_seed, max_size=256)    
         # print("\n\n=============== GenImageAction payload_i2i ===============\n\n", payload_i2i)
 
         response = call_img2img_api(webui_server_url, **payload_i2i)
@@ -928,38 +962,33 @@ async def main(
 
 def extract_final_suggestion(summary_json_str):
     """
-    从包含多个markdown代码块的字符串中，提取SummaryAgent的final_suggestion字段
+    从 SummaryAgent 的消息中提取 final_suggestion 字段
+    输入格式示例：
+    {
+        "role": "SummaryAgent",
+        "content": "{\"agent\": \"SummaryAgent\", \"conflicts\": \"...\", \"final_suggestion\": \"...\"}",
+        "message_type": "Summary with final suggestion"
+    }
     """
-    # 匹配所有```json ... ```代码块
-    code_blocks = re.findall(r"```json\s*([\s\S]*?)```", summary_json_str)
-    if not code_blocks:
-        print("未找到json代码块")
-        return ""
-    # 通常第二个代码块才是SummaryAgent的json
-    if len(code_blocks) >= 2:
-        summary_json = code_blocks[1]
-    else:
-        summary_json = code_blocks[0]
     try:
-        data = json.loads(summary_json)
-        return data.get("final_suggestion", "")
-    except Exception as e:
-        print(f"解析summary json失败: {e}")
+        # 解析 JSON 字符串
+        content_json = json.loads(summary_json_str)
+
+        print("\n\n=============== content_json ===============\n\n", content_json)
+        
+        # 提取 final_suggestion
+        if "final_suggestion" in content_json:
+            return content_json["final_suggestion"]
+        else:
+            print("未找到 final_suggestion 字段")
+            return ""
+            
+    except json.JSONDecodeError as e:
+        print(f"解析 JSON 失败: {e}")
         return ""
-
-
-def extract_final_suggestion_method2(summary_json_str):
-    code_blocks = re.findall(r"```json\s*([\s\S]*?)```", summary_json_str)
-    for block in code_blocks:
-        try:
-            data = json.loads(block)
-            if "final_suggestion" in data:
-                return data["final_suggestion"]
-        except Exception:
-            continue
-    print("未找到final_suggestion字段")
-    return ""
-
+    except Exception as e:
+        print(f"提取 final_suggestion 时发生错误: {e}")
+        return ""
 
 
 if __name__ == "__main__":

@@ -176,6 +176,87 @@
             color: #6c757d;
             font-style: italic;
         }
+
+        /* Token 统计样式 */
+        .token-stats {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .token-stats-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .token-stats-label {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .token-stats-value {
+            color: #007bff;
+        }
+
+        .token-warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .token-progress {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .token-progress-bar {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease;
+        }
+
+        .token-progress-bar.warning {
+            background-color: #ffc107;
+        }
+
+        .token-progress-bar.danger {
+            background-color: #dc3545;
+        }
+
+        /* 图片信息样式 */
+        .image-info {
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .image-info.available {
+            color: #28a745;
+        }
+
+        .image-info.unavailable {
+            color: #dc3545;
+        }
+
+        .image-size {
+            font-family: monospace;
+            color: #6c757d;
+            margin-left: 5px;
+        }
+
+        .image-tokens {
+            font-family: monospace;
+            color: #007bff;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -205,6 +286,9 @@
         // WebSocket连接
         const ws = new WebSocket("ws://localhost:8081");
         const logEntriesContainer = document.getElementById("log-entries");
+        let config = {
+            max_token: 16000  // 默认值，将在收到配置信息时更新
+        };
 
         // 处理接收到的消息
         ws.onmessage = (event) => {
@@ -213,7 +297,11 @@
                 const message = JSON.parse(data);
                 
                 // 处理不同类型的消息
-                if (message.type === "log_entry") {
+                if (message.type === "config") {
+                    // 更新配置
+                    config = { ...config, ...message.data };
+                    console.log("Received config:", config);
+                } else if (message.type === "log_entry") {
                     addLogEntry(message.data);
                 } else if (message.type === "error") {
                     console.error("Server error:", message.message);
@@ -298,8 +386,23 @@
         function formatAdditionalData(data) {
             if (!data) return "";
             
+            let result = "";
+            
+            // 处理图片信息
+            if (data.image_available !== undefined) {
+                result += `
+                    <div class="image-info ${data.image_available ? 'available' : 'unavailable'}">
+                        Image: ${data.image_available ? 'Available' : 'Not Available'}
+                        ${data.image_length ? `(${data.image_length} bytes)` : ''}
+                        ${data.image_size ? `<span class="image-size">${data.image_size[0]}x${data.image_size[1]}</span>` : ''}
+                        ${data.image_tokens ? `<span class="image-tokens">[${data.image_tokens} tokens]</span>` : ''}
+                    </div>
+                `;
+            }
+            
+            // 处理评估结果
             if (data.evaluation) {
-                return `
+                result += `
                     <div class="evaluation-result">
                         <div>Agent: ${data.evaluation.agent}</div>
                         <div>Score: <span class="evaluation-score">${data.evaluation.rating_score}</span></div>
@@ -309,8 +412,49 @@
                 `;
             }
             
-            return `<button class="collapsible">${JSON.stringify(data).substring(0, 50)}...</button>
-                    <div class="content">${JSON.stringify(data, null, 2)}</div>`;
+            // 处理 token 使用信息
+            if (data.token_usage) {
+                const maxToken = data.token_usage.max_token || config.max_token;
+                const totalTokens = data.token_usage.prompt_tokens + data.token_usage.completion_tokens;
+                const usagePercentage = (totalTokens / maxToken * 100).toFixed(1);
+                const isWarning = totalTokens > maxToken * 0.8;
+                const progressClass = usagePercentage > 90 ? 'danger' : usagePercentage > 80 ? 'warning' : '';
+                
+                result += `
+                    <div class="token-stats">
+                        <div class="token-stats-item">
+                            <span class="token-stats-label">Prompt Tokens:</span>
+                            <span class="token-stats-value">${data.token_usage.prompt_tokens}</span>
+                        </div>
+                        <div class="token-stats-item">
+                            <span class="token-stats-label">Completion Tokens:</span>
+                            <span class="token-stats-value">${data.token_usage.completion_tokens}</span>
+                        </div>
+                        <div class="token-stats-item">
+                            <span class="token-stats-label">Total Tokens:</span>
+                            <span class="token-stats-value">${totalTokens}</span>
+                        </div>
+                        <div class="token-stats-item">
+                            <span class="token-stats-label">Max Tokens:</span>
+                            <span class="token-stats-value">${maxToken}</span>
+                        </div>
+                        <div class="token-stats-item">
+                            <span class="token-stats-label">Usage:</span>
+                            <span class="token-stats-value ${isWarning ? 'token-warning' : ''}">${usagePercentage}%</span>
+                        </div>
+                        <div class="token-progress">
+                            <div class="token-progress-bar ${progressClass}" style="width: ${usagePercentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (!result) {
+                return `<button class="collapsible">${JSON.stringify(data).substring(0, 50)}...</button>
+                        <div class="content">${JSON.stringify(data, null, 2)}</div>`;
+            }
+            
+            return result;
         }
 
         // 添加折叠功能

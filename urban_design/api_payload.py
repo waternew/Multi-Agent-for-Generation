@@ -1,4 +1,12 @@
-def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, random_seed):
+def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, random_seed, max_size=256):
+    if height > max_size or width > max_size:
+        if height > width:
+            width = int(width * (max_size / height))
+            height = max_size
+        else:
+            height = int(height * (max_size / width))
+            width = max_size
+
     payload = {
         "alwayson_scripts": {
             "ControlNet": {
@@ -140,7 +148,7 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
     return payload
 
 
-def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_seed):
+def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_seed, max_size=256):
     payload = {
         # 1.基础参数
         "init_images": [init_img],  # 这里是你要输入的init image
@@ -192,8 +200,8 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
         "disable_extra_networks": False,
         "do_not_save_grid": False,
         "do_not_save_samples": False,
-        "hr_resize_x": 1024,
-        "hr_resize_y": 1024,
+        "hr_resize_x": max_size,
+        "hr_resize_y": max_size,
         "hr_scheduler": "Automatic",
         "hr_second_pass_steps": 20,
         "hr_upscaler": "Latent",
