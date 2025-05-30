@@ -36,6 +36,10 @@ from sd_webapi import timestamp, encode_file_to_base64, decode_and_save_base64, 
 import re
 from utils.execution_logger import ExecutionLogger
 
+from tenacity import retry, stop_after_attempt, wait_random_exponential, after_log, retry_if_exception_type
+
+from openai import APIConnectionError
+
 # 创建基础目录结构
 save_dir = str(DEFAULT_WORKSPACE_ROOT / "urban_design")
 os.makedirs(save_dir, exist_ok=True)
@@ -453,6 +457,17 @@ class SafetyAgent(Role):
         return msg
 
 
+def log_and_reraise(retry_state):
+    logger.error(f"Retry attempts exhausted. Last exception: {retry_state.outcome.exception()}")
+    logger.warning(
+        """
+Recommend going to https://deepwisdom.feishu.cn/wiki/MsGnwQBjiif9c3koSJNcYaoSnu4#part-XdatdVlhEojeAfxaaEZcMV3ZniQ
+See FAQ 5.8
+"""
+    )
+    raise retry_state.outcome.exception()
+
+
 class SummaryAction(Action):
     PROMPT_TEMPLATE: str = """
     You are a summary expert. You will receive evaluation results, which will be a JSON array containing the evaluations from UsabilityAgent, VitalityAgent, and SafetyAgent.
@@ -474,13 +489,18 @@ class SummaryAction(Action):
     """
     name: str = "SummaryAction"
 
+    @retry(
+        wait=wait_random_exponential(min=1, max=20),
+        stop=stop_after_attempt(3),
+        after=after_log(logger, logger.level("WARNING").name),    
+        retry=retry_if_exception_type((APIConnectionError, ValueError, json.JSONDecodeError)),
+        retry_error_callback=log_and_reraise,
+    )
     async def run(self, content: str = "", save_path: str = ""):
-        # 确保输入是有效的JSON
         try:
+            # 确保输入是有效的JSON
             evaluations = json.loads(content)
-
-            print("\n\n=============== SummaryAction evaluations ===============\n\n", evaluations)
-
+            
             # 提取每个 agent 的 suggestion
             simplified_evaluations = []
             for eval in evaluations:
@@ -490,71 +510,60 @@ class SummaryAction(Action):
                         "suggestion": eval.get("suggestion", "")
                     })
 
-            print("\n\n=============== SummaryAction simplified_evaluations ===============\n\n", simplified_evaluations)
-
             # 验证评估结果
             if not isinstance(simplified_evaluations, list) or len(simplified_evaluations) < 3:
-                return json.dumps({
-                    "agent": "SummaryAgent",
-                    "summary_error": f"Invalid evaluations format. Expected list of 3 evaluations, got {type(simplified_evaluations)}"
-                })
-        except json.JSONDecodeError as e:
-            return json.dumps({
-                "agent": "SummaryAgent",
-                "summary_error": f"Failed to parse evaluations: {str(e)}"
-            })
+                raise ValueError(f"Invalid evaluations format. Expected list of 3 evaluations, got {type(simplified_evaluations)}")
 
-        prompt = self.PROMPT_TEMPLATE.format(content=simplified_evaluations)
-
-        print("\n\n=============== SummaryAction prompt ===============\n\n", prompt)
-
-        rsp = await self._aask(prompt)
-
-        print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
-        
-        # 验证响应格式
-        try:
-            summary = json.loads(rsp)
+            prompt = self.PROMPT_TEMPLATE.format(content=simplified_evaluations)
+            rsp = await self._aask(prompt)
             
-            # 确保返回的是单个对象而不是数组
-            if isinstance(summary, list):
-                if len(summary) > 0 and isinstance(summary[0], dict):
-                    summary = summary[0]
-                else:
-                    return json.dumps({
-                        "agent": "SummaryAgent",
-                        "summary_error": "Invalid response format: received array instead of object"
-                    })
+            # 验证响应格式
+            try:
+                summary = json.loads(rsp)
+                
+                # 确保返回的是单个对象而不是数组
+                if isinstance(summary, list):
+                    if len(summary) > 0 and isinstance(summary[0], dict):
+                        summary = summary[0]
+                    else:
+                        raise ValueError("Invalid response format: received array instead of object")
 
-            print("\n\n=============== SummaryAction summary ===============\n\n", summary)
+                # 验证返回的对象格式是否正确
+                if not isinstance(summary, dict):
+                    raise ValueError("Response is not a valid JSON object")
+                    
+                # 确保必要字段存在
+                if "agent" not in summary:
+                    summary["agent"] = "SummaryAgent"
+                if "conflicts" not in summary:
+                    summary["conflicts"] = "No conflicts found in the available evaluations."
+                if "final_suggestion" not in summary:
+                    summary["final_suggestion"] = "Based on the available evaluations, further improvements are needed."
 
-            # 验证返回的对象格式是否正确
-            if not isinstance(summary, dict) or "agent" not in summary or "conflicts" not in summary or "final_suggestion" not in summary:
-                return json.dumps({
-                    "agent": "SummaryAgent",
-                    "summary_error": "Invalid summary format: missing required fields"
-                })
-
-            return json.dumps(summary)
-        except json.JSONDecodeError:
-            return json.dumps({
-                "agent": "SummaryAgent",
-                "summary_error": "Failed to generate valid JSON summary"
-            })
+                return json.dumps(summary)
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse LLM response: {rsp}")
+                raise ValueError(f"Failed to generate valid JSON summary: {str(e)}")
+                
+        except Exception as e:
+            logger.error(f"Error in SummaryAction: {str(e)}")
+            raise  # 让重试装饰器处理异常
 
 
 class SummaryAgent(Role):
     name: str = "SummaryAgent"
     profile: str = "SummaryAgent"
 
-    def __init__(self, suggestions_dir: str = "", **kwargs):
+    def __init__(self, suggestions_dir: str = "", max_rounds: int = 3, **kwargs):
         super().__init__(**kwargs)
         self.suggestions_dir = suggestions_dir
         self.current_round = 1
+        self.max_rounds = max_rounds
         self._watch([UsabilityAction, VitalityAction, SafetyAction])
         self.set_actions([SummaryAction])
         self.last_msg = None
         self.evaluations = []  # 存储所有评估结果
+        self.final_round_evaluations = []  # 存储最后一轮的评估结果
 
         execution_logger.log_action(
             agent=self.name,
@@ -575,11 +584,12 @@ class SummaryAgent(Role):
         memories = self.get_memories(k=3)  # 获取最近3条消息，确保获取所有评估结果
 
         # 收集所有评估结果
+        current_round_evaluations = []
         for msg in memories:
             if msg.role in ["UsabilityAgent", "VitalityAgent", "SafetyAgent"]:
                 try:
                     evaluation = json.loads(msg.content)
-                    self.evaluations.append(evaluation)
+                    current_round_evaluations.append(evaluation)
                     execution_logger.log_action(
                         agent=self.name,
                         action="CollectEvaluation",
@@ -605,8 +615,8 @@ class SummaryAgent(Role):
                     )
 
         # 检查是否收集到所有评估结果
-        if len(self.evaluations) < 3:
-            error_msg = f"Missing evaluations. Expected 3, got {len(self.evaluations)}"
+        if len(current_round_evaluations) < 3:
+            error_msg = f"Missing evaluations. Expected 3, got {len(current_round_evaluations)}"
             execution_logger.log_action(
                 agent=self.name,
                 action="CheckEvaluations",
@@ -622,32 +632,38 @@ class SummaryAgent(Role):
                 cause_by=type(todo)
             )
 
-        # 为当前轮次创建建议文件路径
+        # 如果是最后一轮，存储评估结果并发送终止消息
+        if self.current_round >= self.max_rounds:
+            self.final_round_evaluations = current_round_evaluations
+            execution_logger.log_action(
+                agent=self.name,
+                action="FinalEvaluations",
+                description="Collected final round evaluations",
+                additional_data={
+                    "evaluations": self.final_round_evaluations
+                },
+                status="success"
+            )
+            
+            # 发送终止消息
+            terminate_msg = Message(content="TERMINATE", role=self.profile, cause_by=type(todo), send_to=())
+            self.publish_message(terminate_msg)
+            return terminate_msg
+
+        # 如果不是最后一轮，继续正常的总结流程
+        self.evaluations = current_round_evaluations
         current_suggestion_path = os.path.join(self.suggestions_dir, f"round_{self.current_round}.txt")
-        
-
-        # print("\n\n=============== SummaryAction self.evaluations ===============\n\n", self.evaluations)
-
-        # print("\n\n=============== SummaryAction json.dumps(self.evaluations, ensure_ascii=False) ===============\n\n", json.dumps(self.evaluations, ensure_ascii=False))
-        # raise
 
         # 生成总结
         code_text = await todo.run(
             content=json.dumps(self.evaluations, ensure_ascii=False),
-            # evaluation_str=json.dumps(self.evaluations, ensure_ascii=False),
             save_path=current_suggestion_path
         )
-
-        # raise
-
-        print("\n\n=============== SummaryAction code_text ===============\n\n", code_text)
-
 
         # 解析生成的总结
         try:
             summary_result = json.loads(code_text)
-            print("\n\n=============== SummaryAction summary_result ===============\n\n", summary_result)
-            # raise
+            
             # 检查 summary_result 的类型
             if isinstance(summary_result, list):
                 # 如果是列表，取第一个元素
@@ -734,13 +750,8 @@ class GenImageAction(Action):
 
         prompt_i2i = content
         negative_prompt_i2i = ""
-        # print("\n\n=============== GenImageAction prompt_i2i ===============\n\n", prompt_i2i)
-        # raise
-
-        # 第一次的图片、后面的图片？
 
         payload_i2i = i2i_controlnet_payload(prompt_i2i, negative_prompt_i2i, image_base64, layout_base64, random_seed, max_size=256)    
-        # print("\n\n=============== GenImageAction payload_i2i ===============\n\n", payload_i2i)
 
         response = call_img2img_api(webui_server_url, **payload_i2i)
 
@@ -748,7 +759,6 @@ class GenImageAction(Action):
             save_path = os.path.join(gen_image_path, f'img2img-{timestamp()}-{index}.png')
             decode_and_save_base64(image, save_path)
 
-        # print("\n\n=============== GenImageAction response ===============\n\n", response)
         return response
     
     
@@ -833,6 +843,7 @@ class GenImageAgent(Role):
             status="success"
         )
 
+        # 发送图片给评估代理
         gen_msg = Message(content=new_image_base64, role=self.profile, cause_by=type(todo), send_to=(UsabilityAgent, VitalityAgent, SafetyAgent))
         self.publish_message(gen_msg)
 
@@ -850,23 +861,10 @@ class GenImageAgent(Role):
             status="success"
         )
 
-        self.current_round += 1
-        if self.current_round > self.max_rounds:
-            execution_logger.log_action(
-                agent=self.name,
-                action="Terminate",
-                description="Maximum rounds reached, sending termination message",
-                status="success"
-            )
-            gen_msg = Message(content="TERMINATE", role=self.profile, cause_by=type(todo), send_to=())
-            self.publish_message(gen_msg)
-            return gen_msg
-        
         self.last_msg = gen_msg
         self.last_image_base64 = new_image_base64
         self.last_image_path = self.gen_image_path
         return gen_msg
-
 
 
 
@@ -916,7 +914,7 @@ async def main(
     usability_agent = UsabilityAgent(image_base64=init_image_base64)
     vitality_agent = VitalityAgent(image_base64=init_image_base64)
     safety_agent = SafetyAgent(image_base64=init_image_base64)
-    summary_agent = SummaryAgent(suggestions_dir=suggestions_dir)
+    summary_agent = SummaryAgent(suggestions_dir=suggestions_dir, max_rounds=max_rounds)
     gen_image_agent = GenImageAgent(
         image_base64=init_image_base64,
         layout_base64=layout_base64,
@@ -943,10 +941,6 @@ async def main(
         run_count += 1
         logger.info(f"Environment running iteration #{run_count}")
         await env.run()
-
-        if gen_image_agent.current_round > max_rounds:
-            logger.info("Maximum rounds reached, stopping environment")
-            break
 
     logger.info(f"Environment finished, total iterations: {run_count}")
     
