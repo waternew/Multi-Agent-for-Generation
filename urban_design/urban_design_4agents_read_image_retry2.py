@@ -83,7 +83,18 @@ class UsabilityAction(Action):
 
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
-        rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+        
+        # without retry
+        # rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+
+        # with retry
+        rsp = await LLMUtils.ask_with_retry(
+            self, prompt,
+            max_retries=3,
+            extract_json=True,
+            images=[image_base64]
+        )
+
         return rsp
 
 
@@ -214,7 +225,18 @@ class VitalityAction(Action):
 
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
-        rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+
+        # without retry
+        # rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+
+        # with retry
+        rsp = await LLMUtils.ask_with_retry(
+            self, prompt,
+            max_retries=3,
+            extract_json=True,
+            images=[image_base64]
+        )
+
         # print("\n\n=============== VitalityAction rsp ===============\n\n", rsp)
         return rsp
 
@@ -346,7 +368,18 @@ class SafetyAction(Action):
 
     async def run(self, content: str, image_base64: str):
         prompt = self.PROMPT_TEMPLATE.format(content=content)
-        rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+
+        # without retry
+        # rsp = await self._aask(prompt=prompt, system_msgs=None, images=[image_base64])
+
+        # with retry
+        rsp = await LLMUtils.ask_with_retry(
+            self, prompt,
+            max_retries=3,
+            extract_json=True,
+            images=[image_base64]
+        )
+
         return rsp
 
 
@@ -514,7 +547,15 @@ class SummaryAction(Action):
 
             print("\n\n=============== SummaryAction prompt ===============\n\n", prompt)
 
-            rsp = await self._aask(prompt=prompt)
+            # without retry
+            # rsp = await self._aask(prompt=prompt)
+
+            # with retry
+            rsp = await LLMUtils.ask_with_retry(
+                self, prompt,
+                max_retries=3,
+                extract_json=True
+            )
 
             print("\n\n=============== SummaryAction rsp ===============\n\n", rsp)
             

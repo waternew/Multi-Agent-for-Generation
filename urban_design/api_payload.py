@@ -157,12 +157,20 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
         "hr_negative_prompt": negative_prompt,
         "hr_prompt": prompt,
 
+        # 模型设置
+        "override_settings": {
+            # 'sd_model_checkpoint': "anything-v5"  # 确保使用 SD1.5 模型
+            # 'sd_model_checkpoint': "AD_老王SD1.5_ARCH_入门版"
+            'sd_model_checkpoint': "老王SDXL生图模型_XL入门"
+        },
+        "override_settings_restore_afterwards": True,
+
         # 2.controlnet参数
         "alwayson_scripts": {        
             "ControlNet": {
                 "args": [
                     { 
-                        # 线图
+                        # ControlNet配置
                         "advanced_weighting": None,
                         "batch_images": "",
                         "control_mode": "Balanced",
@@ -172,7 +180,6 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
                         "hr_option": "Both",
                         "image": {
                             "image": seg_img,
-                            # "mask": "base64image placeholder"
                         },
                         "inpaint_crop_input_image": True,
                         "input_mode": "simple",
@@ -180,23 +187,28 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
                         "is_ui": True,
                         "loopback": False,
                         "low_vram": False,
-                        "model": "control_v11p_sd15_seg_fp16 [ab613144]",
-                        "module": "none",  # "none",
+                        # "model": "control_v11p_sd15_seg_fp16 [ab613144]",  # SD1.5 的 ControlNet 模型
+                        # "model": "ip-adapter_sd15",
+                        # "model": "ip-adapter_sdxl_vit-h",
+                        # "model": "diffusion_pytorch_model",
+                        "model": "sdxl_segmentation_ade20k_controlnet",
+                        "module": "none",  # 使用分割模块seg_ofcoco
                         "output_dir": "",
+
                         "pixel_perfect": False,
                         "processor_res": 512,
                         "resize_mode": "Crop and Resize",
                         "save_detected_map": True,
                         "threshold_a": 0.5,
                         "threshold_b": 0.5,
-                        "weight": 0.6   # 0.85
+                        "weight": 0.6
                     }
                 ]
             },
         },
 
         # 3.生成参数
-        "denoising_strength": 0.5,          # 0.7
+        "denoising_strength": 0.5,
         "disable_extra_networks": False,
         "do_not_save_grid": False,
         "do_not_save_samples": False,
@@ -210,9 +222,7 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
         "include_init_images": False,
         "send_images": True,
         "save_images": False,
-
     }
-    # print('\n================= prompt =================\n', prompt)
     return payload
 
 
