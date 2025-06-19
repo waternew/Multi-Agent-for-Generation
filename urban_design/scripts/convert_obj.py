@@ -61,167 +61,96 @@ def render_obj(obj_path, output_image):
     print(f"\n总计: {total_vertices} 个顶点, {total_faces} 个面")
     print("=== 详细信息结束 ===\n")
     
-    # 选择所有网格对象并居中
-    for obj in imported_objects:
-        obj.select_set(True)
-    bpy.context.view_layer.objects.active = imported_objects[0]
-    
-    # 居中所有对象
-    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-    bpy.ops.object.location_clear()
-    
-    # 计算模型边界框
+    # 计算所有对象的整体包围盒
     bbox_min = [float('inf')] * 3
     bbox_max = [float('-inf')] * 3
-    
     for obj in imported_objects:
         for vertex in obj.bound_box:
             for i in range(3):
-                bbox_min[i] = min(bbox_min[i], vertex[i])
-                bbox_max[i] = max(bbox_max[i], vertex[i])
-    
+                bbox_min[i] = min(bbox_min[i], vertex[i] + obj.location[i])
+                bbox_max[i] = max(bbox_max[i], vertex[i] + obj.location[i])
     model_size = [bbox_max[i] - bbox_min[i] for i in range(3)]
-    print(f"模型尺寸: {model_size}")
-    print(f"模型边界: 最小={bbox_min}, 最大={bbox_max}")
+    center = [(bbox_min[i] + bbox_max[i]) / 2 for i in range(3)]
+
+    # 自动缩放所有对象到Blender可见范围
+    target_size = 10.0  # 目标最大尺寸（Blender单位）
+    max_model_extent = max(model_size)
+    # scale_factor = target_size / max_model_extent if max_model_extent > 0 else 1.0
+    scale_factor = 0.0001
+    print(f"缩放因子: {scale_factor}")
+    for obj in imported_objects:
+        obj.scale = (scale_factor, scale_factor, scale_factor)
+        obj.location.x = (obj.location.x - center[0]) * scale_factor
+        obj.location.y = (obj.location.y - center[1]) * scale_factor
+        obj.location.z = (obj.location.z - center[2]) * scale_factor
+        print(obj.location.x, obj.location.y, obj.location.z)
+
+    # 添加相机并自动适配
+    bpy.ops.object.camera_add()
+    camera = bpy.context.object
+    camera.data.type = 'ORTHO'
+    camera.data.ortho_scale = target_size * 1.2
+    camera.location = (0, 0, target_size * 2)
+    camera.rotation_euler = (0, 0, 0)
+    bpy.context.scene.camera = camera
+
+    # 添加光源
+    bpy.ops.object.light_add(type='SUN')
+    sun = bpy.context.object
+    sun.location = (0, 0, target_size * 3)
+    sun.rotation_euler = (0, 0, 0)
+    sun.data.energy = 2.0
 
     # 为每个对象设置材质，让它们更容易看到
     print("设置材质...")
     for i, obj in enumerate(imported_objects):
         print(f"----- 设置对象 {i} 的材质 -----")
-        # 创建新材质
         mat_name = f"Building_Material_{i}"
         mat = bpy.data.materials.new(name=mat_name)
         mat.use_nodes = True
         nodes = mat.node_tree.nodes
-        
-        # 清除默认节点
         nodes.clear()
-        
-        # 添加漫反射节点
         diffuse = nodes.new(type='ShaderNodeBsdfDiffuse')
         diffuse.location = (0, 0)
-        
-        # 设置不同的颜色，让每个建筑更容易区分
         import random
-        random.seed(i)  # 使用索引作为种子，确保颜色一致
+        random.seed(i)
         r = random.uniform(0.3, 0.8)
         g = random.uniform(0.3, 0.8)
         b = random.uniform(0.3, 0.8)
         diffuse.inputs[0].default_value = (r, g, b, 1.0)
-        
-        # 添加输出节点
         output = nodes.new(type='ShaderNodeOutputMaterial')
         output.location = (300, 0)
-        
-        # 连接节点
         mat.node_tree.links.new(diffuse.outputs[0], output.inputs[0])
-        
-        # 设置材质属性
-        mat.blend_method = 'OPAQUE'  # 确保不透明
-        mat.shadow_method = 'OPAQUE'  # 确保阴影不透明
-        
-        # 将材质分配给对象
+        mat.blend_method = 'OPAQUE'
+        mat.shadow_method = 'OPAQUE'
         if obj.data.materials:
             obj.data.materials[0] = mat
         else:
             obj.data.materials.append(mat)
-        
-        # 重新计算法线，确保面朝上
         bpy.context.view_layer.objects.active = obj
         obj.select_set(True)
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.normals_make_consistent(inside=False)  # 确保法线朝外
+        bpy.ops.mesh.normals_make_consistent(inside=False)
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.select_set(False)
 
-    # 添加相机
-    bpy.ops.object.camera_add()
-    camera = bpy.context.object
-    # 设置为正交相机
-    camera.data.type = 'ORTHO'
-    
-    # 针对平面模型进行特殊处理
-    max_size = max(model_size)
-    print(f"最大模型尺寸: {max_size}")
-    
-    # 如果模型是平面的（Y轴很小），使用特殊设置
-    if model_size[1] < 1.0:  # Y轴高度很小
-        print("检测到平面模型，使用平面模型设置")
-        # 尝试更激进的相机设置
-        camera.data.ortho_scale = max_size * 1.8  # 进一步减小视野
-        camera.location = (0, 0, max_size * 1.5)  # 进一步减小相机距离
-        # 稍微倾斜相机角度，让平面更容易看到
-        camera.rotation_euler = (0.01, 0, 0)  # 增加倾斜角度
-    elif max_size > 1000:  # 地理坐标系统
-        print("检测到大坐标模型，使用地理坐标设置")
-        camera.data.ortho_scale = max_size * 10.0
-        camera.location = (0, 0, max_size * 50)
-        camera.rotation_euler = (0, 0, 0)
-    else:  # 普通模型
-        print("使用普通模型设置")
-        camera.data.ortho_scale = max_size * 3.0
-        camera.location = (0, 0, max_size * 10)
-        camera.rotation_euler = (0, 0, 0)
-    
-    bpy.context.scene.camera = camera
-    
-    print(f"相机位置: {camera.location}")
-    print(f"相机正交缩放: {camera.data.ortho_scale}")
-    print(f"相机旋转: {camera.rotation_euler}")
-    
-    # 计算相机视野范围
-    ortho_scale = camera.data.ortho_scale
-    print(f"相机视野范围: X={-ortho_scale/2:.2f} 到 {ortho_scale/2:.2f}, Y={-ortho_scale/2:.2f} 到 {ortho_scale/2:.2f}")
-    print(f"模型是否在视野内: X轴 {bbox_min[0] >= -ortho_scale/2 and bbox_max[0] <= ortho_scale/2}")
-    print(f"模型是否在视野内: Z轴 {bbox_min[2] >= -ortho_scale/2 and bbox_max[2] <= ortho_scale/2}")
-
-    # 添加光照 - 针对平面模型优化
-    # 删除默认光源
-    for obj in bpy.context.scene.objects:
-        if obj.type == 'LIGHT':
-            bpy.data.objects.remove(obj, do_unlink=True)
-    
-    # 添加主光源 - 从上方照射
-    bpy.ops.object.light_add(type='SUN')
-    sun = bpy.context.object
-    sun.location = (0, 0, 10)
-    sun.rotation_euler = (0, 0, 0)  # 垂直向下
-    sun.data.energy = 2.0  # 增加光照强度
-    
-    # 添加环境光 - 从侧面照射
-    bpy.ops.object.light_add(type='AREA')
-    fill_light = bpy.context.object
-    fill_light.location = (max_size, 0, max_size)
-    fill_light.rotation_euler = (0.785, 0, 0)  # 45度角
-    fill_light.data.energy = 1.0  # 增加光照强度
-    fill_light.data.size = max_size * 2
-
-    # 设置渲染引擎为Cycles以获得更好的光照效果
     bpy.context.scene.render.engine = 'CYCLES'
     bpy.context.scene.cycles.samples = 128
-    
-    # 设置分辨率
     bpy.context.scene.render.resolution_x = 1920
     bpy.context.scene.render.resolution_y = 1080
     bpy.context.scene.render.image_settings.file_format = 'PNG'
-
-    # 开始渲染
     bpy.context.scene.render.filepath = output_image
     print("开始渲染...")
     bpy.ops.render.render(write_still=True)
-
     print(f"✅ 图像已保存到: {output_image}")
-
+    
 if __name__ == "__main__":
-    # 直接获取参数，跳过脚本名称
-    if len(sys.argv) < 3:
-        print("错误: 需要2个参数")
-        print("用法: blender --background --python script.py <obj_path> <output_image>")
-        exit(1)
+    # obj_path = sys.argv[-2]
+    # output_image = sys.argv[-1]
 
-    obj_path = sys.argv[-2]
-    output_image = sys.argv[-1]
+    obj_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_obj_0.obj"
+    output_image = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_obj.png"
     
     # 检查输入文件是否存在
     if not os.path.exists(obj_path):

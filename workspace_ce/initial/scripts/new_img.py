@@ -14,7 +14,7 @@ def main():
 
     try:
         ce = CE()
-
+        
         # 获取当前脚本所在目录
         script_dir = os.path.dirname(os.path.abspath(__file__))
         print("current dir:", script_dir)
