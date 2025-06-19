@@ -1,0 +1,13 @@
+version "2024.1"
+
+@StartRule
+attr height = 30
+
+Lot -->
+    extrude(height)
+    comp(f) { 
+        top : Roof  
+    }
+    
+Roof -->
+    color("#87CEFA")
