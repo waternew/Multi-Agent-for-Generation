@@ -10,6 +10,7 @@ v 129590.552 30.000 -2553010.599
 v 129332.277 30.000 -2553021.201
 # 4 vertices
 
+o Shape
 g Shape
 s off
 usemtl CityEngineMaterial
@@ -23,6 +24,7 @@ v 129325.064 30.000 -2552844.426
 v 129319.734 30.000 -2552713.809
 # 4 vertices
 
+o Shape 1
 g Shape_1
 s off
 usemtl CityEngineMaterial
@@ -36,6 +38,7 @@ v 129330.442 30.000 -2552976.236
 v 129325.472 30.000 -2552854.427
 # 4 vertices
 
+o Shape 2
 g Shape_2
 s off
 usemtl CityEngineMaterial
@@ -49,6 +52,7 @@ v 129343.025 30.000 -2553284.561
 v 129332.685 30.000 -2553031.202
 # 4 vertices
 
+o Shape 3
 g Shape_3
 s off
 usemtl CityEngineMaterial
@@ -62,6 +66,7 @@ v 129744.557 30.000 -2553004.277
 v 129600.553 30.000 -2553010.188
 # 4 vertices
 
+o Shape 4
 g Shape_4
 s off
 usemtl CityEngineMaterial
@@ -75,6 +80,7 @@ v 129755.347 30.000 -2553267.211
 v 129611.350 30.000 -2553273.270
 # 4 vertices
 
+o Shape 5
 g Shape_5
 s off
 usemtl CityEngineMaterial
@@ -88,6 +94,7 @@ v 129593.290 30.000 -2552833.209
 v 129587.920 30.000 -2552702.325
 # 4 vertices
 
+o Shape 6
 g Shape_6
 s off
 usemtl CityEngineMaterial
@@ -101,6 +108,7 @@ v 129598.708 30.000 -2552965.229
 v 129593.701 30.000 -2552843.210
 # 4 vertices
 
+o Shape 7
 g Shape_7
 s off
 usemtl CityEngineMaterial
@@ -114,6 +122,7 @@ v 129606.179 30.000 -2553147.282
 v 129600.963 30.000 -2553020.189
 # 4 vertices
 
+o Shape 8
 g Shape_8
 s off
 usemtl CityEngineMaterial
@@ -127,6 +136,7 @@ v 129948.938 30.000 -2552995.887
 v 129754.558 30.000 -2553003.866
 # 4 vertices
 
+o Shape 9
 g Shape_9
 s off
 usemtl CityEngineMaterial
@@ -140,6 +150,7 @@ v 129959.387 30.000 -2553258.624
 v 129765.348 30.000 -2553266.790
 # 4 vertices
 
+o Shape 10
 g Shape_10
 s off
 usemtl CityEngineMaterial
@@ -153,6 +164,7 @@ v 129747.297 30.000 -2552826.928
 v 129741.914 30.000 -2552695.732
 # 4 vertices
 
+o Shape 11
 g Shape_11
 s off
 usemtl CityEngineMaterial
@@ -166,6 +178,7 @@ v 129752.713 30.000 -2552958.909
 v 129747.708 30.000 -2552836.929
 # 4 vertices
 
+o Shape 12
 g Shape_12
 s off
 usemtl CityEngineMaterial
@@ -179,6 +192,7 @@ v 129760.185 30.000 -2553140.984
 v 129754.969 30.000 -2553013.867
 # 4 vertices
 
+o Shape 13
 g Shape_13
 s off
 usemtl CityEngineMaterial
@@ -192,6 +206,7 @@ v 130329.631 30.000 -2553242.268
 v 129987.614 30.000 -2553256.660
 # 4 vertices
 
+o Shape 14
 g Shape_14
 s off
 usemtl CityEngineMaterial
@@ -205,6 +220,7 @@ v 129970.124 30.000 -2552816.888
 v 129964.896 30.000 -2552685.421
 # 4 vertices
 
+o Shape 15
 g Shape_15
 s off
 usemtl CityEngineMaterial
@@ -218,6 +234,7 @@ v 130177.032 30.000 -2552808.365
 v 130171.713 30.000 -2552676.566
 # 4 vertices
 
+o Shape 16
 g Shape_16
 s off
 usemtl CityEngineMaterial
@@ -231,6 +248,7 @@ v 130545.791 30.000 -2553233.172
 v 130339.632 30.000 -2553241.847
 # 4 vertices
 
+o Shape 17
 g Shape_17
 s off
 usemtl CityEngineMaterial
@@ -244,6 +262,7 @@ v 130326.595 30.000 -2552802.205
 v 130321.332 30.000 -2552670.159
 # 4 vertices
 
+o Shape 18
 g Shape_18
 s off
 usemtl CityEngineMaterial
@@ -257,6 +276,7 @@ v 129982.619 30.000 -2553131.089
 v 129970.522 30.000 -2552826.889
 # 4 vertices
 
+o Shape 19
 g Shape_19
 s off
 usemtl CityEngineMaterial

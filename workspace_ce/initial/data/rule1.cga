@@ -1,13 +1,14 @@
 version "2024.1"
 
 @StartRule
-attr height = 30
 
 Lot -->
     extrude(height)
     comp(f) { 
         top : Roof  
     }
-    
+
+attr height = 30
+
 Roof -->
     color("#87CEFA")

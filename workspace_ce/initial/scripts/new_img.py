@@ -14,7 +14,7 @@ def main():
 
     try:
         ce = CE()
-
+        
         # 获取当前脚本所在目录
         script_dir = os.path.dirname(os.path.abspath(__file__))
         print("current dir:", script_dir)
@@ -29,7 +29,7 @@ def main():
 
         # 构建输出路径
         output_dir = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images"
-        base_name = "layout_obj"
+        base_name = "layout_obj_nn"
 
         # 创建输出目录（如果不存在）
         # os.makedirs(output_dir, exist_ok=True)
