@@ -61,11 +61,7 @@ def render_obj(obj_path, output_image):
     print(f"\n总计: {total_vertices} 个顶点, {total_faces} 个面")
     print("=== 详细信息结束 ===\n")
     
-<<<<<<< HEAD
     # 重新计算包围盒
-=======
-    # 计算所有对象的整体包围盒
->>>>>>> 36f70c57402c46725c3859a6e187def21a3e7978
     bbox_min = [float('inf')] * 3
     bbox_max = [float('-inf')] * 3
     for obj in imported_objects:
@@ -76,7 +72,6 @@ def render_obj(obj_path, output_image):
     model_size = [bbox_max[i] - bbox_min[i] for i in range(3)]
     center = [(bbox_min[i] + bbox_max[i]) / 2 for i in range(3)]
 
-<<<<<<< HEAD
     # 平移所有对象，使整体中心到原点
     for obj in imported_objects:
         obj.location.x -= center[0]
@@ -97,34 +92,6 @@ def render_obj(obj_path, output_image):
     bpy.ops.object.light_add(type='SUN')
     sun = bpy.context.object
     sun.location = (0, 0, max(model_size[0], model_size[2]) * 3)
-=======
-    # 自动缩放所有对象到Blender可见范围
-    target_size = 10.0  # 目标最大尺寸（Blender单位）
-    max_model_extent = max(model_size)
-    # scale_factor = target_size / max_model_extent if max_model_extent > 0 else 1.0
-    scale_factor = 0.0001
-    print(f"缩放因子: {scale_factor}")
-    for obj in imported_objects:
-        obj.scale = (scale_factor, scale_factor, scale_factor)
-        obj.location.x = (obj.location.x - center[0]) * scale_factor
-        obj.location.y = (obj.location.y - center[1]) * scale_factor
-        obj.location.z = (obj.location.z - center[2]) * scale_factor
-        print(obj.location.x, obj.location.y, obj.location.z)
-
-    # 添加相机并自动适配
-    bpy.ops.object.camera_add()
-    camera = bpy.context.object
-    camera.data.type = 'ORTHO'
-    camera.data.ortho_scale = target_size * 1.2
-    camera.location = (0, 0, target_size * 2)
-    camera.rotation_euler = (0, 0, 0)
-    bpy.context.scene.camera = camera
-
-    # 添加光源
-    bpy.ops.object.light_add(type='SUN')
-    sun = bpy.context.object
-    sun.location = (0, 0, target_size * 3)
->>>>>>> 36f70c57402c46725c3859a6e187def21a3e7978
     sun.rotation_euler = (0, 0, 0)
     sun.data.energy = 2.0
 

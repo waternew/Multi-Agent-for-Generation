@@ -1,0 +1,331 @@
+version "2024.1"
+
+
+@Group("block indicators") 
+@Order(1) @Range(7,20)
+attr setback_dis = 10
+
+@Order(1) @Range("no","yes")
+attr face ="no"
+
+@Group("block indicators") @Order(2) @Range(30,70)
+attr street_jiao = 50
+
+@Group("block indicators") @Order(2) @Range(30,70)
+attr street_jiao_1 = 50
+
+
+@Order(1) @Range(1,20)
+attr Far =rand(5,12)
+
+@Group("block indicators") @Order(2) @Range(30,70)
+attr BD_set_dis_min = 40
+@Group("block indicators") @Order(3) @Range(30,100)
+attr BD_set_dis_max = 90
+
+
+@Group("building_set") @Order(4) @Range(30,100)
+attr BD_kuandu = 50
+
+@Group("building_set") @Order(4) @Range(0,1)
+attr BD_kaikou = rand(0.8,1)
+
+@Group("building_set") @Order(4) @Range(30,100)
+attr BD_gaocen_kaundu = 80
+@Group("building_set") @Order(4) @Range(30,100)
+attr BD_gaocen_shengdu = 80
+@Group("building_set") @Order(4) @Range(10,2000)
+attr BD_gaocen_site = 500
+
+@Group("building_set") @Order(4) @Range(0.3,0.7)
+attr gao_per = rand(0.4,0.7)
+
+@Group("building_set") @Order(4) @Range(0,0.5)
+attr zhong_per = rand(0,1-gao_per)
+
+@Group("building_set") @Order(4) @Range(0,0.5)
+attr di_per =1-gao_per-zhong_per
+
+
+@Group("building_set") @Order(4) @Range(80,300)
+attr BD_dicen_chang = 120
+@Group("building_set") @Order(4) @Range(80,300)
+attr BD_dicen_kuan = 120
+
+
+
+
+
+
+import rule: "gao_BD_split_new.cga"
+import di_BD_:"di_BD_2.cga"
+import di_BD_1:"di_BD_3.cga"
+@Hidden
+attr ZYDMJ = -1 //设定总用地面积
+@Hidden
+attr JZMD = -1
+@Hidden
+attr GCYDMJ = -1
+@Hidden
+attr DCYDMJ = -1
+@Hidden
+attr ZCYDMJ = -1
+@Hidden
+attr chang = -1
+
+taggedArea(name) = 
+    sum(comp(f) { isTagged(name): geometry.area })
+    
+@StartRule
+lot-->  
+  set(ZYDMJ,geometry.area)
+  print("总用地面积"+ZYDMJ)
+  report("总用地面积", ZYDMJ)
+  setbackPerEdge(setback_dis){ all       =street_road   | remainder : box }
+  
+box-->
+rotateScope(0, 45, 0)
+footface//旋转坐标系
+
+footface-->
+split(x) {street_jiao : jeijiao  | ~10 : footface1 }
+//进行歇着的切角
+
+footface1-->
+alignScopeToAxes()
+splitAndSetbackPerimeter(0, 0, [true,false,false,false]) { ~50 : 0 : default_color | 50 : street_jiao_1: jeijiao} { remainder : vvv }
+
+vvv-->
+splitAndSetbackPerimeter(0,3,[false,false,false,true,false]) { ~50: 0 : default_color | 50 : street_jiao_1: jeijiao } { remainder : aaa }
+
+aaa-->
+   splitAndSetbackPerimeter(0,8,[false,false,false,false,false,false,false,true]) {50 : street_jiao_1: jeijiao | ~50: 0 : default_color  } { remainder :ccs }
+   
+ccs-->
+ setbackPerEdge(rand(BD_set_dis_min,BD_set_dis_max)){ all       =BD   |remainder : green }
+ 
+BD-->
+inline(append){ [ tag("LayoutBD") LayouBD ]}
+
+//splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou : 0 :default_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :default_color} { remainder : default_color}
+//设定围合街区向外开口的区域
+BDCC
+
+LayouBD-->
+inline(append) { [ tag("LayoutBD_1") LayouBD_1 ]}
+ChooseLayout_BD_1
+
+LayouBD_1-->
+
+splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou :0 :default_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :default_color} { remainder : default_color}
+//设定围合街区向外开口的区域
+
+BD_1-->
+cleanupGeometry(all, 0)
+convexify(20)
+comp(f) { all : BD_1_face }
+
+gao_1_face-->
+case scope.sx >= 10 && scope.sy >= 10 :
+ssss_bd
+ else:
+default_color
+
+ChooseLayout_BD_1-->
+set(JZMD ,  sum(comp(f) { isTagged("LayoutBD_1"): geometry.area })/ZYDMJ) 
+print("建筑密度"+JZMD)
+report("建筑密度",JZMD)
+report("建筑底面积",sum(comp(f) { isTagged("LayoutBD_1"): geometry.area }))
+BD_3
+
+
+
+BD_3-->
+cleanupGeometry(all, 0)
+inline(append) {
+        [ tag("Layoute") Layoute ] 
+        [ tag("Layoutc") Layoutc ] }
+ChooseLayout_c
+
+Layoute-->
+inline(append) {
+        [ tag("Layoutu") Layoutu] }
+uuuuu
+
+Layoutu-->
+alignScopeToAxes()
+footprint()
+splitAndSetbackPerimeter(0) {BD_gaocen_kaundu: BD_gaocen_shengdu:  BD_gaocen | BD_gaocen_site:0 :  default_color | BD_gaocen_kaundu: BD_gaocen_shengdu:  BD_gaocen } { remainder : default_color}
+
+
+uuuuu-->
+set(GCYDMJ,geometry.area)
+//set(GCYDMJ,sum(comp(f) { isTagged("Layoutu"): geometry.area }))
+print("高层建筑用地面积"+GCYDMJ)
+report("高层建筑底面积",GCYDMJ)
+gao_ex
+
+
+gao_ex-->
+convexify(50)
+comp(f) { all : gao_BD_face }
+
+gao_BD_face-->
+  case scope.sx >= 10 && scope.sy >= 10 :
+ gao_BD_face_ex
+ else:
+default_color
+
+gao_BD_face_ex-->////高层的底面积
+color("#464646")  // 添加颜色
+extrude(gao_per*Far*ZYDMJ/GCYDMJ*3)
+rectify(10)
+cleanupGeometry(all, 1)
+kaka
+
+kaka-->
+case face =="yes":
+rule.lot
+else:kaka_lp
+
+
+BDCC-->
+
+kk
+ll
+
+ll-->
+alignScopeToAxes()
+footprint()
+ll_al
+
+ll_al-->
+inline(append) {[ tag("Layoutdi") Layoutdi ] }
+ChooseLayout_di
+
+
+Layoutdi-->
+
+//set(SYZDMJ,ZYDMJ-GCYDMJ)
+//print("剩余占地面积",SYZDMJ)
+splitAndSetbackPerimeter(0) {BD_gaocen_kaundu: BD_gaocen_shengdu:  default_color | BD_gaocen_site:0:  BD_dicen | BD_gaocen_kaundu: BD_gaocen_shengdu:  default_color } { remainder : BD_dicen}
+
+//BD_dicen-->
+//color(1,0,0)
+//extrude(30)
+
+ChooseLayout_di-->//这里确认的低层底面积
+inline(append) {
+        [ tag("Layoutdi_A") Layoutdi_A ] 
+        [ tag("Layoutdi_B") Layoutdi_B ] }
+ChooseLayout_di__ggg//将它复制两个，为了将低层面积传导到中层
+
+Layoutdi_A-->
+inline(append) {
+        [ tag("Layoutdi_di_P") Layoutdi_di_P ] }
+di_di_ppp
+
+Layoutdi_di_P -->//这里确定低层区域
+alignScopeToAxes()
+footprint()
+splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : BD_dicen_face  } { remainder : default_color }
+
+di_di_ppp-->
+set(DCYDMJ,geometry.area )
+print("低层建筑底面积"+DCYDMJ)
+report("底层建筑底面积", DCYDMJ)
+convexify(20)
+comp(f) { all : di_BD_face }
+
+di_BD_face-->
+case scope.sx >= 10 && scope.sy >= 10 :
+color("#464646")
+di_BD_face_ex//低层占地面积
+else:
+default_color
+
+di_BD_face_ex-->
+//底层的底面积
+color("#464646") 
+extrude((1-gao_per-zhong_per)*Far*ZYDMJ/DCYDMJ*3)
+lala
+lala-->
+case face =="yes":
+di_BD_.lot
+else:lala_lp
+
+
+
+ChooseLayout_di__ggg-->
+zhong_1
+zhong_2
+
+zhong_2-->
+inline(append) {
+        [ tag("Layoutdi_zhong_P") Layoutdi_zhong_P ] }
+zhong_end
+
+Layoutdi_zhong_P-->
+alignScopeToAxes()
+footprint()
+splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : default_color  } { remainder : BD_face_zhong }//这里确定了中层区域
+
+zhong_end-->
+set(ZCYDMJ, geometry.area )
+print("中层建筑底面积"+ZCYDMJ)
+report("中层建筑底面积",ZCYDMJ)
+convexify(20)
+comp(f) { all : zhong_BD_face }
+
+zhong_BD_face-->
+case scope.sx >= 10 && scope.sy >= 10 :
+color("#464646") 
+zhong_BD_face_ex//低层占地面积
+else:
+default_color
+
+zhong_BD_face_ex-->
+color("#464646") 
+extrude(zhong_per*Far*ZYDMJ/ZCYDMJ*3)
+mama
+
+
+mama-->
+case face =="yes":
+di_BD_1.lot
+else:mama_lp
+//中层的底面积
+green-->
+ //alignScopeToAxes(x)
+// color(0,1,0,0.5)
+rotateScope(rand(30,60), rand(30,60), 0)
+ split(x,adjust) {30 : green_text |  rand(10,30) : road_text_m |~20 : green_text}
+ 
+ green_text-->
+ rotateScope(rand(100,360), rand(10,20), 0)
+ split(x,adjust) {60: green_text_o |  rand(10,30) : road_text_m |~20 : green_text_o}
+ 
+ road_text_m-->
+ color("#FF1F00")  // 道路（十六进制）
+// setupProjection(0, scope.xz, 15, 10)
+//   texture("images/ssa.png")
+//texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
+//   projectUV(0)
+ 
+ green_text_o-->
+ color("#04C803") // #04C803 树 #04FA07 草 #CCFF04 植物
+ //color(0,1,0,0.5)
+ 
+jeijiao-->
+color("#000000")  // 黑色（十六进制）
+//   setupProjection(0, scope.xz, 10, 40)
+//   texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
+///   projectUV(0)
+   
+ street_road-->
+   //color(0.5,0.5,0.5)
+   color("#8C8C8C") #小路
+
+default_color -->
+    color("#464646") // 使用地板颜色作为兜底颜色
+

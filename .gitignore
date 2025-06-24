@@ -204,4 +204,13 @@ metagpt/ext/aflow/scripts/optimized
 workspace/
 
 workspace_ce/initial/images/*.obj
+workspace_ce/initial/images/*.mtl
+workspace_ce/initial/images/*.txt
 workspace_ce/initial/images/success/*.obj
+workspace_ce/initial/images/success/*.mtl
+workspace_ce/initial/images/success/*.txt
+workspace_ce/initial/images/cache/*
+workspace_ce/initial/scenes/*.cej
+workspace_ce/initial/bin/*
+
+workspace_ce/citydesigne_business/

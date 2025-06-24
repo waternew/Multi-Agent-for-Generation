@@ -1,280 +1,770 @@
-  0     2 'Building Height.0' 15.4562
-  0     2 'Min Height.0' 10
-  0     2 'Max Height.0' 30
-  0     2 'Id' 0
-  0     2 'Parcel Area.0' 33740.5
-  0     2 'Text' 'salut'
-  0     3 'Bool value' true
-  0     3 'Value' 1
-  0     0 'Default$parcelArea' 0  [evalFloat]
-  0     0 'Default$minBuildingHeight' 10  [evalFloat]
-  0     0 'Default$buildingColor' '#FF00FF' [evalString]
-  0     0 'Default$text' 'salut' [evalString]
-  0     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  0     0 'Default$OBJECTID' 0  [evalFloat]
-  1     2 'Building Height.0' 15.4562
-  1     2 'Min Height.0' 10
-  1     2 'Max Height.0' 30
-  1     2 'Id' 0
-  1     2 'Parcel Area.0' 18299.4
-  1     2 'Text' 'salut'
-  1     3 'Bool value' true
-  1     3 'Value' 1
-  1     0 'Default$parcelArea' 0  [evalFloat]
-  1     0 'Default$minBuildingHeight' 10  [evalFloat]
-  1     0 'Default$buildingColor' '#FF00FF' [evalString]
-  1     0 'Default$text' 'salut' [evalString]
-  1     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  1     0 'Default$OBJECTID' 0  [evalFloat]
-  2     2 'Building Height.0' 15.4562
-  2     2 'Min Height.0' 10
-  2     2 'Max Height.0' 30
-  2     2 'Id' 0
-  2     2 'Parcel Area.0' 17575.8
-  2     2 'Text' 'salut'
-  2     3 'Bool value' true
-  2     3 'Value' 1
-  2     0 'Default$parcelArea' 0  [evalFloat]
-  2     0 'Default$minBuildingHeight' 10  [evalFloat]
-  2     0 'Default$buildingColor' '#FF00FF' [evalString]
-  2     0 'Default$text' 'salut' [evalString]
-  2     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  2     0 'Default$OBJECTID' 0  [evalFloat]
-  3     2 'Building Height.0' 15.4562
-  3     2 'Min Height.0' 10
-  3     2 'Max Height.0' 30
-  3     2 'Id' 0
-  3     2 'Parcel Area.0' 26576.6
-  3     2 'Text' 'salut'
-  3     3 'Bool value' true
-  3     3 'Value' 1
-  3     0 'Default$parcelArea' 0  [evalFloat]
-  3     0 'Default$minBuildingHeight' 10  [evalFloat]
-  3     0 'Default$buildingColor' '#FF00FF' [evalString]
-  3     0 'Default$text' 'salut' [evalString]
-  3     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  3     0 'Default$OBJECTID' 0  [evalFloat]
-  4     2 'Building Height.0' 15.4562
-  4     2 'Min Height.0' 10
-  4     2 'Max Height.0' 30
-  4     2 'Id' 0
-  4     2 'Parcel Area.0' 18410.3
-  4     2 'Text' 'salut'
-  4     3 'Bool value' true
-  4     3 'Value' 1
-  4     0 'Default$parcelArea' 0  [evalFloat]
-  4     0 'Default$minBuildingHeight' 10  [evalFloat]
-  4     0 'Default$buildingColor' '#FF00FF' [evalString]
-  4     0 'Default$text' 'salut' [evalString]
-  4     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  4     0 'Default$OBJECTID' 0  [evalFloat]
-  5     2 'Building Height.0' 15.4562
-  5     2 'Min Height.0' 10
-  5     2 'Max Height.0' 30
-  5     2 'Id' 0
-  5     2 'Parcel Area.0' 25906.4
-  5     2 'Text' 'salut'
-  5     3 'Bool value' true
-  5     3 'Value' 1
-  5     0 'Default$parcelArea' 0  [evalFloat]
-  5     0 'Default$minBuildingHeight' 10  [evalFloat]
-  5     0 'Default$buildingColor' '#FF00FF' [evalString]
-  5     0 'Default$text' 'salut' [evalString]
-  5     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  5     0 'Default$OBJECTID' 0  [evalFloat]
-  6     2 'Building Height.0' 15.4562
-  6     2 'Min Height.0' 10
-  6     2 'Max Height.0' 30
-  6     2 'Id' 0
-  6     2 'Parcel Area.0' 25561.8
-  6     2 'Text' 'salut'
-  6     3 'Bool value' true
-  6     3 'Value' 1
-  6     0 'Default$parcelArea' 0  [evalFloat]
-  6     0 'Default$minBuildingHeight' 10  [evalFloat]
-  6     0 'Default$buildingColor' '#FF00FF' [evalString]
-  6     0 'Default$text' 'salut' [evalString]
-  6     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  6     0 'Default$OBJECTID' 0  [evalFloat]
-  7     2 'Building Height.0' 15.4562
-  7     2 'Min Height.0' 10
-  7     2 'Max Height.0' 30
-  7     2 'Id' 0
-  7     2 'Parcel Area.0' 23709.7
-  7     2 'Text' 'salut'
-  7     3 'Bool value' true
-  7     3 'Value' 1
-  7     0 'Default$parcelArea' 0  [evalFloat]
-  7     0 'Default$minBuildingHeight' 10  [evalFloat]
-  7     0 'Default$buildingColor' '#FF00FF' [evalString]
-  7     0 'Default$text' 'salut' [evalString]
-  7     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  7     0 'Default$OBJECTID' 0  [evalFloat]
-  8     2 'Building Height.0' 15.4562
-  8     2 'Min Height.0' 10
-  8     2 'Max Height.0' 30
-  8     2 'Id' 0
-  8     2 'Parcel Area.0' 23730.3
-  8     2 'Text' 'salut'
-  8     3 'Bool value' true
-  8     3 'Value' 1
-  8     0 'Default$parcelArea' 0  [evalFloat]
-  8     0 'Default$minBuildingHeight' 10  [evalFloat]
-  8     0 'Default$buildingColor' '#FF00FF' [evalString]
-  8     0 'Default$text' 'salut' [evalString]
-  8     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  8     0 'Default$OBJECTID' 0  [evalFloat]
-  9     2 'Building Height.0' 15.4562
-  9     2 'Min Height.0' 10
-  9     2 'Max Height.0' 30
-  9     2 'Id' 0
-  9     2 'Parcel Area.0' 18853.5
-  9     2 'Text' 'salut'
-  9     3 'Bool value' true
-  9     3 'Value' 1
-  9     0 'Default$parcelArea' 0  [evalFloat]
-  9     0 'Default$minBuildingHeight' 10  [evalFloat]
-  9     0 'Default$buildingColor' '#FF00FF' [evalString]
-  9     0 'Default$text' 'salut' [evalString]
-  9     0 'Default$maxBuildingHeight' 30  [evalFloat]
-  9     0 'Default$OBJECTID' 0  [evalFloat]
- 10     2 'Building Height.0' 15.4562
- 10     2 'Min Height.0' 10
- 10     2 'Max Height.0' 30
- 10     2 'Id' 0
- 10     2 'Parcel Area.0' 6793.66
- 10     2 'Text' 'salut'
- 10     3 'Bool value' true
- 10     3 'Value' 1
- 10     0 'Default$parcelArea' 0  [evalFloat]
- 10     0 'Default$minBuildingHeight' 10  [evalFloat]
- 10     0 'Default$buildingColor' '#FF00FF' [evalString]
- 10     0 'Default$text' 'salut' [evalString]
- 10     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 10     0 'Default$OBJECTID' 0  [evalFloat]
- 11     2 'Building Height.0' 15.4562
- 11     2 'Min Height.0' 10
- 11     2 'Max Height.0' 30
- 11     2 'Id' 0
- 11     2 'Parcel Area.0' 169695
- 11     2 'Text' 'salut'
- 11     3 'Bool value' true
- 11     3 'Value' 1
- 11     0 'Default$parcelArea' 0  [evalFloat]
- 11     0 'Default$minBuildingHeight' 10  [evalFloat]
- 11     0 'Default$buildingColor' '#FF00FF' [evalString]
- 11     0 'Default$text' 'salut' [evalString]
- 11     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 11     0 'Default$OBJECTID' 0  [evalFloat]
- 12     2 'Building Height.0' 15.4562
- 12     2 'Min Height.0' 10
- 12     2 'Max Height.0' 30
- 12     2 'Id' 0
- 12     2 'Parcel Area.0' 5032.83
- 12     2 'Text' 'salut'
- 12     3 'Bool value' true
- 12     3 'Value' 1
- 12     0 'Default$parcelArea' 0  [evalFloat]
- 12     0 'Default$minBuildingHeight' 10  [evalFloat]
- 12     0 'Default$buildingColor' '#FF00FF' [evalString]
- 12     0 'Default$text' 'salut' [evalString]
- 12     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 12     0 'Default$OBJECTID' 0  [evalFloat]
- 13     2 'Building Height.0' 15.4562
- 13     2 'Min Height.0' 10
- 13     2 'Max Height.0' 30
- 13     2 'Id' 0
- 13     2 'Parcel Area.0' 24694.6
- 13     2 'Text' 'salut'
- 13     3 'Bool value' true
- 13     3 'Value' 1
- 13     0 'Default$parcelArea' 0  [evalFloat]
- 13     0 'Default$minBuildingHeight' 10  [evalFloat]
- 13     0 'Default$buildingColor' '#FF00FF' [evalString]
- 13     0 'Default$text' 'salut' [evalString]
- 13     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 13     0 'Default$OBJECTID' 0  [evalFloat]
- 14     2 'Building Height.0' 15.4562
- 14     2 'Min Height.0' 10
- 14     2 'Max Height.0' 30
- 14     2 'Id' 0
- 14     2 'Parcel Area.0' 39440.7
- 14     2 'Text' 'salut'
- 14     3 'Bool value' true
- 14     3 'Value' 1
- 14     0 'Default$parcelArea' 0  [evalFloat]
- 14     0 'Default$minBuildingHeight' 10  [evalFloat]
- 14     0 'Default$buildingColor' '#FF00FF' [evalString]
- 14     0 'Default$text' 'salut' [evalString]
- 14     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 14     0 'Default$OBJECTID' 0  [evalFloat]
- 15     2 'Building Height.0' 15.4562
- 15     2 'Min Height.0' 10
- 15     2 'Max Height.0' 30
- 15     2 'Id' 0
- 15     2 'Parcel Area.0' 31488.5
- 15     2 'Text' 'salut'
- 15     3 'Bool value' true
- 15     3 'Value' 1
- 15     0 'Default$parcelArea' 0  [evalFloat]
- 15     0 'Default$minBuildingHeight' 10  [evalFloat]
- 15     0 'Default$buildingColor' '#FF00FF' [evalString]
- 15     0 'Default$text' 'salut' [evalString]
- 15     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 15     0 'Default$OBJECTID' 0  [evalFloat]
- 16     2 'Building Height.0' 15.4562
- 16     2 'Min Height.0' 10
- 16     2 'Max Height.0' 30
- 16     2 'Id' 0
- 16     2 'Parcel Area.0' 22453
- 16     2 'Text' 'salut'
- 16     3 'Bool value' true
- 16     3 'Value' 1
- 16     0 'Default$parcelArea' 0  [evalFloat]
- 16     0 'Default$minBuildingHeight' 10  [evalFloat]
- 16     0 'Default$buildingColor' '#FF00FF' [evalString]
- 16     0 'Default$text' 'salut' [evalString]
- 16     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 16     0 'Default$OBJECTID' 0  [evalFloat]
- 17     2 'Building Height.0' 15.4562
- 17     2 'Min Height.0' 10
- 17     2 'Max Height.0' 30
- 17     2 'Id' 0
- 17     2 'Parcel Area.0' 9027.19
- 17     2 'Text' 'salut'
- 17     3 'Bool value' true
- 17     3 'Value' 1
- 17     0 'Default$parcelArea' 0  [evalFloat]
- 17     0 'Default$minBuildingHeight' 10  [evalFloat]
- 17     0 'Default$buildingColor' '#FF00FF' [evalString]
- 17     0 'Default$text' 'salut' [evalString]
- 17     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 17     0 'Default$OBJECTID' 0  [evalFloat]
- 18     2 'Building Height.0' 15.4562
- 18     2 'Min Height.0' 10
- 18     2 'Max Height.0' 30
- 18     2 'Id' 0
- 18     2 'Parcel Area.0' 16686.6
- 18     2 'Text' 'salut'
- 18     3 'Bool value' true
- 18     3 'Value' 1
- 18     0 'Default$parcelArea' 0  [evalFloat]
- 18     0 'Default$minBuildingHeight' 10  [evalFloat]
- 18     0 'Default$buildingColor' '#FF00FF' [evalString]
- 18     0 'Default$text' 'salut' [evalString]
- 18     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 18     0 'Default$OBJECTID' 0  [evalFloat]
- 19     2 'Building Height.0' 15.4562
- 19     2 'Min Height.0' 10
- 19     2 'Max Height.0' 30
- 19     2 'Id' 0
- 19     2 'Parcel Area.0' 65394.3
- 19     2 'Text' 'salut'
- 19     3 'Bool value' true
- 19     3 'Value' 1
- 19     0 'Default$parcelArea' 0  [evalFloat]
- 19     0 'Default$minBuildingHeight' 10  [evalFloat]
- 19     0 'Default$buildingColor' '#FF00FF' [evalString]
- 19     0 'Default$text' 'salut' [evalString]
- 19     0 'Default$maxBuildingHeight' 30  [evalFloat]
- 19     0 'Default$OBJECTID' 0  [evalFloat]
+  0     1 '总用地面积' 33740.5
+  0    16 '建筑密度' 0.512291
+  0    16 '建筑底面积' 17285
+  0    16 '高层建筑底面积' 17285
+  0    21 '底层建筑底面积' 4402.58
+  0    25 '中层建筑底面积' 4402.58
+  0     0 'Default$GCYDMJ' -1  [evalFloat]
+  0     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  0     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  0     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  0     0 'Default$street_jiao' 50  [evalFloat]
+  0     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  0     0 'Default$rule.cengao_one' 8  [evalFloat]
+  0     0 'Default$setback_dis' 10  [evalFloat]
+  0     0 'Default$ZYDMJ' -1  [evalFloat]
+  0     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  0     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  0     0 'Default$rule.setback_dis' 10  [evalFloat]
+  0     0 'Default$rule.setback_type' 'increase' [evalString]
+  0     0 'Default$rule.cengao_other' 4  [evalFloat]
+  0     0 'Default$face' 'no' [evalString]
+  0     0 'Default$BD_kuandu' 50  [evalFloat]
+  0     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  0     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  0     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  0     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  0     0 'Default$ZCYDMJ' -1  [evalFloat]
+  0     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  0     0 'Default$DCYDMJ' -1  [evalFloat]
+  0     0 'Default$street_jiao_1' 50  [evalFloat]
+  0     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  0     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  0     0 'Default$chang' -1  [evalFloat]
+  0     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  0     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  0     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  0     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  0     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  0     0 'Default$JZMD' -1  [evalFloat]
+  1     1 '总用地面积' 18299.4
+  1    16 '建筑密度' 0.2398
+  1    16 '建筑底面积' 4388.21
+  1    16 '高层建筑底面积' 4388.21
+  1    21 '底层建筑底面积' 3697.55
+  1    25 '中层建筑底面积' 3697.55
+  1     0 'Default$GCYDMJ' -1  [evalFloat]
+  1     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  1     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  1     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  1     0 'Default$street_jiao' 50  [evalFloat]
+  1     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  1     0 'Default$rule.cengao_one' 8  [evalFloat]
+  1     0 'Default$setback_dis' 10  [evalFloat]
+  1     0 'Default$ZYDMJ' -1  [evalFloat]
+  1     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  1     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  1     0 'Default$rule.setback_dis' 10  [evalFloat]
+  1     0 'Default$rule.setback_type' 'increase' [evalString]
+  1     0 'Default$rule.cengao_other' 4  [evalFloat]
+  1     0 'Default$face' 'no' [evalString]
+  1     0 'Default$BD_kuandu' 50  [evalFloat]
+  1     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  1     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  1     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  1     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  1     0 'Default$ZCYDMJ' -1  [evalFloat]
+  1     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  1     0 'Default$DCYDMJ' -1  [evalFloat]
+  1     0 'Default$street_jiao_1' 50  [evalFloat]
+  1     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  1     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  1     0 'Default$chang' -1  [evalFloat]
+  1     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  1     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  1     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  1     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  1     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  1     0 'Default$JZMD' -1  [evalFloat]
+  2     1 '总用地面积' 17575.8
+  2    16 '建筑密度' 0.228411
+  2    16 '建筑底面积' 4014.51
+  2    16 '高层建筑底面积' 4014.51
+  2    21 '底层建筑底面积' 3881.99
+  2    25 '中层建筑底面积' 3881.99
+  2     0 'Default$GCYDMJ' -1  [evalFloat]
+  2     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  2     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  2     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  2     0 'Default$street_jiao' 50  [evalFloat]
+  2     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  2     0 'Default$rule.cengao_one' 8  [evalFloat]
+  2     0 'Default$setback_dis' 10  [evalFloat]
+  2     0 'Default$ZYDMJ' -1  [evalFloat]
+  2     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  2     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  2     0 'Default$rule.setback_dis' 10  [evalFloat]
+  2     0 'Default$rule.setback_type' 'increase' [evalString]
+  2     0 'Default$rule.cengao_other' 4  [evalFloat]
+  2     0 'Default$face' 'no' [evalString]
+  2     0 'Default$BD_kuandu' 50  [evalFloat]
+  2     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  2     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  2     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  2     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  2     0 'Default$ZCYDMJ' -1  [evalFloat]
+  2     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  2     0 'Default$DCYDMJ' -1  [evalFloat]
+  2     0 'Default$street_jiao_1' 50  [evalFloat]
+  2     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  2     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  2     0 'Default$chang' -1  [evalFloat]
+  2     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  2     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  2     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  2     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  2     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  2     0 'Default$JZMD' -1  [evalFloat]
+  3     1 '总用地面积' 26576.6
+  3    16 '建筑密度' 0.419954
+  3    16 '建筑底面积' 11160.9
+  3    16 '高层建筑底面积' 11160.9
+  3    21 '底层建筑底面积' 3741.65
+  3    25 '中层建筑底面积' 3741.65
+  3     0 'Default$GCYDMJ' -1  [evalFloat]
+  3     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  3     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  3     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  3     0 'Default$street_jiao' 50  [evalFloat]
+  3     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  3     0 'Default$rule.cengao_one' 8  [evalFloat]
+  3     0 'Default$setback_dis' 10  [evalFloat]
+  3     0 'Default$ZYDMJ' -1  [evalFloat]
+  3     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  3     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  3     0 'Default$rule.setback_dis' 10  [evalFloat]
+  3     0 'Default$rule.setback_type' 'increase' [evalString]
+  3     0 'Default$rule.cengao_other' 4  [evalFloat]
+  3     0 'Default$face' 'no' [evalString]
+  3     0 'Default$BD_kuandu' 50  [evalFloat]
+  3     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  3     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  3     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  3     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  3     0 'Default$ZCYDMJ' -1  [evalFloat]
+  3     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  3     0 'Default$DCYDMJ' -1  [evalFloat]
+  3     0 'Default$street_jiao_1' 50  [evalFloat]
+  3     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  3     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  3     0 'Default$chang' -1  [evalFloat]
+  3     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  3     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  3     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  3     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  3     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  3     0 'Default$JZMD' -1  [evalFloat]
+  4     1 '总用地面积' 18410.3
+  4    16 '建筑密度' 0.233823
+  4    16 '建筑底面积' 4304.73
+  4    16 '高层建筑底面积' 4304.73
+  4    21 '底层建筑底面积' 3569.77
+  4    25 '中层建筑底面积' 3569.77
+  4     0 'Default$GCYDMJ' -1  [evalFloat]
+  4     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  4     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  4     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  4     0 'Default$street_jiao' 50  [evalFloat]
+  4     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  4     0 'Default$rule.cengao_one' 8  [evalFloat]
+  4     0 'Default$setback_dis' 10  [evalFloat]
+  4     0 'Default$ZYDMJ' -1  [evalFloat]
+  4     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  4     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  4     0 'Default$rule.setback_dis' 10  [evalFloat]
+  4     0 'Default$rule.setback_type' 'increase' [evalString]
+  4     0 'Default$rule.cengao_other' 4  [evalFloat]
+  4     0 'Default$face' 'no' [evalString]
+  4     0 'Default$BD_kuandu' 50  [evalFloat]
+  4     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  4     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  4     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  4     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  4     0 'Default$ZCYDMJ' -1  [evalFloat]
+  4     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  4     0 'Default$DCYDMJ' -1  [evalFloat]
+  4     0 'Default$street_jiao_1' 50  [evalFloat]
+  4     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  4     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  4     0 'Default$chang' -1  [evalFloat]
+  4     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  4     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  4     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  4     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  4     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  4     0 'Default$JZMD' -1  [evalFloat]
+  5     1 '总用地面积' 25906.4
+  5    16 '建筑密度' 0.409641
+  5    16 '建筑底面积' 10612.3
+  5    16 '高层建筑底面积' 10612.3
+  5    21 '底层建筑底面积' 3714.19
+  5    25 '中层建筑底面积' 3714.19
+  5     0 'Default$GCYDMJ' -1  [evalFloat]
+  5     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  5     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  5     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  5     0 'Default$street_jiao' 50  [evalFloat]
+  5     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  5     0 'Default$rule.cengao_one' 8  [evalFloat]
+  5     0 'Default$setback_dis' 10  [evalFloat]
+  5     0 'Default$ZYDMJ' -1  [evalFloat]
+  5     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  5     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  5     0 'Default$rule.setback_dis' 10  [evalFloat]
+  5     0 'Default$rule.setback_type' 'increase' [evalString]
+  5     0 'Default$rule.cengao_other' 4  [evalFloat]
+  5     0 'Default$face' 'no' [evalString]
+  5     0 'Default$BD_kuandu' 50  [evalFloat]
+  5     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  5     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  5     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  5     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  5     0 'Default$ZCYDMJ' -1  [evalFloat]
+  5     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  5     0 'Default$DCYDMJ' -1  [evalFloat]
+  5     0 'Default$street_jiao_1' 50  [evalFloat]
+  5     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  5     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  5     0 'Default$chang' -1  [evalFloat]
+  5     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  5     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  5     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  5     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  5     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  5     0 'Default$JZMD' -1  [evalFloat]
+  6     1 '总用地面积' 25561.8
+  6    16 '建筑密度' 0.40407
+  6    16 '建筑底面积' 10328.8
+  6    16 '高层建筑底面积' 10328.8
+  6    21 '底层建筑底面积' 3699.54
+  6    25 '中层建筑底面积' 3699.54
+  6     0 'Default$GCYDMJ' -1  [evalFloat]
+  6     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  6     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  6     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  6     0 'Default$street_jiao' 50  [evalFloat]
+  6     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  6     0 'Default$rule.cengao_one' 8  [evalFloat]
+  6     0 'Default$setback_dis' 10  [evalFloat]
+  6     0 'Default$ZYDMJ' -1  [evalFloat]
+  6     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  6     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  6     0 'Default$rule.setback_dis' 10  [evalFloat]
+  6     0 'Default$rule.setback_type' 'increase' [evalString]
+  6     0 'Default$rule.cengao_other' 4  [evalFloat]
+  6     0 'Default$face' 'no' [evalString]
+  6     0 'Default$BD_kuandu' 50  [evalFloat]
+  6     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  6     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  6     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  6     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  6     0 'Default$ZCYDMJ' -1  [evalFloat]
+  6     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  6     0 'Default$DCYDMJ' -1  [evalFloat]
+  6     0 'Default$street_jiao_1' 50  [evalFloat]
+  6     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  6     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  6     0 'Default$chang' -1  [evalFloat]
+  6     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  6     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  6     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  6     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  6     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  6     0 'Default$JZMD' -1  [evalFloat]
+  7     1 '总用地面积' 23709.7
+  7    16 '建筑密度' 0.439965
+  7    16 '建筑底面积' 10431.4
+  7    16 '高层建筑底面积' 10431.4
+  7    21 '底层建筑底面积' 3708.52
+  7    25 '中层建筑底面积' 3708.52
+  7     0 'Default$GCYDMJ' -1  [evalFloat]
+  7     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  7     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  7     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  7     0 'Default$street_jiao' 50  [evalFloat]
+  7     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  7     0 'Default$rule.cengao_one' 8  [evalFloat]
+  7     0 'Default$setback_dis' 10  [evalFloat]
+  7     0 'Default$ZYDMJ' -1  [evalFloat]
+  7     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  7     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  7     0 'Default$rule.setback_dis' 10  [evalFloat]
+  7     0 'Default$rule.setback_type' 'increase' [evalString]
+  7     0 'Default$rule.cengao_other' 4  [evalFloat]
+  7     0 'Default$face' 'no' [evalString]
+  7     0 'Default$BD_kuandu' 50  [evalFloat]
+  7     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  7     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  7     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  7     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  7     0 'Default$ZCYDMJ' -1  [evalFloat]
+  7     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  7     0 'Default$DCYDMJ' -1  [evalFloat]
+  7     0 'Default$street_jiao_1' 50  [evalFloat]
+  7     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  7     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  7     0 'Default$chang' -1  [evalFloat]
+  7     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  7     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  7     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  7     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  7     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  7     0 'Default$JZMD' -1  [evalFloat]
+  8     1 '总用地面积' 23730.3
+  8    16 '建筑密度' 0.385863
+  8    16 '建筑底面积' 9156.66
+  8    16 '高层建筑底面积' 9156.67
+  8    21 '底层建筑底面积' 3868.48
+  8    25 '中层建筑底面积' 3868.48
+  8     0 'Default$GCYDMJ' -1  [evalFloat]
+  8     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  8     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  8     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  8     0 'Default$street_jiao' 50  [evalFloat]
+  8     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  8     0 'Default$rule.cengao_one' 8  [evalFloat]
+  8     0 'Default$setback_dis' 10  [evalFloat]
+  8     0 'Default$ZYDMJ' -1  [evalFloat]
+  8     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  8     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  8     0 'Default$rule.setback_dis' 10  [evalFloat]
+  8     0 'Default$rule.setback_type' 'increase' [evalString]
+  8     0 'Default$rule.cengao_other' 4  [evalFloat]
+  8     0 'Default$face' 'no' [evalString]
+  8     0 'Default$BD_kuandu' 50  [evalFloat]
+  8     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  8     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  8     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  8     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  8     0 'Default$ZCYDMJ' -1  [evalFloat]
+  8     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  8     0 'Default$DCYDMJ' -1  [evalFloat]
+  8     0 'Default$street_jiao_1' 50  [evalFloat]
+  8     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  8     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  8     0 'Default$chang' -1  [evalFloat]
+  8     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  8     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  8     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  8     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  8     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  8     0 'Default$JZMD' -1  [evalFloat]
+  9     1 '总用地面积' 18853.5
+  9    16 '建筑密度' 0.247533
+  9    16 '建筑底面积' 4666.86
+  9    16 '高层建筑底面积' 4666.86
+  9    21 '底层建筑底面积' 3582.07
+  9    25 '中层建筑底面积' 3582.07
+  9     0 'Default$GCYDMJ' -1  [evalFloat]
+  9     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+  9     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+  9     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+  9     0 'Default$street_jiao' 50  [evalFloat]
+  9     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+  9     0 'Default$rule.cengao_one' 8  [evalFloat]
+  9     0 'Default$setback_dis' 10  [evalFloat]
+  9     0 'Default$ZYDMJ' -1  [evalFloat]
+  9     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+  9     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+  9     0 'Default$rule.setback_dis' 10  [evalFloat]
+  9     0 'Default$rule.setback_type' 'increase' [evalString]
+  9     0 'Default$rule.cengao_other' 4  [evalFloat]
+  9     0 'Default$face' 'no' [evalString]
+  9     0 'Default$BD_kuandu' 50  [evalFloat]
+  9     0 'Default$BD_set_dis_min' 40  [evalFloat]
+  9     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+  9     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+  9     0 'Default$BD_set_dis_max' 90  [evalFloat]
+  9     0 'Default$ZCYDMJ' -1  [evalFloat]
+  9     0 'Default$BD_dicen_chang' 120  [evalFloat]
+  9     0 'Default$DCYDMJ' -1  [evalFloat]
+  9     0 'Default$street_jiao_1' 50  [evalFloat]
+  9     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+  9     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+  9     0 'Default$chang' -1  [evalFloat]
+  9     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+  9     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+  9     0 'Default$BD_gaocen_site' 500  [evalFloat]
+  9     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+  9     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+  9     0 'Default$JZMD' -1  [evalFloat]
+ 10     1 '总用地面积' 6793.66
+ 10     0 'Default$GCYDMJ' -1  [evalFloat]
+ 10     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 10     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 10     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 10     0 'Default$street_jiao' 50  [evalFloat]
+ 10     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 10     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 10     0 'Default$setback_dis' 10  [evalFloat]
+ 10     0 'Default$ZYDMJ' -1  [evalFloat]
+ 10     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 10     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 10     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 10     0 'Default$rule.setback_type' 'increase' [evalString]
+ 10     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 10     0 'Default$face' 'no' [evalString]
+ 10     0 'Default$BD_kuandu' 50  [evalFloat]
+ 10     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 10     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 10     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 10     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 10     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 10     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 10     0 'Default$DCYDMJ' -1  [evalFloat]
+ 10     0 'Default$street_jiao_1' 50  [evalFloat]
+ 10     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 10     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 10     0 'Default$chang' -1  [evalFloat]
+ 10     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 10     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 10     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 10     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 10     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 10     0 'Default$JZMD' -1  [evalFloat]
+ 11     1 '总用地面积' 169695
+ 11    18 '建筑密度' 0.502408
+ 11    18 '建筑底面积' 85256.3
+ 11    18 '高层建筑底面积' 85256.3
+ 11    36 '底层建筑底面积' 12830.8
+ 11    40 '中层建筑底面积' 12830.8
+ 11     0 'Default$GCYDMJ' -1  [evalFloat]
+ 11     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 11     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 11     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 11     0 'Default$street_jiao' 50  [evalFloat]
+ 11     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 11     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 11     0 'Default$setback_dis' 10  [evalFloat]
+ 11     0 'Default$ZYDMJ' -1  [evalFloat]
+ 11     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 11     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 11     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 11     0 'Default$rule.setback_type' 'increase' [evalString]
+ 11     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 11     0 'Default$face' 'no' [evalString]
+ 11     0 'Default$BD_kuandu' 50  [evalFloat]
+ 11     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 11     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 11     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 11     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 11     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 11     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 11     0 'Default$DCYDMJ' -1  [evalFloat]
+ 11     0 'Default$street_jiao_1' 50  [evalFloat]
+ 11     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 11     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 11     0 'Default$chang' -1  [evalFloat]
+ 11     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 11     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 11     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 11     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 11     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 11     0 'Default$JZMD' -1  [evalFloat]
+ 12     1 '总用地面积' 5032.83
+ 12     0 'Default$GCYDMJ' -1  [evalFloat]
+ 12     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 12     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 12     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 12     0 'Default$street_jiao' 50  [evalFloat]
+ 12     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 12     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 12     0 'Default$setback_dis' 10  [evalFloat]
+ 12     0 'Default$ZYDMJ' -1  [evalFloat]
+ 12     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 12     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 12     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 12     0 'Default$rule.setback_type' 'increase' [evalString]
+ 12     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 12     0 'Default$face' 'no' [evalString]
+ 12     0 'Default$BD_kuandu' 50  [evalFloat]
+ 12     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 12     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 12     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 12     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 12     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 12     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 12     0 'Default$DCYDMJ' -1  [evalFloat]
+ 12     0 'Default$street_jiao_1' 50  [evalFloat]
+ 12     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 12     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 12     0 'Default$chang' -1  [evalFloat]
+ 12     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 12     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 12     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 12     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 12     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 12     0 'Default$JZMD' -1  [evalFloat]
+ 13     1 '总用地面积' 24694.6
+ 13    16 '建筑密度' 0.395618
+ 13    16 '建筑底面积' 9769.63
+ 13    16 '高层建筑底面积' 9769.63
+ 13    21 '底层建筑底面积' 3766.29
+ 13    25 '中层建筑底面积' 3766.29
+ 13     0 'Default$GCYDMJ' -1  [evalFloat]
+ 13     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 13     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 13     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 13     0 'Default$street_jiao' 50  [evalFloat]
+ 13     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 13     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 13     0 'Default$setback_dis' 10  [evalFloat]
+ 13     0 'Default$ZYDMJ' -1  [evalFloat]
+ 13     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 13     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 13     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 13     0 'Default$rule.setback_type' 'increase' [evalString]
+ 13     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 13     0 'Default$face' 'no' [evalString]
+ 13     0 'Default$BD_kuandu' 50  [evalFloat]
+ 13     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 13     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 13     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 13     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 13     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 13     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 13     0 'Default$DCYDMJ' -1  [evalFloat]
+ 13     0 'Default$street_jiao_1' 50  [evalFloat]
+ 13     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 13     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 13     0 'Default$chang' -1  [evalFloat]
+ 13     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 13     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 13     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 13     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 13     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 13     0 'Default$JZMD' -1  [evalFloat]
+ 14     1 '总用地面积' 39440.7
+ 14    16 '建筑密度' 0.59375
+ 14    16 '建筑底面积' 23417.9
+ 14    16 '高层建筑底面积' 23417.9
+ 14    21 '底层建筑底面积' 5487.5
+ 14    25 '中层建筑底面积' 5487.5
+ 14     0 'Default$GCYDMJ' -1  [evalFloat]
+ 14     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 14     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 14     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 14     0 'Default$street_jiao' 50  [evalFloat]
+ 14     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 14     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 14     0 'Default$setback_dis' 10  [evalFloat]
+ 14     0 'Default$ZYDMJ' -1  [evalFloat]
+ 14     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 14     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 14     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 14     0 'Default$rule.setback_type' 'increase' [evalString]
+ 14     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 14     0 'Default$face' 'no' [evalString]
+ 14     0 'Default$BD_kuandu' 50  [evalFloat]
+ 14     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 14     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 14     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 14     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 14     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 14     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 14     0 'Default$DCYDMJ' -1  [evalFloat]
+ 14     0 'Default$street_jiao_1' 50  [evalFloat]
+ 14     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 14     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 14     0 'Default$chang' -1  [evalFloat]
+ 14     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 14     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 14     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 14     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 14     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 14     0 'Default$JZMD' -1  [evalFloat]
+ 15     1 '总用地面积' 31488.5
+ 15    16 '建筑密度' 0.49691
+ 15    16 '建筑底面积' 15647
+ 15    16 '高层建筑底面积' 15647
+ 15    21 '底层建筑底面积' 4539.62
+ 15    25 '中层建筑底面积' 4539.62
+ 15     0 'Default$GCYDMJ' -1  [evalFloat]
+ 15     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 15     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 15     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 15     0 'Default$street_jiao' 50  [evalFloat]
+ 15     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 15     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 15     0 'Default$setback_dis' 10  [evalFloat]
+ 15     0 'Default$ZYDMJ' -1  [evalFloat]
+ 15     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 15     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 15     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 15     0 'Default$rule.setback_type' 'increase' [evalString]
+ 15     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 15     0 'Default$face' 'no' [evalString]
+ 15     0 'Default$BD_kuandu' 50  [evalFloat]
+ 15     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 15     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 15     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 15     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 15     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 15     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 15     0 'Default$DCYDMJ' -1  [evalFloat]
+ 15     0 'Default$street_jiao_1' 50  [evalFloat]
+ 15     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 15     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 15     0 'Default$chang' -1  [evalFloat]
+ 15     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 15     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 15     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 15     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 15     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 15     0 'Default$JZMD' -1  [evalFloat]
+ 16     1 '总用地面积' 22453
+ 16    16 '建筑密度' 0.417445
+ 16    16 '建筑底面积' 9372.88
+ 16    16 '高层建筑底面积' 9372.88
+ 16    21 '底层建筑底面积' 3561.8
+ 16    25 '中层建筑底面积' 3561.8
+ 16     0 'Default$GCYDMJ' -1  [evalFloat]
+ 16     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 16     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 16     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 16     0 'Default$street_jiao' 50  [evalFloat]
+ 16     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 16     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 16     0 'Default$setback_dis' 10  [evalFloat]
+ 16     0 'Default$ZYDMJ' -1  [evalFloat]
+ 16     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 16     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 16     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 16     0 'Default$rule.setback_type' 'increase' [evalString]
+ 16     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 16     0 'Default$face' 'no' [evalString]
+ 16     0 'Default$BD_kuandu' 50  [evalFloat]
+ 16     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 16     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 16     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 16     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 16     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 16     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 16     0 'Default$DCYDMJ' -1  [evalFloat]
+ 16     0 'Default$street_jiao_1' 50  [evalFloat]
+ 16     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 16     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 16     0 'Default$chang' -1  [evalFloat]
+ 16     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 16     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 16     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 16     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 16     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 16     0 'Default$JZMD' -1  [evalFloat]
+ 17     1 '总用地面积' 9027.19
+ 17    16 '建筑密度' 0.0899617
+ 17    16 '建筑底面积' 812.101
+ 17    16 '高层建筑底面积' 812.102
+ 17    21 '底层建筑底面积' 8229.02
+ 17    25 '中层建筑底面积' 8229.02
+ 17     0 'Default$GCYDMJ' -1  [evalFloat]
+ 17     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 17     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 17     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 17     0 'Default$street_jiao' 50  [evalFloat]
+ 17     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 17     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 17     0 'Default$setback_dis' 10  [evalFloat]
+ 17     0 'Default$ZYDMJ' -1  [evalFloat]
+ 17     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 17     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 17     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 17     0 'Default$rule.setback_type' 'increase' [evalString]
+ 17     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 17     0 'Default$face' 'no' [evalString]
+ 17     0 'Default$BD_kuandu' 50  [evalFloat]
+ 17     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 17     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 17     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 17     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 17     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 17     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 17     0 'Default$DCYDMJ' -1  [evalFloat]
+ 17     0 'Default$street_jiao_1' 50  [evalFloat]
+ 17     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 17     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 17     0 'Default$chang' -1  [evalFloat]
+ 17     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 17     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 17     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 17     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 17     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 17     0 'Default$JZMD' -1  [evalFloat]
+ 18     1 '总用地面积' 16686.6
+ 18    16 '建筑密度' 0.275205
+ 18    16 '建筑底面积' 4592.24
+ 18    16 '高层建筑底面积' 4592.24
+ 18    21 '底层建筑底面积' 3221.87
+ 18    25 '中层建筑底面积' 3221.87
+ 18     0 'Default$GCYDMJ' -1  [evalFloat]
+ 18     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 18     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 18     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 18     0 'Default$street_jiao' 50  [evalFloat]
+ 18     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 18     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 18     0 'Default$setback_dis' 10  [evalFloat]
+ 18     0 'Default$ZYDMJ' -1  [evalFloat]
+ 18     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 18     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 18     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 18     0 'Default$rule.setback_type' 'increase' [evalString]
+ 18     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 18     0 'Default$face' 'no' [evalString]
+ 18     0 'Default$BD_kuandu' 50  [evalFloat]
+ 18     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 18     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 18     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 18     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 18     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 18     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 18     0 'Default$DCYDMJ' -1  [evalFloat]
+ 18     0 'Default$street_jiao_1' 50  [evalFloat]
+ 18     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 18     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 18     0 'Default$chang' -1  [evalFloat]
+ 18     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 18     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 18     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 18     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 18     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 18     0 'Default$JZMD' -1  [evalFloat]
+ 19     1 '总用地面积' 65394.3
+ 19    18 '建筑密度' 0.614814
+ 19    18 '建筑底面积' 40205.3
+ 19    18 '高层建筑底面积' 40205.3
+ 19    29 '底层建筑底面积' 4644.93
+ 19    33 '中层建筑底面积' 4644.93
+ 19     0 'Default$GCYDMJ' -1  [evalFloat]
+ 19     0 'Default$rule.retract_dis' 0.84017581939697272286  [evalFloat]
+ 19     0 'Default$rule.censhu' 29.176876544952392578  [evalFloat]
+ 19     0 'Default$rule.retract_floor_din' 3.3560048043727874756  [evalFloat]
+ 19     0 'Default$street_jiao' 50  [evalFloat]
+ 19     0 'Default$rule.retract_dis_2' 0.86944150328636171654  [evalFloat]
+ 19     0 'Default$rule.cengao_one' 8  [evalFloat]
+ 19     0 'Default$setback_dis' 10  [evalFloat]
+ 19     0 'Default$ZYDMJ' -1  [evalFloat]
+ 19     0 'Default$rule.retract_floor' 2.4963432550430297852  [evalFloat]
+ 19     0 'Default$rule.one_floor_empty' 'yes' [evalString]
+ 19     0 'Default$rule.setback_dis' 10  [evalFloat]
+ 19     0 'Default$rule.setback_type' 'increase' [evalString]
+ 19     0 'Default$rule.cengao_other' 4  [evalFloat]
+ 19     0 'Default$face' 'no' [evalString]
+ 19     0 'Default$BD_kuandu' 50  [evalFloat]
+ 19     0 'Default$BD_set_dis_min' 40  [evalFloat]
+ 19     0 'Default$BD_gaocen_kaundu' 80  [evalFloat]
+ 19     0 'Default$BD_gaocen_shengdu' 80  [evalFloat]
+ 19     0 'Default$BD_set_dis_max' 90  [evalFloat]
+ 19     0 'Default$ZCYDMJ' -1  [evalFloat]
+ 19     0 'Default$BD_dicen_chang' 120  [evalFloat]
+ 19     0 'Default$DCYDMJ' -1  [evalFloat]
+ 19     0 'Default$street_jiao_1' 50  [evalFloat]
+ 19     0 'Default$Far' 7.4501038491725921631  [evalFloat]
+ 19     0 'Default$BD_kaikou' 0.82449105381965637207  [evalFloat]
+ 19     0 'Default$chang' -1  [evalFloat]
+ 19     0 'Default$gao_per' 0.53618533611297602981  [evalFloat]
+ 19     0 'Default$zhong_per' 0.34451047289344960411  [evalFloat]
+ 19     0 'Default$BD_gaocen_site' 500  [evalFloat]
+ 19     0 'Default$BD_dicen_kuan' 120  [evalFloat]
+ 19     0 'Default$di_per' 0.11930419099357436608  [evalFloat]
+ 19     0 'Default$JZMD' -1  [evalFloat]

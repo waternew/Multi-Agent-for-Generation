@@ -1,0 +1,90 @@
+/**
+ * File:    di_BD_2.cga
+ * Created: 1 Sep 2023 07:34:38 GMT
+ * Author:  zmz
+ */
+
+version "2022.1"
+lot-->
+   case scope.sx >30 : box_one
+   else:box_two
+   
+box_one-->
+ // extrude(30)
+  split(x) { 30 : box_two | 20 : face_glass label("glass") | ~10 : face_two }
+ 
+box_two-->#可以是box_two
+
+  split(y) {0.5 : wall_tex | ~12: comp(f) { side : side_face  | top:ss_tex | bottom:ss_tex} |0.5 : wall_tex}*
+ side_face-->
+   case touches(all,"glass") : 
+   ssa
+   else: ll
+  ll-->
+  
+ 
+
+  
+  [extrude(-1.5) 
+   comp(f) { bottom : NIL | side: wall_tex | top : box }]
+  [extrude(-1.0) 
+   comp(f) { bottom : NIL | side: NIL | top : mu_face }]
+   
+ box-->
+   split(y) { ~3 : split(x) { 4 : glass_tex | 1 : wall_tex}* | 0.3 : extrude(-0.3)  wall_tex}*
+mu_face-->
+  split(x) { '0.5 :NIL | 'rand(0.3,0.5) : mu_face_one | ~10 : NIL }
+  
+mu_face_one-->
+ split(x) { 0.3 :extrude(0.3) mu_tex  | 0.3 : NIL}*
+   
+face_glass-->
+  
+  s('1,'1,'0.9)
+ label("glass")
+  center(xyz)
+ glass_tex_box
+ 
+ glass_tex_box-->
+   split(y) { '0.5 : box_cc | ~0.2 : box_yy }
+ box_cc-->
+ center(xyz)
+ s('1,'1,'0.9) 
+ center(xyz)   
+ split(x) { 1 : glass_tex | 0.5 : extrude(1) wall_tex }*
+ 
+ box_yy-->
+   comp(f) { side : yy_face |top : top_face_yy | bottom : bottom_face_xx }
+ yy_face-->
+   offset(-2)
+   comp(f) { inside : glass_tex | border : gg }
+ gg-->
+   extrude(1)
+   mu_tex
+
+face_two-->
+ split(x) { '0.7 : box_two |~10 : face_two_two}
+ 
+
+face_two_two-->
+  split(y) { 14 : split(x) { ~3 : NIL | 1 : zhuzi_face| ~0.5 : NIL} | ~1 : face_two_one }
+  zhuzi_face-->
+ NIL
+face_two_one-->
+  comp(f) { side : split(x) { 4 : extrude(0.3) mu_tex | 2 : glass_tex  }*  | top : top_ss | bottom: bot_ss}
+
+glass_tex-->
+color("#E6E6E6")
+//  set(material.ambient.r,0) set(material.ambient.g,0) set(material.ambient.b,1)
+//	set(material.specular.r,0.8) set(material.specular.g,0.8) set(material.specular.b,0.8)
+//	set(material.reflectivity,0.8) set(material.shininess,50) set(material.opacity,0.6)
+wall_tex-->
+color("#787878")
+// setupProjection(0, scope.xy, 0.5, 6)
+//  texture("images/wall99.jpg")
+//   projectUV(0)
+ mu_tex-->
+color("#B47878")
+//    setupProjection(0, scope.xy, 0.5, 6)
+//   texture("images/muban04.jpg")
+//   projectUV(0)texture

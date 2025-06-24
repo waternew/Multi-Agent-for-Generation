@@ -1,0 +1,94 @@
+version "2024.1"
+
+@Group("建筑") @Order(1) @Range(20,39)
+attr censhu= rand(20,30)
+@Group("建筑") @Order(2) @Range(4,20)
+attr cengao_one = 8
+@Group("建筑") @Order(3) @Range(3,8)
+attr cengao_other = 4
+@Group("建筑") @Order(4) @Range("yes","no")
+attr one_floor_empty = "yes"
+@Group("后退") @Order(4) @Range("increase","fencen","no")
+attr setback_type = "increase"
+@Group("后退") @Order(4) @Range(3,10)
+attr setback_dis = 30
+@Group("缩进") @Order(4) @Range(1,10)
+attr retract_floor = rand(2,3)
+@Group("缩进") @Order(4) @Range(1,10)
+attr retract_floor_din = rand(2,5)
+@Group("缩进") @Order(4) @Range(0.8,1)
+attr retract_dis = rand(0.8,0.9)
+
+@Group("缩进") @Order(4) @Range(0.7,1)
+attr retract_dis_2= rand(0.8,0.9)
+@Group("墙体与窗户")@Order(4)  
+//attr wall_texture = "images/wall_concrete_1.jpg"
+getHeight = cengao_one + (censhu*cengao_other-1)
+
+
+@StartRule
+lot-->
+  
+  split(y) { rint(cengao_one) : floor_one | ~10 : floor_other_box }
+floor_other_box-->
+  split(y){rint(cengao_other):floor_other(split.index,split.total)}*
+ 
+ floor_one--> 
+   
+   case one_floor_empty =="yes" :
+   center(xyz)
+   s('0.95,'1,'0.95)
+   center(xyz)
+   comp(f) { side : split(x) {1:zhuzi | 8 :default_color }* }
+      else:
+   floor_other_box
+   
+  zhuzi-->
+    primitiveCylinder(10,0.5,cengao_one) 
+
+     floor_other(idx,n)-->
+   case idx > rint(n/retract_floor) && idx < rint(n/2+1):
+   s('retract_dis_2,'1,'retract_dis_2)
+   center(xyz)
+   floor_other_s(idx,n)
+   case idx>n-retract_floor_din:
+   s('retract_dis,'1,'retract_dis)
+   floor_other_box(idx,n)
+   case idx==n-retract_floor_din+3 ||idx ==n-retract_floor_din+4:
+   s('1,'1,'0.9)
+   floor_other_box(idx,n)
+   
+      else:
+   floor_other_box(idx,n)
+   
+floor_other_s(idx,n)-->
+comp(f) { side : side_face_one | top : top_face|bottom:bot_face }
+side_face_one-->
+split(x) { 0.2 : wall | ~3 : window}*
+floor_other_box(idx,n)-->
+ comp(f) { side : floor_other_box_side(idx,n) | top : top_face|bottom:bot_face }
+ 
+  floor_other_box_side(idx,n)-->
+    split(y) { 0.3 : wall | ~2 :  floor_other_box_side_win(idx,n) |0.3 : wall  }
+    
+   floor_other_box_side_win(idx,n)-->
+    case idx%2 == 0:
+       split(x) { 0.2 : wall | ~1 : window}*
+        else:
+   split(x) { 0.1 : wall | ~5 : window}*
+ 
+
+ window-->
+ color("#E6E6E6")
+ //color(0.7,0.75,1)
+//	set(material.ambient.r,0) set(material.ambient.g,0) set(material.ambient.b,1)
+//	set(material.specular.r,0.8) set(material.specular.g,0.8) set(material.specular.b,0.8)
+//	set(material.reflectivity,0.8) set(material.shininess,50) set(material.opacity,0.6)
+	
+wall-->
+color("#787878")
+//  projectUV(0)
+//  texture("images/wall_concrete_1.jpg")
+
+default_color -->
+    color("#464646") // 使用地板颜色作为兜底颜色
