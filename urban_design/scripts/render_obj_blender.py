@@ -164,10 +164,27 @@ def render_multiple_objs(obj_paths, output_image):
     print(f"相机位置: {camera.location}")
     print(f"相机朝向: {camera.rotation_euler}")
     
-    # 移除外部光源设置，使用自发光材质
-    print("设置自发光材质...")
+    # 添加光源以照亮Principled BSDF材质
+    print("设置光源...")
     
-    # 为每个对象设置自发光材质
+    # 主光源 - 太阳光
+    bpy.ops.object.light_add(type='SUN')
+    sun = bpy.context.object
+    sun.location = (center[0], center[1] - 10, center[2] + 20)
+    sun.rotation_euler = (math.radians(45), 0, math.radians(-45))  # 45度角照射
+    sun.data.energy = 3.0  # 适中的太阳光强度
+    sun.data.color = (1.0, 0.98, 0.95)  # 接近自然光
+    
+    # 填充光 - 环境光
+    bpy.ops.object.light_add(type='AREA')
+    fill_light = bpy.context.object
+    fill_light.location = (center[0] - 15, center[1] + 5, center[2] + 10)
+    fill_light.rotation_euler = (0, math.radians(90), 0)
+    fill_light.data.energy = 1.5  # 适中的填充光强度
+    fill_light.data.color = (0.95, 0.98, 1.0)  # 冷色调
+    fill_light.data.size = 15.0  # 光源面积
+    
+    # 为每个对象设置材质
     print("设置材质...")
     
     # 读取MTL文件中的颜色信息
@@ -192,21 +209,31 @@ def render_multiple_objs(obj_paths, output_image):
         nodes = mat.node_tree.nodes
         nodes.clear()
         
-        # 创建发光着色器
-        emission = nodes.new(type='ShaderNodeEmission')
-        emission.location = (0, 0)
+        # 创建Principled BSDF着色器（更接近CityEngine的材质）
+        principled = nodes.new(type='ShaderNodeBsdfPrincipled')
+        principled.location = (0, 0)
         
-        # 使用CityEngine的原始颜色
+        # 使用CityEngine的原始颜色，但调整以匹配CityEngine效果
         r, g, b = original_color
-        emission.inputs[0].default_value = (r, g, b, 1.0)  # 发光颜色
-        emission.inputs[1].default_value = 2.0  # 发光强度
+        
+        # 对于非黑色颜色，稍微调暗以匹配CityEngine效果
+        if r > 0.01 or g > 0.01 or b > 0.01:  # 不是黑色
+            # 调整颜色以更接近CityEngine的漫反射效果
+            r = r * 0.8  # 调暗20%
+            g = g * 0.8
+            b = b * 0.8
+        
+        principled.inputs[0].default_value = (r, g, b, 1.0)  # 基础色
+        principled.inputs[7].default_value = 0.3  # 粗糙度
+        principled.inputs[9].default_value = 0.0  # 金属度
+        principled.inputs[17].default_value = 0.0  # 发光强度设为0
         
         # 创建输出节点
         output = nodes.new(type='ShaderNodeOutputMaterial')
         output.location = (300, 0)
         
         # 连接节点
-        mat.node_tree.links.new(emission.outputs[0], output.inputs[0])
+        mat.node_tree.links.new(principled.outputs[0], output.inputs[0])
         
         # 确保材质完全不透明
         mat.blend_method = 'OPAQUE'  # 不透明混合模式
@@ -256,7 +283,7 @@ def render_multiple_objs(obj_paths, output_image):
     # 设置渲染层属性，确保正确的深度排序
     bpy.context.scene.render.use_freestyle = False  # 关闭自由样式线条
     
-    # 设置世界环境 - 白色背景突出自发光效果
+    # 设置世界环境 - 白色背景
     world = bpy.context.scene.world
     world.use_nodes = True
     world_nodes = world.node_tree.nodes
@@ -265,10 +292,9 @@ def render_multiple_objs(obj_paths, output_image):
     # 创建背景节点 - 设置为白色背景
     background = world_nodes.new(type='ShaderNodeBackground')
     background.location = (300, 0)
-    # background.inputs[0].default_value = (1.0, 1.0, 1.0, 1.0)  # 白色背景
-    # background.inputs[1].default_value = 1.0  # 背景强度为1，完全白色
-    background.inputs[0].default_value = (0.0, 0.0, 0.0, 1.0)  # 黑色背景
-    background.inputs[1].default_value = 0.0  # 背景强度为0，完全黑暗    
+    background.inputs[0].default_value = (1.0, 1.0, 1.0, 1.0)  # 白色背景
+    background.inputs[1].default_value = 0.5  # 适中的环境光强度
+    
     # 创建输出节点
     world_output = world_nodes.new(type='ShaderNodeOutputWorld')
     world_output.location = (600, 0)
