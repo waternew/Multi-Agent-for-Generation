@@ -1,63 +1,76 @@
-CGAWarning    0     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    0    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      0    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    1     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    1    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      1    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    2     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    2    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      2    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    3     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    3    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      3    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    4     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    4    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      4    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    5     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    5    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      5    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    6     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    6    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      6    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    7     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    7    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    7    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      7    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    8     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    8    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      8    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning    9     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning    9    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError      9    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   10    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAWarning   11     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   11    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   11    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAError     11    18   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   12    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAWarning   13     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   13    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError     13    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   14     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   14    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   14    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError     14    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   14    20   75 0x      8a [Method: 'Default$Layoutdi'] splitAndSetbackPerimeter(): SplitAndSetbackPerimeter: leaf 2 is fully covered by others, no geometry, ignored
-CGAWarning   15     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   15    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError     15    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   16     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   16    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   16    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError     16    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   17    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAWarning   17    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError     17    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   18     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   18    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   18    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
-CGAError     18    16   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
-CGAWarning   19     7  139 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   19    10  144 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAWarning   19    13  112 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
-CGAError     19    18   55 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    0     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    0    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    0    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError      0    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    1     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    1    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    1    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError      1    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    2     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    2    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    2    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError      2    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    3     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    3    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    3    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError      3    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    4     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    4    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    4    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError      4    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    5     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    5    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    5    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError      5    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    6     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    6    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    6    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError      6    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    7     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    7    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    7    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError      7    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    8     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    8    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    8    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError      8    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning    9     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    9    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning    9    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError      9    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   10    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAWarning   11     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   11    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   11    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError     11    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   12    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAWarning   13     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   13    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   13    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError     13    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   14     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   14    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   14    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError     14    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   15     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   15    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   15    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError     15    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   16     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   16    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   16    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError     16    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   17    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAWarning   17    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError     17    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAError     17    19   73 0x       6 [Method: 'Default$ll'] footprint(): Geometry is empty. Keeping original geometry.
+CGAError     17    21   90 0x       6 [Method: 'Default$Layoutdi_di_P'] footprint(): Geometry is empty. Keeping original geometry.
+CGAError     17    24  103 0x       6 [Method: 'Default$Layoutdi_zhong_P'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   18     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   18    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   18    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size larger than face edge count, ignoring some values.
+CGAError     18    16   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.
+CGAWarning   19     7  140 0x      8c [Method: 'Default$footface1'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   19    10  145 0x      8f [Method: 'Default$vvv'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAWarning   19    13  113 0x      9e [Method: 'Default$aaa'] splitAndSetbackPerimeter(): Provided array (selectedEdgesMask) size smaller than face edge count, using default value (false).
+CGAError     19    18   56 0x       6 [Method: 'Default$Layoutu'] footprint(): Geometry is empty. Keeping original geometry.

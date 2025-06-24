@@ -9,6 +9,7 @@ CityEngine SDK Python处理器
 import os
 import sys
 import json
+import random
 from pathlib import Path
 import pyprt
 import geopandas as gpd
@@ -148,6 +149,8 @@ class CityEngineProcessor:
             
             # 为每个初始形状创建属性字典
             shape_attributes = [default_attributes for _ in initial_shapes]
+            print("\n\n\nshape_attributes\n\n\n", shape_attributes)
+            # raise
             
             print("🔄 正在生成3D模型...")
             print(f"   RPK文件: {rpk_path}")
@@ -240,12 +243,54 @@ def main():
     # 使用官方示例的RPK文件进行测试
     # rpk_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/cityengine-sdk/data/candler.rpk"
     rpk_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/data/shangye.rpk"
+    # rpk_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/data/shangye.cga"
     output_dir = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images"
     
+
+    #  动态参数
+    setback_dis = random.uniform(7,20)
+    street_jiao = random.uniform(30,70)
+    street_jiao_1 = random.uniform(30,70)
+    Far = random.uniform(5,12)
+    BD_set_dis_min = random.uniform(30,70)
+    BD_set_dis_max = random.uniform(BD_set_dis_min,100)
+    BD_kuandu = random.uniform(30,100)
+    BD_kaikou = random.uniform(0.8,1.0)
+    BD_gaocen_kaundu = random.uniform(30,100)
+    BD_gaocen_shengdu = random.uniform(30,100)
+    BD_gaocen_site = random.uniform(10,2000)
+    BD_gaocen_kaundu = random.uniform(30,100)
+    gao_per = random.uniform(0.4,0.7)
+    zhong_per = random.uniform(0,1-gao_per)
+    di_per = 1 - gao_per - zhong_per
+    BD_dicen_chang = random.uniform(80,300)
+    BD_dicen_kuan = random.uniform(80,300)
+
+
     # 使用简化的属性（只保留必要的）todo
     attributes = {
         'height': 30.0,  # 对应CGA中的 attr height = 30
-        'Mode': 'Visualization'
+        'Mode': 'Visualization',
+
+        # 'jiejiao_color': '#000000',
+        'setback_dis': setback_dis,
+        'street_jiao': street_jiao,
+        'street_jiao_1': street_jiao_1,
+        'Far': Far,
+        'BD_set_dis_min': BD_set_dis_min,
+        'BD_set_dis_max': BD_set_dis_max,
+        'BD_kuandu': BD_kuandu,
+        'BD_kaikou': BD_kaikou,
+        'BD_gaocen_kaundu': BD_gaocen_kaundu,
+        'BD_gaocen_shengdu': BD_gaocen_shengdu,
+        'BD_gaocen_site': BD_gaocen_site,
+        'BD_gaocen_kaundu': BD_gaocen_kaundu,
+        'gao_per': gao_per,
+        'zhong_per': zhong_per,
+        'di_per': di_per,
+        'BD_dicen_chang': BD_dicen_chang,
+        'BD_dicen_kuan': BD_dicen_kuan,
+
     }
     
     print("🔄 开始处理文件...")

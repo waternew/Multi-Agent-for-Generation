@@ -76,6 +76,11 @@ attr chang = -1
 taggedArea(name) = 
     sum(comp(f) { isTagged(name): geometry.area })
     
+
+// 动态调参
+attr jiejiao_color = "#000000"
+    
+    
 @StartRule
 lot-->  
   set(ZYDMJ,geometry.area)
@@ -317,7 +322,7 @@ rotateScope(rand(30,60), rand(30,60), 0)
  //color(0,1,0,0.5)
  
 jeijiao-->
-color("#000000")  // 黑色（十六进制）
+color(jiejiao_color)  // 黑色（十六进制）
 //   setupProjection(0, scope.xz, 10, 40)
 //   texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
 ///   projectUV(0)
