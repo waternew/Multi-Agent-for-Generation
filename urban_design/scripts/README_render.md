@@ -46,7 +46,7 @@
 
 ```bash
 # 替换为你的Blender路径
-"C:\Program Files\Blender Foundation\Blender 4.0\blender.exe" --background --python render_obj_blender.py
+"D:\aaa\blender\blender-3.0.0-windows-x64\blender-3.0.0-windows-x64\blender.exe" --background --python render_obj_blender.py
 ```
 
 ## 脚本功能

@@ -4,40 +4,6 @@ import sys
 import mathutils
 import math
 
-def read_mtl_colors(mtl_file_path):
-    """读取MTL文件中的材质颜色信息"""
-    colors = {}
-    current_material = None
-    
-    if not os.path.exists(mtl_file_path):
-        print(f"警告: MTL文件不存在: {mtl_file_path}")
-        return colors
-    
-    try:
-        with open(mtl_file_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith('newmtl '):
-                    # 新材质定义
-                    current_material = line.split(' ', 1)[1]
-                    colors[current_material] = {'Kd': (0.8, 0.8, 0.8)}  # 默认颜色
-                elif line.startswith('Kd ') and current_material:
-                    # 漫反射颜色
-                    parts = line.split()
-                    if len(parts) >= 4:
-                        r = float(parts[1])
-                        g = float(parts[2])
-                        b = float(parts[3])
-                        colors[current_material]['Kd'] = (r, g, b)
-    except Exception as e:
-        print(f"读取MTL文件时出错: {e}")
-    
-    print(f"从MTL文件读取到 {len(colors)} 个材质颜色")
-    for material, color_info in colors.items():
-        print(f"  {material}: {color_info['Kd']}")
-    
-    return colors
-
 def render_multiple_objs(obj_paths, output_image):
     # 清除默认对象
     bpy.ops.object.select_all(action='SELECT')
@@ -144,8 +110,8 @@ def render_multiple_objs(obj_paths, output_image):
     camera.data.type = 'ORTHO'  # 正交相机：无变形、技术图纸，全景/VR：PANO，真实空间感：PERSP
     
     # 相机位置：在Y轴正方向，稍微向上偏移
-    camera_distance = max(model_size[0], model_size[2]) * 1.5  # 距离是建筑宽度的2倍
-    camera.location = (center[0], bbox_max[1] + camera_distance, center[2] + model_size[2] * 0.1)
+    camera_distance = max(model_size[0], model_size[2]) * 5.5  # 距离是建筑宽度的2倍
+    camera.location = (center[0], bbox_max[1] + camera_distance, center[2] + model_size[2] * 0.5)
     
     # 相机朝向：看向建筑群中心
     direction = center_vector - camera.location
@@ -155,7 +121,7 @@ def render_multiple_objs(obj_paths, output_image):
     # # 设置相机视野 - 透视相机
     # camera.data.lens = 35  # 35mm镜头
     # 设置相机视野 - 正交相机需要设置正交比例
-    camera.data.ortho_scale = max(model_size[0], model_size[2]) * 1.1  # 正交比例，控制视野范围
+    camera.data.ortho_scale = max(model_size[0], model_size[2]) * 2.0  # 正交比例，控制视野范围
     camera.data.clip_start = 0.1
     camera.data.clip_end = 1000.0
     
@@ -164,54 +130,70 @@ def render_multiple_objs(obj_paths, output_image):
     print(f"相机位置: {camera.location}")
     print(f"相机朝向: {camera.rotation_euler}")
     
-    # 移除外部光源设置，使用自发光材质
-    print("设置自发光材质...")
+    # 设置光源
+    print("设置光源...")
     
-    # 为每个对象设置自发光材质
+    # 主光源 - 太阳光，增加强度
+    bpy.ops.object.light_add(type='SUN')
+    sun = bpy.context.object
+    sun.location = (center[0], center[1] - 10, center[2] + 20)
+    sun.rotation_euler = (math.radians(45), 0, math.radians(-45))  # 45度角照射
+    sun.data.energy = 8.0  # 增加太阳光强度
+    sun.data.color = (1.0, 0.98, 0.95)  # 更接近自然光
+    
+    # 填充光 - 环境光，增加强度
+    bpy.ops.object.light_add(type='AREA')
+    fill_light = bpy.context.object
+    fill_light.location = (center[0] - 15, center[1] + 5, center[2] + 10)
+    fill_light.rotation_euler = (0, math.radians(90), 0)
+    fill_light.data.energy = 3.0  # 增加填充光强度
+    fill_light.data.color = (0.95, 0.98, 1.0)  # 冷色调
+    fill_light.data.size = 15.0  # 增大光源面积
+    
+    # 添加额外的环境光
+    bpy.ops.object.light_add(type='AREA')
+    ambient_light = bpy.context.object
+    ambient_light.location = (center[0] + 15, center[1] - 5, center[2] + 8)
+    ambient_light.rotation_euler = (0, math.radians(-90), 0)
+    ambient_light.data.energy = 2.0
+    ambient_light.data.color = (1.0, 1.0, 1.0)  # 纯白光
+    ambient_light.data.size = 12.0
+    
+    # 为每个对象设置材质
     print("设置材质...")
-    
-    # 读取MTL文件中的颜色信息
-    mtl_file_path = os.path.join(os.path.dirname(obj_paths[0]), "generated.mtl")
-    cityengine_colors = read_mtl_colors(mtl_file_path)
-    
     for i, obj in enumerate(all_imported_objects):
-        print(f"设置对象 {i+1} 的材质: {obj.name}")
-        
-        # 获取CityEngine原始颜色
-        if obj.name in cityengine_colors:
-            original_color = cityengine_colors[obj.name]['Kd']
-            print(f"  使用CityEngine颜色: {original_color}")
-        else:
-            # 如果没有找到对应的颜色，使用默认颜色
-            original_color = (0.7, 0.7, 0.7)
-            print(f"  使用默认颜色: {original_color}")
-        
+        print(f"设置对象 {i+1} 的材质...")
         mat_name = f"Building_Material_{i}"
         mat = bpy.data.materials.new(name=mat_name)
         mat.use_nodes = True
         nodes = mat.node_tree.nodes
         nodes.clear()
         
-        # 创建发光着色器
-        emission = nodes.new(type='ShaderNodeEmission')
-        emission.location = (0, 0)
+        # 创建Principled BSDF着色器（更接近CityEngine的材质）
+        principled = nodes.new(type='ShaderNodeBsdfPrincipled')
+        principled.location = (0, 0)
         
-        # 使用CityEngine的原始颜色
-        r, g, b = original_color
-        emission.inputs[0].default_value = (r, g, b, 1.0)  # 发光颜色
-        emission.inputs[1].default_value = 2.0  # 发光强度
+        # 随机颜色，但保持建筑感，增加亮度
+        import random
+        random.seed(i)
+        r = random.uniform(0.6, 0.9)  # 增加亮度范围
+        g = random.uniform(0.6, 0.9)
+        b = random.uniform(0.6, 0.9)
+        principled.inputs[0].default_value = (r, g, b, 1.0)  # 基础色
+        
+        # 调整材质参数，让建筑更亮
+        principled.inputs[7].default_value = 0.1  # 粗糙度
+        principled.inputs[9].default_value = 0.0  # 金属度
+        principled.inputs[17].default_value = 1.0  # 发光强度
         
         # 创建输出节点
         output = nodes.new(type='ShaderNodeOutputMaterial')
         output.location = (300, 0)
         
         # 连接节点
-        mat.node_tree.links.new(emission.outputs[0], output.inputs[0])
-        
-        # 确保材质完全不透明
-        mat.blend_method = 'OPAQUE'  # 不透明混合模式
-        mat.shadow_method = 'OPAQUE'  # 不透明阴影模式
-        mat.use_backface_culling = True  # 背面剔除，避免双面渲染
+        mat.node_tree.links.new(principled.outputs[0], output.inputs[0])
+        mat.blend_method = 'OPAQUE'
+        mat.shadow_method = 'OPAQUE'
         
         # 应用材质到对象
         if obj.data.materials:
@@ -228,52 +210,43 @@ def render_multiple_objs(obj_paths, output_image):
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.select_set(False)
     
-    # 设置渲染参数 - 确保正确的深度排序
+    # 设置渲染参数
     print("设置渲染参数...")
-    bpy.context.scene.render.engine = 'BLENDER_EEVEE' # CYCLES
+    bpy.context.scene.render.engine = 'CYCLES'
     bpy.context.scene.cycles.samples = 128  # 减少采样数以加快渲染
     bpy.context.scene.render.resolution_x = 1920
     bpy.context.scene.render.resolution_y = 1080
-    bpy.context.scene.render.image_settings.file_format = 'PNG'  # 改为PNG以支持透明
-    bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # 支持透明通道
-    bpy.context.scene.render.film_transparent = True  # 启用透明背景
-    bpy.context.scene.render.filepath = output_image.replace('.jpg', '.png')  # 改为PNG文件
+    bpy.context.scene.render.image_settings.file_format = 'JPEG'
+    bpy.context.scene.render.image_settings.quality = 95
+    bpy.context.scene.render.filepath = output_image
     
-    # 可选：设置边界框渲染 - 使用更保守的设置确保对象完整
-    # bpy.context.scene.render.use_border = True
-    # bpy.context.scene.render.use_crop_to_border = True
-    
-    # 使用更保守的边界框设置 - 只裁剪很小的边距
-    # margin = 0.02  # 2%边距，确保对象完整
-    # bpy.context.scene.render.border_min_x = margin
-    # bpy.context.scene.render.border_min_y = margin
-    # bpy.context.scene.render.border_max_x = 1.0 - margin
-    # bpy.context.scene.render.border_max_y = 1.0 - margin
-    
-    # print(f"设置渲染边界框: X[{margin:.3f}, {1.0-margin:.3f}], Y[{margin:.3f}, {1.0-margin:.3f}]")
-    print("启用透明背景渲染，不设置边界框裁剪")
-    
-    # 设置渲染层属性，确保正确的深度排序
-    bpy.context.scene.render.use_freestyle = False  # 关闭自由样式线条
-    
-    # 设置世界环境 - 白色背景突出自发光效果
+    # 设置世界环境 - 更亮的环境光
     world = bpy.context.scene.world
     world.use_nodes = True
     world_nodes = world.node_tree.nodes
     world_nodes.clear()
     
-    # 创建背景节点 - 设置为白色背景
+    # 创建天空纹理
+    sky_texture = world_nodes.new(type='ShaderNodeTexSky')
+    sky_texture.location = (0, 0)
+    sky_texture.sky_type = 'HOSEK_WILKIE'
+    sky_texture.sun_elevation = 0.8  # 增加太阳高度
+    sky_texture.sun_rotation = 0.0
+    sky_texture.altitude = 0.0
+    sky_texture.air_density = 0.8  # 减少大气密度
+    sky_texture.dust_density = 0.8  # 减少灰尘密度
+    
+    # 创建背景节点
     background = world_nodes.new(type='ShaderNodeBackground')
     background.location = (300, 0)
-    # background.inputs[0].default_value = (1.0, 1.0, 1.0, 1.0)  # 白色背景
-    # background.inputs[1].default_value = 1.0  # 背景强度为1，完全白色
-    background.inputs[0].default_value = (0.0, 0.0, 0.0, 1.0)  # 黑色背景
-    background.inputs[1].default_value = 0.0  # 背景强度为0，完全黑暗    
+    background.inputs[1].default_value = 1.2  # 增加环境光强度
+    
     # 创建输出节点
     world_output = world_nodes.new(type='ShaderNodeOutputWorld')
     world_output.location = (600, 0)
     
     # 连接节点
+    world.node_tree.links.new(sky_texture.outputs[0], background.inputs[0])
     world.node_tree.links.new(background.outputs[0], world_output.inputs[0])
     
     print("开始渲染...")
@@ -288,7 +261,7 @@ def render_multiple_objs(obj_paths, output_image):
 # ]
 obj_paths = ["E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_0.obj"]
 
-output_image = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"  # 改为PNG格式
+output_image = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.jpg"
 
 # 检查输入文件是否存在
 for obj_path in obj_paths:

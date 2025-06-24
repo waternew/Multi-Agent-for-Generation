@@ -242,7 +242,7 @@ def main():
     rpk_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/data/shangye.rpk"
     output_dir = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images"
     
-    # 使用简化的属性（只保留必要的）
+    # 使用简化的属性（只保留必要的）todo
     attributes = {
         'height': 30.0,  # 对应CGA中的 attr height = 30
         'Mode': 'Visualization'
