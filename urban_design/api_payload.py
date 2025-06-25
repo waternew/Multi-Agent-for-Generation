@@ -1,11 +1,11 @@
-def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, random_seed, max_size=256):
-    if height > max_size or width > max_size:
-        if height > width:
-            width = int(width * (max_size / height))
-            height = max_size
-        else:
-            height = int(height * (max_size / width))
-            width = max_size
+def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, random_seed):
+    # if height > max_size or width > max_size:
+    #     if height > width:
+    #         width = int(width * (max_size / height))
+    #         height = max_size
+    #     else:
+    #         height = int(height * (max_size / width))
+    #         width = max_size
 
     payload = {
         "alwayson_scripts": {
@@ -128,7 +128,8 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
 
         # 换模型
         "override_settings": {
-            'sd_model_checkpoint': "LandscapeBING_v1.0.safetensors [0bbe3f1aa3]"
+            # 'sd_model_checkpoint': "LandscapeBING_v1.0.safetensors [0bbe3f1aa3]"
+            'sd_model_checkpoint': "control_v11p_sd15_seg_fp16 [ab613144]"
         },            
         "override_settings_restore_afterwards": False,
 

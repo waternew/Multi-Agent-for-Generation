@@ -306,33 +306,38 @@ def render_multiple_objs(obj_paths, output_image):
     bpy.ops.render.render(write_still=True)
     print(f"✅ 布局图已保存到: {output_image}")
 
-# 定义OBJ文件路径
-# obj_paths = [
-#     "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_model_0.obj",
-#     "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_model_1.obj",
-#     "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_model_2.obj"
-# ]
-obj_paths = ["E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_0.obj"]
+def main():
+    # 定义OBJ文件路径
+    # obj_paths = [
+    #     "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_model_0.obj",
+    #     "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_model_1.obj",
+    #     "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_model_2.obj"
+    # ]
+    obj_paths = ["E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/generated_0.obj"]
 
-output_image = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"  # 改为PNG格式
+    output_image = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"  # 改为PNG格式
 
-# 检查输入文件是否存在
-for obj_path in obj_paths:
-    if not os.path.exists(obj_path):
-        print(f"错误: 输入文件不存在: {obj_path}")
-        # 在Blender中不能使用exit()，所以用return
-        raise Exception(f"输入文件不存在: {obj_path}")
+    # 检查输入文件是否存在
+    for obj_path in obj_paths:
+        if not os.path.exists(obj_path):
+            print(f"错误: 输入文件不存在: {obj_path}")
+            # 在Blender中不能使用exit()，所以用return
+            raise Exception(f"输入文件不存在: {obj_path}")
 
-# 确保输出目录存在
-output_dir = os.path.dirname(output_image)
-if output_dir and not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+    # 确保输出目录存在
+    output_dir = os.path.dirname(output_image)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-print("=== 多OBJ文件布局渲染 ===")
-print(f"输入文件:")
-for i, obj_path in enumerate(obj_paths):
-    print(f"  {i+1}. {obj_path}")
-print(f"输出文件: {output_image}")
-print("=" * 30)
+    print("=== 多OBJ文件布局渲染 ===")
+    print(f"输入文件:")
+    for i, obj_path in enumerate(obj_paths):
+        print(f"  {i+1}. {obj_path}")
+    print(f"输出文件: {output_image}")
+    print("=" * 30)
 
-render_multiple_objs(obj_paths, output_image) 
+    render_multiple_objs(obj_paths, output_image) 
+
+
+if __name__ == "__main__":
+    main()

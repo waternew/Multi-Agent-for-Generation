@@ -48,6 +48,10 @@ def call_api(webui_server_url, api_endpoint, **payload):
     response = urllib.request.urlopen(request)
     return json.loads(response.read().decode('utf-8'))
 
+def call_txt2img_api(webui_server_url, **payload):
+    response = call_api(webui_server_url, 'sdapi/v1/txt2img', **payload)
+    return response
+
 def call_img2img_api(webui_server_url, **payload):
     # 记录输入图片尺寸
     if 'init_images' in payload and payload['init_images']:
@@ -88,7 +92,7 @@ if __name__ == '__main__':
 
     payload_i2i = i2i_controlnet_payload(prompt_i2i, negative_prompt_i2i, init_img, controlnet_seg_img, random_seed, max_size=256)
 
-    response = call_img2img_api(**payload_i2i)
+    response = call_img2img_api(webui_server_url, **payload_i2i)
     for index, image in enumerate(response.get('images')):
         save_path = os.path.join(out_i2i_dir, f'img2img-{timestamp()}-{index}.png')
         decode_and_save_base64(image, save_path)
