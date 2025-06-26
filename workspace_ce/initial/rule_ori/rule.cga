@@ -1,12 +1,9 @@
 version "2024.1"
 
-
 @Group("block indicators") 
 @Order(1) @Range(7,20)
 attr setback_dis = 10
 
-@Order(1) @Range("no","yes")
-attr face ="no"
 
 @Group("block indicators") @Order(2) @Range(30,70)
 attr street_jiao = 50
@@ -16,7 +13,7 @@ attr street_jiao_1 = 50
 
 
 @Order(1) @Range(1,20)
-attr Far =rand(5,12)
+attr Far =6
 
 @Group("block indicators") @Order(2) @Range(30,70)
 attr BD_set_dis_min = 40
@@ -24,62 +21,67 @@ attr BD_set_dis_min = 40
 attr BD_set_dis_max = 90
 
 
-@Group("building_set") @Order(4) @Range(30,100)
+@Group("寤虹瓚") @Order(4) @Range(30,100)
+attr BD_changdu = 50
+@Group("寤虹瓚") @Order(4) @Range(30,100)
 attr BD_kuandu = 50
 
-@Group("building_set") @Order(4) @Range(0,1)
-attr BD_kaikou = rand(0.8,1)
+@Group("寤虹瓚") @Order(4) @Range(0,1)
+attr BD_kaikou = rand(0.5,0.8)
 
-@Group("building_set") @Order(4) @Range(30,100)
+@Group("寤虹瓚") @Order(4) @Range(30,100)
 attr BD_gaocen_kaundu = 80
-@Group("building_set") @Order(4) @Range(30,100)
+@Group("寤虹瓚") @Order(4) @Range(30,100)
 attr BD_gaocen_shengdu = 80
-@Group("building_set") @Order(4) @Range(10,2000)
+@Group("寤虹瓚") @Order(4) @Range(10,2000)
 attr BD_gaocen_site = 500
 
-@Group("building_set") @Order(4) @Range(0.3,0.7)
+@Group("寤虹瓚") @Order(4) @Range(0.3,0.7)
 attr gao_per = rand(0.4,0.7)
 
-@Group("building_set") @Order(4) @Range(0,0.5)
+@Group("寤虹瓚") @Order(4) @Range(0,0.5)
 attr zhong_per = rand(0,1-gao_per)
 
-@Group("building_set") @Order(4) @Range(0,0.5)
+@Group("寤虹瓚") @Order(4) @Range(0,0.5)
 attr di_per =1-gao_per-zhong_per
 
 
-@Group("building_set") @Order(4) @Range(80,300)
+@Group("寤虹瓚") @Order(4) @Range(80,200)
+attr BD_gaocen_hight_min = 80
+@Group("寤虹瓚") @Order(4) @Range(80,200)
+attr BD_gaocen_hight_max = 180
+
+
+@Group("寤虹瓚") @Order(4) @Range(80,300)
 attr BD_dicen_chang = 120
-@Group("building_set") @Order(4) @Range(80,300)
+@Group("寤虹瓚") @Order(4) @Range(80,300)
 attr BD_dicen_kuan = 120
 
+@Group("寤虹瓚") @Order(4) @Range(30,70)
+attr zhong_min = 30
+attr zhong_max = 70
+@Group("寤虹瓚") @Order(4) @Range(15,40)
+attr dicen_min = 15
+attr dicen_max = 40
+
+
+import gao_BD_split_2:"rules/gao_BD_split.cga"
+const dists = [100,120,100,120,100,120,100,120,100,120,100,120]
+import di_BD_2:"rules/di_BD_2.cga"
+import di_BD_3:"rules/di_BD_3.cga"
 
 
 
-
-
-import rule: "gao_BD_split_new.cga"
-import di_BD_:"di_BD_2.cga"
-import di_BD_1:"di_BD_3.cga"
 @Hidden
 attr ZYDMJ = -1 //设定总用地面积
-@Hidden
 attr JZMD = -1
-@Hidden
 attr GCYDMJ = -1
-@Hidden
 attr DCYDMJ = -1
-@Hidden
 attr ZCYDMJ = -1
-@Hidden
 attr chang = -1
 
 taggedArea(name) = 
     sum(comp(f) { isTagged(name): geometry.area })
-    
-
-// 动态调参
-attr jiejiao_color = "#000000"
-    
     
 @StartRule
 lot-->  
@@ -88,7 +90,7 @@ lot-->
   report("总用地面积", ZYDMJ)
   setbackPerEdge(setback_dis){ all       =street_road   | remainder : box }
   
-box-->
+ box-->
 rotateScope(0, 45, 0)
 footface//旋转坐标系
 
@@ -98,13 +100,13 @@ split(x) {street_jiao : jeijiao  | ~10 : footface1 }
 
 footface1-->
 alignScopeToAxes()
-splitAndSetbackPerimeter(0, 0, [true,false,false,false]) { ~50 : 0 : default_color | 50 : street_jiao_1: jeijiao} { remainder : vvv }
+splitAndSetbackPerimeter(0, 0, [true,false,false,false]) { ~50 : 0 : NIL | 50 : street_jiao_1: jeijiao} { remainder : vvv }
 
 vvv-->
-splitAndSetbackPerimeter(0,3,[false,false,false,true,false]) { ~50: 0 : default_color | 50 : street_jiao_1: jeijiao } { remainder : aaa }
+splitAndSetbackPerimeter(0,3,[false,false,false,true,false]) { ~50: 0 : NIL | 50 : street_jiao_1: jeijiao } { remainder : aaa }
 
 aaa-->
-   splitAndSetbackPerimeter(0,8,[false,false,false,false,false,false,false,true]) {50 : street_jiao_1: jeijiao | ~50: 0 : default_color  } { remainder :ccs }
+   splitAndSetbackPerimeter(0,8,[false,false,false,false,false,false,false,true]) {50 : street_jiao_1: jeijiao | ~50: 0 : NIL  } { remainder :ccs }
    
 ccs-->
  setbackPerEdge(rand(BD_set_dis_min,BD_set_dis_max)){ all       =BD   |remainder : green }
@@ -112,7 +114,7 @@ ccs-->
 BD-->
 inline(append){ [ tag("LayoutBD") LayouBD ]}
 
-//splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou : 0 :default_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :default_color} { remainder : default_color}
+//splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou : 0 :NIL |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :NIL} { remainder : NIL}
 //设定围合街区向外开口的区域
 BDCC
 
@@ -122,7 +124,7 @@ ChooseLayout_BD_1
 
 LayouBD_1-->
 
-splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou :0 :default_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :default_color} { remainder : default_color}
+splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou :0 :NIL |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :NIL} { remainder : NIL}
 //设定围合街区向外开口的区域
 
 BD_1-->
@@ -134,7 +136,7 @@ gao_1_face-->
 case scope.sx >= 10 && scope.sy >= 10 :
 ssss_bd
  else:
-gaocen_color
+NIL
 
 ChooseLayout_BD_1-->
 set(JZMD ,  sum(comp(f) { isTagged("LayoutBD_1"): geometry.area })/ZYDMJ) 
@@ -142,8 +144,6 @@ print("建筑密度"+JZMD)
 report("建筑密度",JZMD)
 report("建筑底面积",sum(comp(f) { isTagged("LayoutBD_1"): geometry.area }))
 BD_3
-
-
 
 BD_3-->
 cleanupGeometry(all, 0)
@@ -160,7 +160,7 @@ uuuuu
 Layoutu-->
 alignScopeToAxes()
 footprint()
-splitAndSetbackPerimeter(0) {BD_gaocen_kaundu: BD_gaocen_shengdu:  BD_gaocen | BD_gaocen_site:0 :  gaocen_color | BD_gaocen_kaundu: BD_gaocen_shengdu:  BD_gaocen } { remainder : gaocen_color}
+splitAndSetbackPerimeter(0) {BD_gaocen_kaundu: BD_gaocen_shengdu:  BD_gaocen | BD_gaocen_site:0 :  NIL | BD_gaocen_kaundu: BD_gaocen_shengdu:  BD_gaocen } { remainder : NIL}
 
 
 uuuuu-->
@@ -179,20 +179,14 @@ gao_BD_face-->
   case scope.sx >= 10 && scope.sy >= 10 :
  gao_BD_face_ex
  else:
-gaocen_color
+NIL
+
 
 gao_BD_face_ex-->////高层的底面积
-color("FF09E0")  // 添加颜色
 extrude(gao_per*Far*ZYDMJ/GCYDMJ*3)
 rectify(10)
 cleanupGeometry(all, 1)
-kaka
-
-kaka-->
-case face =="yes":
-rule.lot
-else:kaka_lp
-
+color(1,0,0)
 
 BDCC-->
 
@@ -213,7 +207,7 @@ Layoutdi-->
 
 //set(SYZDMJ,ZYDMJ-GCYDMJ)
 //print("剩余占地面积",SYZDMJ)
-splitAndSetbackPerimeter(0) {BD_gaocen_kaundu: BD_gaocen_shengdu:  gaocen_color | BD_gaocen_site:0:  BD_dicen | BD_gaocen_kaundu: BD_gaocen_shengdu:  gaocen_color } { remainder : BD_dicen}
+splitAndSetbackPerimeter(0) {BD_gaocen_kaundu: BD_gaocen_shengdu:  NIL | BD_gaocen_site:0:  BD_dicen | BD_gaocen_kaundu: BD_gaocen_shengdu:  NIL } { remainder : BD_dicen}
 
 //BD_dicen-->
 //color(1,0,0)
@@ -233,7 +227,7 @@ di_di_ppp
 Layoutdi_di_P -->//这里确定低层区域
 alignScopeToAxes()
 footprint()
-splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : BD_dicen_face  } { remainder : default_color }
+splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : BD_dicen_face  } { remainder : NIL }
 
 di_di_ppp-->
 set(DCYDMJ,geometry.area )
@@ -244,21 +238,13 @@ comp(f) { all : di_BD_face }
 
 di_BD_face-->
 case scope.sx >= 10 && scope.sy >= 10 :
-color("#464646")
 di_BD_face_ex//低层占地面积
 else:
-default_color
+NIL
 
 di_BD_face_ex-->
-//底层的底面积
-color("#464646") 
-extrude((1-gao_per-zhong_per)*Far*ZYDMJ/DCYDMJ*3)
-lala
-lala-->
-case face =="yes":
-di_BD_.lot
-else:lala_lp
-
+color(0,1,0)//底层的底面积
+extrude(di_per*Far*ZYDMJ/DCYDMJ*3)
 
 
 ChooseLayout_di__ggg-->
@@ -273,7 +259,7 @@ zhong_end
 Layoutdi_zhong_P-->
 alignScopeToAxes()
 footprint()
-splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : default_color  } { remainder : BD_face_zhong }//这里确定了中层区域
+splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : NIL  } { remainder : BD_face_zhong }//这里确定了中层区域
 
 zhong_end-->
 set(ZCYDMJ, geometry.area )
@@ -284,57 +270,12 @@ comp(f) { all : zhong_BD_face }
 
 zhong_BD_face-->
 case scope.sx >= 10 && scope.sy >= 10 :
-color("#464646") 
 zhong_BD_face_ex//低层占地面积
 else:
-default_color
+NIL
 
 zhong_BD_face_ex-->
-color("#464646") 
 extrude(zhong_per*Far*ZYDMJ/ZCYDMJ*3)
-mama
-
-
-mama-->
-case face =="yes":
-di_BD_1.lot
-else:mama_lp
+color(0,0,1)
 //中层的底面积
-green-->
- //alignScopeToAxes(x)
-// color(0,1,0,0.5)
-rotateScope(rand(30,60), rand(30,60), 0)
- split(x,adjust) {30 : green_text |  rand(10,30) : road_text_m |~20 : green_text}
- 
- green_text-->
- rotateScope(rand(100,360), rand(10,20), 0)
- split(x,adjust) {60: green_text_o |  rand(10,30) : road_text_m |~20 : green_text_o}
- 
- road_text_m-->
- color("#FF1F00")  // 道路（十六进制）
-// setupProjection(0, scope.xz, 15, 10)
-//   texture("images/ssa.png")
-//texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
-//   projectUV(0)
- 
- green_text_o-->
- color("#04C803") // #04C803 树 #04FA07 草 #CCFF04 植物
- //color(0,1,0,0.5)
- 
-jeijiao-->
-color(jiejiao_color)  // 黑色（十六进制）
-//   setupProjection(0, scope.xz, 10, 40)
-//   texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
-///   projectUV(0)
-   
- street_road-->
-   //color(0.5,0.5,0.5)
-   color("#8C8C8C") #小路
-
-default_color -->
-//    color("#464646") // 使用地板颜色作为兜底颜色
-    color("#FFFFFF") // 使用地板颜色作为兜底颜色
-    
-gaocen_color -->
-    color("FF09E0")
 

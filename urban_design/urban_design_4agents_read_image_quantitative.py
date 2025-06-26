@@ -30,7 +30,7 @@ from metagpt.schema import Message
 from metagpt.team import Team
 from metagpt.tools.tool_recommend import BM25ToolRecommender
 
-from api_payload import i2i_controlnet_payload, t2i_controlnet_payload
+from api_payload import i2i_controlnet_payload, t2i_controlnet_payload, i2i_payload
 from sd_webapi import timestamp, encode_file_to_base64, decode_and_save_base64, call_api, call_img2img_api, call_txt2img_api
 
 import re
@@ -1246,97 +1246,102 @@ if __name__ == "__main__":
     # ==== 定量评估分支 ====
     print("\n\n=============== 定量评估分支 ===============\n\n")
 
-    # 读取shp文件
-    shp_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data_shp/site01_utm_final/site01_utm_final.shp"
-    rpk_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/data/shangye.rpk"
-    obj_output_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images"
+    # # 读取shp文件
+    # shp_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data_shp/site01_utm_final/site01_utm_final.shp"
+    # rpk_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/data/shangye.rpk"
+    # obj_output_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images"
 
-    print("🏙️ CityEngine SDK Python处理器")
-    print("=" * 50)
+    # print("🏙️ CityEngine SDK Python处理器")
+    # print("=" * 50)
 
-    processor = CityEngineProcessor()
+    # processor = CityEngineProcessor()
 
-    # 动态参数
-    setback_dis = random.uniform(7,20)
-    street_jiao = random.uniform(30,70)
-    street_jiao_1 = random.uniform(30,70)
-    Far = random.uniform(5,12)
-    BD_set_dis_min = random.uniform(30,70)
-    BD_set_dis_max = random.uniform(BD_set_dis_min,100)
-    BD_kuandu = random.uniform(30,100)
-    BD_kaikou = random.uniform(0.8,1.0)
-    BD_gaocen_kaundu = random.uniform(30,100)
-    BD_gaocen_shengdu = random.uniform(30,100)
-    BD_gaocen_site = random.uniform(10,2000)
-    BD_gaocen_kaundu = random.uniform(30,100)
-    gao_per = random.uniform(0.4,0.7)
-    zhong_per = random.uniform(0,1-gao_per)
-    di_per = 1 - gao_per - zhong_per
-    BD_dicen_chang = random.uniform(80,300)
-    BD_dicen_kuan = random.uniform(80,300)
+    # # 动态参数
+    # setback_dis = random.uniform(7,20)
+    # street_jiao = random.uniform(30,70)
+    # street_jiao_1 = random.uniform(30,70)
+    # Far = random.uniform(5,12)
+    # BD_set_dis_min = random.uniform(30,70)
+    # BD_set_dis_max = random.uniform(BD_set_dis_min,100)
+    # BD_kuandu = random.uniform(30,100)
+    # BD_kaikou = random.uniform(0.8,1.0)
+    # BD_gaocen_kaundu = random.uniform(30,100)
+    # BD_gaocen_shengdu = random.uniform(30,100)
+    # BD_gaocen_site = random.uniform(10,2000)
+    # BD_gaocen_kaundu = random.uniform(30,100)
+    # gao_per = random.uniform(0.4,0.7)
+    # zhong_per = random.uniform(0,1-gao_per)
+    # di_per = 1 - gao_per - zhong_per
+    # BD_dicen_chang = random.uniform(80,300)
+    # BD_dicen_kuan = random.uniform(80,300)
 
-    # 使用简化的属性（只保留必要的）todo
-    attributes = {
-        'height': 30.0,  # 对应CGA中的 attr height = 30
-        'Mode': 'Visualization',
+    # # 使用简化的属性（只保留必要的）todo
+    # attributes = {
+    #     'height': 30.0,  # 对应CGA中的 attr height = 30
+    #     'Mode': 'Visualization',
 
-        'setback_dis': setback_dis,
-        'street_jiao': street_jiao,
-        'street_jiao_1': street_jiao_1,
-        'Far': Far,
-        'BD_set_dis_min': BD_set_dis_min,
-        'BD_set_dis_max': BD_set_dis_max,
-        'BD_kuandu': BD_kuandu,
-        'BD_kaikou': BD_kaikou,
-        'BD_gaocen_kaundu': BD_gaocen_kaundu,
-        'BD_gaocen_shengdu': BD_gaocen_shengdu,
-        'BD_gaocen_site': BD_gaocen_site,
-        'BD_gaocen_kaundu': BD_gaocen_kaundu,
-        'gao_per': gao_per,
-        'zhong_per': zhong_per,
-        'di_per': di_per,
-        'BD_dicen_chang': BD_dicen_chang,
-        'BD_dicen_kuan': BD_dicen_kuan,
-    }
+    #     'setback_dis': setback_dis,
+    #     'street_jiao': street_jiao,
+    #     'street_jiao_1': street_jiao_1,
+    #     'Far': Far,
+    #     'BD_set_dis_min': BD_set_dis_min,
+    #     'BD_set_dis_max': BD_set_dis_max,
+    #     'BD_kuandu': BD_kuandu,
+    #     'BD_kaikou': BD_kaikou,
+    #     'BD_gaocen_kaundu': BD_gaocen_kaundu,
+    #     'BD_gaocen_shengdu': BD_gaocen_shengdu,
+    #     'BD_gaocen_site': BD_gaocen_site,
+    #     'BD_gaocen_kaundu': BD_gaocen_kaundu,
+    #     'gao_per': gao_per,
+    #     'zhong_per': zhong_per,
+    #     'di_per': di_per,
+    #     'BD_dicen_chang': BD_dicen_chang,
+    #     'BD_dicen_kuan': BD_dicen_kuan,
+    # }
 
-    ## 生成3D模型
-    processor.process_files(shp_path, rpk_path, obj_output_path, attributes)
+    # ## 生成3D模型
+    # processor.process_files(shp_path, rpk_path, obj_output_path, attributes)
 
-    ## 渲染布局图片
-    gen_obj_path = f"{obj_output_path}/generated_0.obj"
-    obj_paths = [gen_obj_path]
+    # ## 渲染布局图片
+    # gen_obj_path = f"{obj_output_path}/generated_0.obj"
+    # obj_paths = [gen_obj_path]
 
-    layout_output_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"
+    # layout_output_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"
 
-    render_with_blender(obj_paths, layout_output_path) 
+    # render_with_blender(obj_paths, layout_output_path) 
     
     ## 生成初始图片
 
     # 读取布局图片并缩放
-    layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"
+    # layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"
+    layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/topview4.png"
+    ip_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/ip2.png"
     
     # 使用新的图片处理函数，缩放图片以避免WebUI内存溢出
     print("🖼️ 处理layout图片用于WebUI...")
-    layout_image_base64 = process_image_for_webui(layout_image_path, resize=True, max_size=512)
+    # layout_image_base64 = process_image_for_webui(layout_image_path, resize=True, max_size=512)
+    layout_image_base64 = encode_image(layout_image_path)
+    ip_image_base64 = encode_image(ip_image_path)
 
     webui_server_url = 'http://127.0.0.1:7860'
 
     gen_initial_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/"
     os.makedirs(gen_initial_image_path, exist_ok=True)
     
-    prompt = "A beautiful urban design image, city with building, street, road, tree"
-    negative_prompt = ""
+    prompt = "block,block scale,outdoor,urban planning,master plan design,architectural site plan,residential area,mixed-use development,square,abundant space,diverse open spaces,children's playground,greening,public parks,trees,bird's-eye view,abundant landscape,square,children's facilities,paving,water features,high detail,vibrant urban environment,3D visualization,top-down view,"
+    negative_prompt = "ng_deepnegative_v1_75t,(badhandv4:1.2),EasyNegative,(worst quality:2),fence,enclosure,wall,interior design"
     random_seed = random.randint(1,1000000)
 
     # 对于1920x1080的图片，等比例缩放到512x288 (512 * 1080/1920)
     # 但为了更好的效果，我们使用512x512的正方形
-    target_width = 512
-    target_height = 512
+    img = cv2.imread(layout_image_path)
+    target_width = img.shape[1]//2#1600#480#2404
+    target_height = img.shape[0]//2#870#270#1886
     
     print(f"🎨 设置生成图片尺寸: {target_width}x{target_height}")
     
     # 使用更小的图片尺寸，避免VAE内存溢出
-    payload_t2i = t2i_controlnet_payload(height=target_height, width=target_width, prompt=prompt, negative_prompt=negative_prompt, seg_img=layout_image_base64, random_seed=random_seed)
+    payload_t2i = t2i_controlnet_payload(height=target_height, width=target_width,prompt=prompt, negative_prompt=negative_prompt, seg_img=layout_image_base64, ip_img=ip_image_base64, random_seed=random_seed)
     
     # 添加重试机制
     max_retries = 3
@@ -1356,7 +1361,7 @@ if __name__ == "__main__":
                 raise e
 
     for index, image in enumerate(response.get('images')):
-        save_path = os.path.join(gen_initial_image_path, f't2i_img-{timestamp()}-{index}.png')
+        save_path = os.path.join(gen_initial_image_path, f'i2i_img-{timestamp()}-{index}.png')
         decode_and_save_base64(image, save_path)
 
     raise

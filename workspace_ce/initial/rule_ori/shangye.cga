@@ -76,11 +76,6 @@ attr chang = -1
 taggedArea(name) = 
     sum(comp(f) { isTagged(name): geometry.area })
     
-
-// 动态调参
-attr jiejiao_color = "#000000"
-    
-    
 @StartRule
 lot-->  
   set(ZYDMJ,geometry.area)
@@ -98,13 +93,13 @@ split(x) {street_jiao : jeijiao  | ~10 : footface1 }
 
 footface1-->
 alignScopeToAxes()
-splitAndSetbackPerimeter(0, 0, [true,false,false,false]) { ~50 : 0 : default_color | 50 : street_jiao_1: jeijiao} { remainder : vvv }
+splitAndSetbackPerimeter(0, 0, [true,false,false,false]) { ~50 : 0 : NIL | 50 : street_jiao_1: jeijiao} { remainder : vvv }
 
 vvv-->
-splitAndSetbackPerimeter(0,3,[false,false,false,true,false]) { ~50: 0 : default_color | 50 : street_jiao_1: jeijiao } { remainder : aaa }
+splitAndSetbackPerimeter(0,3,[false,false,false,true,false]) { ~50: 0 : NIL | 50 : street_jiao_1: jeijiao } { remainder : aaa }
 
 aaa-->
-   splitAndSetbackPerimeter(0,8,[false,false,false,false,false,false,false,true]) {50 : street_jiao_1: jeijiao | ~50: 0 : default_color  } { remainder :ccs }
+   splitAndSetbackPerimeter(0,8,[false,false,false,false,false,false,false,true]) {50 : street_jiao_1: jeijiao | ~50: 0 : NIL  } { remainder :ccs }
    
 ccs-->
  setbackPerEdge(rand(BD_set_dis_min,BD_set_dis_max)){ all       =BD   |remainder : green }
@@ -112,7 +107,7 @@ ccs-->
 BD-->
 inline(append){ [ tag("LayoutBD") LayouBD ]}
 
-//splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou : 0 :default_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :default_color} { remainder : default_color}
+//splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou : 0 :NIL |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :NIL} { remainder : NIL}
 //设定围合街区向外开口的区域
 BDCC
 
@@ -122,7 +117,7 @@ ChooseLayout_BD_1
 
 LayouBD_1-->
 
-splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou :0 :default_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :default_color} { remainder : default_color}
+splitAndSetbackPerimeter(0) {'BD_kaikou:BD_kuandu : BD_1 | 'BD_kaikou :0 :setback_color |'BD_kaikou:BD_kuandu: BD_1 |'BD_kaikou : 0 :setback_color} { remainder : setback_color}
 //设定围合街区向外开口的区域
 
 BD_1-->
@@ -182,7 +177,6 @@ gao_BD_face-->
 gaocen_color
 
 gao_BD_face_ex-->////高层的底面积
-color("FF09E0")  // 添加颜色
 extrude(gao_per*Far*ZYDMJ/GCYDMJ*3)
 rectify(10)
 cleanupGeometry(all, 1)
@@ -233,7 +227,7 @@ di_di_ppp
 Layoutdi_di_P -->//这里确定低层区域
 alignScopeToAxes()
 footprint()
-splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : BD_dicen_face  } { remainder : default_color }
+splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : BD_dicen_face  } { remainder : NIL }
 
 di_di_ppp-->
 set(DCYDMJ,geometry.area )
@@ -244,14 +238,12 @@ comp(f) { all : di_BD_face }
 
 di_BD_face-->
 case scope.sx >= 10 && scope.sy >= 10 :
-color("#464646")
 di_BD_face_ex//低层占地面积
 else:
-default_color
+NIL
 
 di_BD_face_ex-->
 //底层的底面积
-color("#464646") 
 extrude((1-gao_per-zhong_per)*Far*ZYDMJ/DCYDMJ*3)
 lala
 lala-->
@@ -273,7 +265,7 @@ zhong_end
 Layoutdi_zhong_P-->
 alignScopeToAxes()
 footprint()
-splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : default_color  } { remainder : BD_face_zhong }//这里确定了中层区域
+splitAndSetbackPerimeter(0) { BD_dicen_chang: BD_dicen_kuan : NIL  } { remainder : BD_face_zhong }//这里确定了中层区域
 
 zhong_end-->
 set(ZCYDMJ, geometry.area )
@@ -284,13 +276,11 @@ comp(f) { all : zhong_BD_face }
 
 zhong_BD_face-->
 case scope.sx >= 10 && scope.sy >= 10 :
-color("#464646") 
 zhong_BD_face_ex//低层占地面积
 else:
-default_color
+NIL
 
 zhong_BD_face_ex-->
-color("#464646") 
 extrude(zhong_per*Far*ZYDMJ/ZCYDMJ*3)
 mama
 
@@ -311,30 +301,27 @@ rotateScope(rand(30,60), rand(30,60), 0)
  split(x,adjust) {60: green_text_o |  rand(10,30) : road_text_m |~20 : green_text_o}
  
  road_text_m-->
- color("#FF1F00")  // 道路（十六进制）
-// setupProjection(0, scope.xz, 15, 10)
-//   texture("images/ssa.png")
-//texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
-//   projectUV(0)
+ setupProjection(0, scope.xz, 15, 10)
+ color("#8C8C8C")
+# texture("images/ssa.png")
+# //texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
+#    projectUV(0)
  
  green_text_o-->
- color("#04C803") // #04C803 树 #04FA07 草 #CCFF04 植物
- //color(0,1,0,0.5)
- 
+#  color(0,1,0,0.5)
+ color("#04C803")
 jeijiao-->
-color(jiejiao_color)  // 黑色（十六进制）
-//   setupProjection(0, scope.xz, 10, 40)
-//   texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
-///   projectUV(0)
+color("#000000")
+#    setupProjection(0, scope.xz, 10, 40)
+# texture("images/deb9aa323f787c6eb97c2939a8777c3a84e024869e0ba-3vLiTQ.jpg")
+#    projectUV(0)
    
  street_road-->
-   //color(0.5,0.5,0.5)
-   color("#8C8C8C") #小路
+#    color(0.5,0.5,0.5)
+color("#8C8C8C")
 
-default_color -->
-//    color("#464646") // 使用地板颜色作为兜底颜色
-    color("#FFFFFF") // 使用地板颜色作为兜底颜色
-    
 gaocen_color -->
-    color("FF09E0")
+color("#B47878")
 
+setback_color -->
+color("#EBFF07")

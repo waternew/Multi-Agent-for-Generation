@@ -22,7 +22,7 @@ attr retract_dis = rand(0.8,0.9)
 @Group("缩进") @Order(4) @Range(0.7,1)
 attr retract_dis_2= rand(0.8,0.9)
 @Group("墙体与窗户")@Order(4)  
-//attr wall_texture = "images/wall_concrete_1.jpg"
+attr wall_texture = "images/wall_concrete_1.jpg"
 getHeight = cengao_one + (censhu*cengao_other-1)
 
 
@@ -39,7 +39,7 @@ floor_other_box-->
    center(xyz)
    s('0.95,'1,'0.95)
    center(xyz)
-   comp(f) { side : split(x) {1:zhuzi | 8 :default_color }* }
+   comp(f) { side : split(x) {1:zhuzi | 8 :NIL }* }
       else:
    floor_other_box
    
@@ -79,19 +79,14 @@ floor_other_box(idx,n)-->
  
 
  window-->
- color("#E6E6E6")
- //color(0.7,0.75,1)
-//	set(material.ambient.r,0) set(material.ambient.g,0) set(material.ambient.b,1)
-//	set(material.specular.r,0.8) set(material.specular.g,0.8) set(material.specular.b,0.8)
-//	set(material.reflectivity,0.8) set(material.shininess,50) set(material.opacity,0.6)
+
+ color(0.7,0.75,1)
+	set(material.ambient.r,0) set(material.ambient.g,0) set(material.ambient.b,1)
+	set(material.specular.r,0.8) set(material.specular.g,0.8) set(material.specular.b,0.8)
+	set(material.reflectivity,0.8) set(material.shininess,50) set(material.opacity,0.6)
 	
 wall-->
-color("#787878")
-//  projectUV(0)
-//  texture("images/wall_concrete_1.jpg")
 
-default_color -->
-    color("#464646") // 使用地板颜色作为兜底颜色
-    
-gaocen_color -->
-    color("FF09E0")
+  	
+  projectUV(0)
+  texture("images/wall_concrete_1.jpg")

@@ -1,4 +1,4 @@
-def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, random_seed):
+def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, ip_img, random_seed):
     # if height > max_size or width > max_size:
     #     if height > width:
     #         width = int(width * (max_size / height))
@@ -8,46 +8,60 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
     #         width = max_size
 
     payload = {
+        # 换模型
+        "override_settings": {
+            # 'sd_model_checkpoint': "LandscapeBING_v1.0.safetensors [0bbe3f1aa3]"
+            # 'sd_model_checkpoint': "老王SDXL生图模型_XL入门"
+            'sd_model_checkpoint': "AD_老王SD1.5_ARCH_入门版"
+        },            
+        "override_settings_restore_afterwards": False,
+
         "alwayson_scripts": {
             "ControlNet": {
                 "args": [
-                    # { 
-                    #     # 线图
-                    #     "advanced_weighting": None,
-                    #     "batch_images": "",
-                    #     "control_mode": "ControlNet is more important",
-                    #     "enabled": True,
-                    #     "guidance_end": 0.68,
-                    #     "guidance_start": 0,
-                    #     "hr_option": "Both",
-                    #     "image": {
-                    #         "image": line_img,
-                    #         # "mask": "base64image placeholder"
-                    #     },
-                    #     "inpaint_crop_input_image": True,
-                    #     "input_mode": "simple",
-                    #     "ipadapter_input": None,
-                    #     "is_ui": True,
-                    #     "loopback": False,
-                    #     "low_vram": False,
-                    #     "model": "control_v11p_sd15_lineart_fp16 [5c23b17d]",
-                    #     "module": "lineart_standard (from white bg & black line)",
-                    #     "output_dir": "",
-                    #     "pixel_perfect": False,
-                    #     "processor_res": 512,
-                    #     "resize_mode": "Crop and Resize",
-                    #     "save_detected_map": True,
-                    #     "threshold_a": 0.5,
-                    #     "threshold_b": 0.5,
-                    #     "weight": 0.65
-                    # }
+                    { 
+                        # 线图
+                        "advanced_weighting": None,
+                        "batch_images": "",
+                        "control_mode": "ControlNet is more important",
+                        "enabled": True,
+                        "guidance_end": 0.98,
+                        "guidance_start": 0,
+                        "hr_option": "Both",
+                        "image": {
+                            "image": ip_img,
+                            # "mask": "base64image placeholder"
+                        },
+                        "inpaint_crop_input_image": True,
+                        "input_mode": "simple",
+                        "ipadapter_input": None,
+                        "is_ui": True,
+                        "loopback": False,
+                        "low_vram": False,
+                        # "model": "sdxl-controlnet-lineart-promeai-fp16",
+                        "model": "ip-adapter_sd15",
+                        # "model": "ip-adapter_sdxl_vit-h",
+                        # "model": "control_v11p_sd15_lineart_fp16 [5c23b17d]",
+                        "module": "ip-adapter_clip_sd15",
+                        # "module": "ip-adapter_clip_g",
+                        # "module": "ip-adapter_clip_sdxl_plus_vith",
+                        # "module": "lineart_standard (from white bg & black line)",
+                        "output_dir": "",
+                        "pixel_perfect": False,
+                        "processor_res": 512,
+                        "resize_mode": "Crop and Resize",
+                        "save_detected_map": True,
+                        "threshold_a": 0.5,
+                        "threshold_b": 0.5,
+                        "weight": 0.85
+                    },
                     {
                         # 分割图
                         "advanced_weighting": None,
                         "batch_images": "",
                         "control_mode": "ControlNet is more important",
                         "enabled": True,
-                        "guidance_end": 0.73,
+                        "guidance_end": 0.98,
                         "guidance_start": 0,
                         "hr_option": "Both",
                         "image": {
@@ -60,8 +74,10 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
                         "is_ui": True,
                         "loopback": False,
                         "low_vram": False,
+                        # "model": "sdxl_segmentation_ade20k_controlnet",
                         "model": "control_v11p_sd15_seg_fp16 [ab613144]",
-                        "module": "seg_ofcoco",
+                        # "module": "seg_ofcoco",
+                        "module": "none",
                         "output_dir": "",
                         "pixel_perfect": False,
                         "processor_res": 512,
@@ -69,7 +85,7 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
                         "save_detected_map": True,
                         "threshold_a": 0.5,
                         "threshold_b": 0.5,
-                        "weight": 0.85
+                        "weight": 0.95
                     }
                 ]
             },
@@ -125,13 +141,6 @@ def t2i_controlnet_payload(height, width, prompt, negative_prompt, seg_img, rand
         "subseed_strength": 0,              
         "tiling": False,
 
-
-        # 换模型
-        "override_settings": {
-            # 'sd_model_checkpoint': "LandscapeBING_v1.0.safetensors [0bbe3f1aa3]"
-            'sd_model_checkpoint': "control_v11p_sd15_seg_fp16 [ab613144]"
-        },            
-        "override_settings_restore_afterwards": False,
 
         "width": width,                     # 生成图像宽度
         "height": height,                   # 生成图像高度
@@ -215,6 +224,84 @@ def i2i_controlnet_payload(prompt, negative_prompt, init_img, seg_img, random_se
         "do_not_save_samples": False,
         "hr_resize_x": max_size,
         "hr_resize_y": max_size,
+        "hr_scheduler": "Automatic",
+        "hr_second_pass_steps": 20,
+        "hr_upscaler": "Latent",
+
+        # 4.其他参数
+        "include_init_images": False,
+        "send_images": True,
+        "save_images": False,
+    }
+    return payload
+
+
+def i2i_payload(prompt, negative_prompt, seg_img, random_seed, max_size=256):
+    payload = {
+        # 1.基础参数
+        "init_images": [seg_img],  # 这里是你要输入的init image
+        "negative_prompt": negative_prompt,
+        "prompt": prompt,
+        "hr_negative_prompt": negative_prompt,
+        "hr_prompt": prompt,
+
+        # 模型设置
+        "override_settings": {
+            # 'sd_model_checkpoint': "anything-v5"  # 确保使用 SD1.5 模型
+            # 'sd_model_checkpoint': "AD_老王SD1.5_ARCH_入门版"
+            'sd_model_checkpoint': "老王SDXL生图模型_XL入门"
+        },
+        "override_settings_restore_afterwards": True,
+
+        # 2.controlnet参数
+        # "alwayson_scripts": {        
+        #     "ControlNet": {
+        #         "args": [
+        #             { 
+        #                 # ControlNet配置
+        #                 "advanced_weighting": None,
+        #                 "batch_images": "",
+        #                 "control_mode": "Balanced",
+        #                 "enabled": True,
+        #                 "guidance_end": 0.68,
+        #                 "guidance_start": 0,
+        #                 "hr_option": "Both",
+        #                 "image": {
+        #                     "image": seg_img,
+        #                 },
+        #                 "inpaint_crop_input_image": True,
+        #                 "input_mode": "simple",
+        #                 "ipadapter_input": None,
+        #                 "is_ui": True,
+        #                 "loopback": False,
+        #                 "low_vram": False,
+        #                 # "model": "control_v11p_sd15_seg_fp16 [ab613144]",  # SD1.5 的 ControlNet 模型
+        #                 # "model": "ip-adapter_sd15",
+        #                 # "model": "ip-adapter_sdxl_vit-h",
+        #                 # "model": "diffusion_pytorch_model",
+        #                 "model": "sdxl_segmentation_ade20k_controlnet",
+        #                 "module": "none",  # 使用分割模块seg_ofcoco
+        #                 "output_dir": "",
+
+        #                 "pixel_perfect": False,
+        #                 "processor_res": 512,
+        #                 "resize_mode": "Crop and Resize",
+        #                 "save_detected_map": True,
+        #                 "threshold_a": 0.5,
+        #                 "threshold_b": 0.5,
+        #                 "weight": 0.6
+        #             }
+        #         ]
+        #     },
+        # },
+
+        # 3.生成参数
+        "denoising_strength": 0.5,
+        "disable_extra_networks": False,
+        "do_not_save_grid": False,
+        "do_not_save_samples": False,
+        "hr_resize_x": 0,
+        "hr_resize_y": 0,
         "hr_scheduler": "Automatic",
         "hr_second_pass_steps": 20,
         "hr_upscaler": "Latent",
