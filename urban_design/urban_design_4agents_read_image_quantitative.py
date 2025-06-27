@@ -71,7 +71,7 @@ def encode_image(image_path: Path | str) -> str:
         return b64code
 
 
-def process_image_for_webui(image_path: str, resize: bool = True, max_size: int = 512) -> str:
+def encode_image_resize(image_path: str, resize: bool = True, new_width: int = 512, new_height: int = 512) -> str:
     """
     处理图片用于WebUI，可以选择是否缩放
     
@@ -94,20 +94,8 @@ def process_image_for_webui(image_path: str, resize: bool = True, max_size: int 
             if resize:
                 # 计算等比例缩放
                 width, height = img.size
-                print(f"📐 原始宽高比: {width}:{height} = {width/height:.3f}")
-                
-                # 等比例缩放：保持宽高比，最长边不超过max_size
-                if width > height:
-                    # 横向图片，以宽度为基准
-                    new_width = max_size
-                    new_height = int(height * max_size / width)
-                else:
-                    # 纵向图片，以高度为基准
-                    new_height = max_size
-                    new_width = int(width * max_size / height)
-                
+                print(f"📐 原始尺寸: {width}x{height}")                      
                 print(f"📏 缩放后尺寸: {new_width}x{new_height}")
-                print(f"📐 缩放后宽高比: {new_width}:{new_height} = {new_width/new_height:.3f}")
                 
                 # 缩放图片，使用高质量的重采样方法
                 img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
@@ -1242,9 +1230,10 @@ if __name__ == "__main__":
     # 等待服务器启动
     time.sleep(1)
 
+    # ==== 1.启动阶段 ====
+    print("\n\n=============== 1.启动阶段 ===============\n\n")
 
-    # ==== 定量评估分支 ====
-    print("\n\n=============== 定量评估分支 ===============\n\n")
+    ## 1.1 生成layout图
 
     # # 读取shp文件
     # shp_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/data_shp/site01_utm_final/site01_utm_final.shp"
@@ -1310,65 +1299,79 @@ if __name__ == "__main__":
 
     # render_with_blender(obj_paths, layout_output_path) 
     
-    ## 生成初始图片
 
-    # 读取布局图片并缩放
-    # layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"
-    layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/topview4.png"
-    ip_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/ip2.png"
-    
-    # 使用新的图片处理函数，缩放图片以避免WebUI内存溢出
-    print("🖼️ 处理layout图片用于WebUI...")
-    # layout_image_base64 = process_image_for_webui(layout_image_path, resize=True, max_size=512)
-    layout_image_base64 = encode_image(layout_image_path)
-    ip_image_base64 = encode_image(ip_image_path)
+    # ## 1.2 生成初始图片
 
-    webui_server_url = 'http://127.0.0.1:7860'
+    # # 读取layout图
+    # # layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/layout_render_0.png"
+    # layout_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/topview4.png"
+    # ip_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/ip2.png"
+    
+    # print("🖼️ 处理layout图片用于WebUI...")
+    # # layout_image_base64 = process_image_for_webui(layout_image_path, resize=True, max_size=512)
+    # layout_image_base64 = encode_image(layout_image_path)
+    # ip_image_base64 = encode_image(ip_image_path)
 
-    gen_initial_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/"
-    os.makedirs(gen_initial_image_path, exist_ok=True)
-    
-    prompt = "block,block scale,outdoor,urban planning,master plan design,architectural site plan,residential area,mixed-use development,square,abundant space,diverse open spaces,children's playground,greening,public parks,trees,bird's-eye view,abundant landscape,square,children's facilities,paving,water features,high detail,vibrant urban environment,3D visualization,top-down view,"
-    negative_prompt = "ng_deepnegative_v1_75t,(badhandv4:1.2),EasyNegative,(worst quality:2),fence,enclosure,wall,interior design"
-    random_seed = random.randint(1,1000000)
+    # webui_server_url = 'http://127.0.0.1:7860'
 
-    # 对于1920x1080的图片，等比例缩放到512x288 (512 * 1080/1920)
-    # 但为了更好的效果，我们使用512x512的正方形
-    img = cv2.imread(layout_image_path)
-    target_width = img.shape[1]//2#1600#480#2404
-    target_height = img.shape[0]//2#870#270#1886
+    # gen_initial_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/"
+    # os.makedirs(gen_initial_image_path, exist_ok=True)
     
-    print(f"🎨 设置生成图片尺寸: {target_width}x{target_height}")
-    
-    # 使用更小的图片尺寸，避免VAE内存溢出
-    payload_t2i = t2i_controlnet_payload(height=target_height, width=target_width,prompt=prompt, negative_prompt=negative_prompt, seg_img=layout_image_base64, ip_img=ip_image_base64, random_seed=random_seed)
-    
-    # 添加重试机制
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            print(f"🔄 尝试调用WebUI API (第{attempt + 1}次)")
-            response = call_txt2img_api(webui_server_url, **payload_t2i)
-            print("✅ WebUI API调用成功")
-            break
-        except Exception as e:
-            print(f"❌ WebUI API调用失败 (第{attempt + 1}次): {e}")
-            if attempt < max_retries - 1:
-                print("⏳ 等待5秒后重试...")
-                time.sleep(5)
-            else:
-                print("❌ 所有重试都失败了，跳过图片生成")
-                raise e
+    # prompt = "block,block scale,outdoor,urban planning,master plan design,architectural site plan,residential area,mixed-use development,square,abundant space,diverse open spaces,children's playground,greening,public parks,trees,bird's-eye view,abundant landscape,square,children's facilities,paving,water features,high detail,vibrant urban environment,3D visualization,top-down view,"
+    # negative_prompt = "ng_deepnegative_v1_75t,(badhandv4:1.2),EasyNegative,(worst quality:2),fence,enclosure,wall,interior design"
+    # random_seed = random.randint(1,1000000)
 
-    for index, image in enumerate(response.get('images')):
-        save_path = os.path.join(gen_initial_image_path, f'i2i_img-{timestamp()}-{index}.png')
-        decode_and_save_base64(image, save_path)
+    # # 使用新的图片处理函数，缩放图片以避免WebUI内存溢出
+    # img = cv2.imread(layout_image_path)
+    # target_width = img.shape[1]//2#1600#480#2404
+    # target_height = img.shape[0]//2#870#270#1886
+    # print(f"🎨 设置生成图片尺寸: {target_width}x{target_height}")
+
+    # # 调用WebUI API生成初始图片
+    # payload_t2i = t2i_controlnet_payload(height=target_height, width=target_width,prompt=prompt, negative_prompt=negative_prompt, seg_img=layout_image_base64, ip_img=ip_image_base64, random_seed=random_seed)
+
+    # # 添加重试机制
+    # max_retries = 3
+    # for attempt in range(max_retries):
+    #     try:
+    #         print(f"🔄 尝试调用WebUI API (第{attempt + 1}次)")
+    #         response = call_txt2img_api(webui_server_url, **payload_t2i)
+    #         print("✅ WebUI API调用成功")
+    #         break
+    #     except Exception as e:
+    #         print(f"❌ WebUI API调用失败 (第{attempt + 1}次): {e}")
+    #         if attempt < max_retries - 1:
+    #             print("⏳ 等待5秒后重试...")
+    #             time.sleep(5)
+    #         else:
+    #             print("❌ 所有重试都失败了，跳过图片生成")
+    #             raise e
+
+    # for index, image in enumerate(response.get('images')):
+    #     save_path = os.path.join(gen_initial_image_path, f'i2i_img-{timestamp()}-{index}.png')
+    #     decode_and_save_base64(image, save_path)
+    
+
+
+    # ==== 2.定量评估分支 ====
+    print("\n\n=============== 2.定量评估分支 ===============\n\n")
+
+    startup_image_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/startup/00013-2565856190.png"
+    startup_layout_path = "E:/HKUST/202505_Agent_Urban_Design/MetaGPT/workspace_ce/initial/images/control_img/topview6.png"
+
+    startup_img = cv2.imread(startup_image_path)
+    weight, height = startup_img.shape[:2]
+    new_width, new_height = weight//4, height//4
+    
+    startup_img_base64 = encode_image_resize(startup_image_path, new_width=new_width, new_height=new_height)
+    startup_layout_base64 = encode_image_resize(startup_layout_path, new_width=new_width, new_height=new_height)
 
     raise
 
 
-    # ==== 定性评估分支 ====
-    print("\n\n=============== 定性评估分支 ===============\n\n")
+
+    # ==== 3.定性评估分支 ====
+    print("\n\n=============== 3.定性评估分支 ===============\n\n")
 
     description = "This is an urban design image. Hire 3 evaluation agents (UsabilityAgent, VitalityAgent, SafetyAgent) to give specific evaluation of the image, and 1 summary agent (SummaryAgent) to give a summary of the evaluation results based on the evaluation results of the 3 agents and find the conflicts and unify their suggestions and give a final suggestion for improvement."
 
